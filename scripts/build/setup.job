@@ -6,10 +6,12 @@
 */
 
 
-def folderName  = 'BestBets-Svc'    // Folder where the jbos will be placed.
+def folderName  = 'BestBets-Svc'    // Jenkins folder where the jbos will be placed.
+
+def sourcePath = 'src/NCI.OCPL.Services.BestBets'       // Source code path relative to the working directory
+def testPath = 'test/NCI.OCPL.Services.BestBets.Tests'  // Unit test code path relative to the working directory  
+
 def GH_REPO_NAME = 'bestbets-svc'    // The project's repository name (as used in the URL).
-
-
 def GH_ORGANIZATION_NAME = 'NCIOCPL'   // GitHub Organization name (as used in the URL/userid).
 def GH_USER_KEY = 'NCIOCPL-GitHub'    // Jenkins ID of the credential string containing the GitHub userid which creates releases.
 def GH_USER_TOKEN_KEY = 'NCIOCPL-GitHub-Token'    // Jenkins ID of the credential string containing the GitHub access token for creating releases.
@@ -36,7 +38,7 @@ job("${folderName}/${devBuild}") {
         github(sourceRepository)
     }
     steps {
-        shell("./build/${devBuild}.sh")
+        shell("./build/${devBuild}.sh ${sourcePath} ${testPath}")
     }
 }
 
@@ -60,7 +62,7 @@ job("${folderName}/${releaseBuild}") {
         github(sourceRepository)
     }
     steps {
-        shell("./build/${releaseBuild}.sh" + ' $RELEASE_TOKEN')
+        shell("./build/${releaseBuild}.sh ${sourcePath} ${testPath}" + ' $RELEASE_TOKEN')
     }
 }
 
@@ -69,7 +71,7 @@ job("${folderName}/${releaseToStage}") {
         github(sourceRepository)
     }
     steps {
-        shell("./build/${releaseToStage}.sh")
+        shell("./build/${releaseToStage}.sh ${sourcePath} ${testPath}")
     }
 }
 
@@ -78,6 +80,6 @@ job("${folderName}/${releaseToProd}") {
         github(sourceRepository)
     }
     steps {
-        shell("./build/${releaseToProd}.sh")
+        shell("./build/${releaseToProd}.sh ${sourcePath} ${testPath}")
     }
 }

@@ -1,6 +1,9 @@
+#!/bin/sh
 # This is the template for a release build.
 # Command Line Parameters:
-#   $1 - GitHub token for creating a release and uploading artifacts.
+#   $1 - Source path
+#   $2 - Unit Test path
+#   $3 - GitHub token for creating a release and uploading artifacts.
 
 # Required Enviroment Variables
 # GH_ORGANIZATION_NAME - The GitHub organization (or username) the repository belongs to. 
@@ -10,17 +13,21 @@
 
 echo Creating Release Build.
 
+SRC_PATH=$1      # $1 - Source path
+TEST_PATH=$2     # $2 - Unit Test path
+export GITHUB_TOKEN=$3  # Make GitHub security token available to release tool.
+
+
 # Create temporary location for publishing output
 TMPDIR=`mktemp -d` || exit 1
-
-# Make GitHub security token available to release tool. 
-export GITHUB_TOKEN=$1
 
 # Main project directory
 PROJECT_DIR=`pwd`
 
 # Publish to temporary location.
 dotnet restore
+dotnet build $TEST_PATH # Build unit test and dependencies.
+dotnet test $TEST_PATH
 dotnet publish -o $TMPDIR
 
 # Create archive for uploading to GitHub.  Creating it in the

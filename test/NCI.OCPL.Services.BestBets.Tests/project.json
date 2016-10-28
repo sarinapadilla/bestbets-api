@@ -2,11 +2,15 @@
     "version": "1.0.0-*",
     "testRunner": "xunit",
     "dependencies": {
-        "dotnet-test-xunit": "2.2.0-preview2-build1029",
-        "xunit": "2.2.0-beta2-build3300",
+        "dotnet-test-xunit": "2.2.0-preview2-build1029",        
+        "xunit": "2.2.0-beta3-build3402",
+        "Microsoft.Extensions.Logging": "1.0.0",
         "NCI.OCPL.Services.BestBets": {
             "target": "project"
-        }
+        },
+        "Moq": "4.6.38-alpha",
+        "NEST": "2.4.6",
+        "Elasticsearch.Net": "2.4.6"    
     },
     "frameworks": {
         "netcoreapp1.0": {
@@ -20,7 +24,7 @@
     },
     "buildOptions": {
         "copyToOutput": {
-            "include": [ "xunit.runner.json" ]
+            "include": [ "xunit.runner.json", "TestData" ]
         },
         "debugType": "portable"
     },

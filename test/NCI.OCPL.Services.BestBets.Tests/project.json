@@ -10,7 +10,8 @@
         },
         "Moq": "4.6.38-alpha",
         "NEST": "2.4.6",
-        "Elasticsearch.Net": "2.4.6"    
+        "Elasticsearch.Net": "2.4.6",
+        "System.Xml.XmlSerializer": "4.0.11"
     },
     "frameworks": {
         "netcoreapp1.0": {

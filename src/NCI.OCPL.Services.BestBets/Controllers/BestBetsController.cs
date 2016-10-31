@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -56,27 +57,56 @@ namespace NCI.OCPL.Services.BestBets.Controllers
                 isSpanish = true;
 
             // Step 4. Iterate over the matches    
-            var matches = GetBestBetMatches(
+            IEnumerable<BestBetsMatch> matches = GetBestBetMatches(
                 cleanedTerm,
                 isSpanish,
                 numTokens
             );
 
+            // Step 5. Process the matches and extract only the category IDs we will
+            // be returning to the client
+            string[] validCategories = FilterValidCategories(matches, numTokens); 
+
+            
+            //Now get categories for ID.
+
+            return term;
+        }
+
+        /// <summary>
+        /// Process a list of BestBetsMatches and returns an array of category IDs for display. 
+        /// </summary>
+        /// <param name="matches">A list of matches</param>
+        /// <param name="numTokens">The number of tokens in the search term</param>
+        /// <returns>An array of category ids</returns>
+        private string[] FilterValidCategories(IEnumerable<BestBetsMatch> matches, int numTokens) 
+        {
             //CatIDs to ignore because of a negation
             List<string> excludedIDs = new List<string>();
 
             //The IDs that we will end up sending back to the client.
             List<string> matchedIDs = new List<string>();
 
+            // Iterate through ALL the matches and extract the categories that
+            // should be displayed.  There may be multiple matches for a single
+            // category, the probability increase with the number of tokens. 
             foreach (BestBetsMatch match in matches) {
                 
-                //Exact matches need to match the exact number of tokens as well
+                //Exact matches need to match the exact number of tokens as well.
+                //Exact matches can be used for both inclusion and exclusion
                 if (match.IsExact && (match.TokenCount != numTokens))
                     continue;
 
                 
                 if (match.IsNegated)
                 {
+                    // A negated match will remove a category from the display.
+                    // For example, "Breast Cancer Treatment" would return the 
+                    // Best Bets for "Breast Cancer" and "Breast Cancer Treatment".
+                    // However, as "Breast Cancer Treatment" is more specific, a 
+                    // BB editor has created a Negated synonyn of "Treatment" for
+                    // the "Breast Cancer" category.  So we should only show
+                    // "Breast Cancer Treatment" to the user. 
                     if (!excludedIDs.Contains(match.ContentID))
                     {
                         excludedIDs.Add(match.ContentID);
@@ -86,6 +116,8 @@ namespace NCI.OCPL.Services.BestBets.Controllers
                 }
                 else
                 {
+                    // Just a normal match.  Let's make sure that we are not excluding
+                    // that category first, otherwise, add it to the list of matches.
                     if (!matchedIDs.Contains(match.ContentID) 
                         && !excludedIDs.Contains(match.ContentID))
                     {
@@ -94,10 +126,7 @@ namespace NCI.OCPL.Services.BestBets.Controllers
                 }
             }
 
-            //matchedIDs should be good.
-            //Now get categories for ID.
-
-            return term;
+            return matchedIDs.ToArray();            
         }
 
         /// <summary>

@@ -25,18 +25,12 @@ namespace NCI.OCPL.Utils.Testing
         /// <returns></returns>
         public static IElasticClient GetInMemoryElasticClient(string testFile) {
 
-            // Determine where the output folder is that should be the parent for the TestData
-            string assmPath = Path.GetDirectoryName(typeof(ElasticTools).GetTypeInfo().Assembly.Location);
-            
-            // Build a path to the test json
-            string path = Path.Combine(new string[] { assmPath, "TestData", testFile } );
+            //Get Response JSON
+            byte[] responseBody = TestingTools.GetTestFileAsBytes(testFile);
 
             //While this has a URI, it does not matter, an InMemoryConnection never requests
             //from the server.
             var pool = new SingleNodeConnectionPool(new Uri("http://localhost:9200"));
-
-            //Get Response JSON
-            byte[] responseBody = File.ReadAllBytes(path);
 
             // Setup ElasticSearch stuff using the contents of the JSON file as the client response.
             InMemoryConnection conn = new InMemoryConnection(responseBody);  

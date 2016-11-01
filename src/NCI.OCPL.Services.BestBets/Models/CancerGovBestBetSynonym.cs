@@ -1,4 +1,6 @@
 using System;
+using System.Xml;
+using System.Xml.Schema;
 using System.Xml.Serialization;
 
 
@@ -7,7 +9,7 @@ namespace NCI.OCPL.Services.BestBets
     /// <summary>
     /// Represents a BestBetSynonym as returned by CGov XML
     /// </summary>
-    public class CancerGovBestBetSynonym : IBestBetSynonym
+    public class CancerGovBestBetSynonym : IXmlSerializable, IBestBetSynonym
     {
         /// <summary>
         ///Is this Synonym an exact match? 
@@ -20,5 +22,21 @@ namespace NCI.OCPL.Services.BestBets
         /// </summary>
         [System.Xml.Serialization.XmlText]
         public string Text { get; set; }
+
+        public XmlSchema GetSchema()
+        {
+            return null;
+        }
+
+        public void ReadXml(XmlReader reader)
+        {
+
+            
+        }
+
+        public void WriteXml(XmlWriter writer)
+        {
+            writer.WriteAttributeString("IsExactMatch", IsExactMatch.ToString());
+        }
     }
 }

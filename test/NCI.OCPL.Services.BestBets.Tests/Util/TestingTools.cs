@@ -40,7 +40,7 @@ namespace NCI.OCPL.Utils.Testing
             // Load the file and deserialize
             using (FileStream xmlFile = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete))
             {
-                using (XmlReader xmlReader = XmlReader.Create(xmlFile))
+                using (XmlReader xmlReader = XmlReader.Create(filePath))
                 {
                     return (T)serializer.Deserialize(xmlReader);
                 }
@@ -61,5 +61,6 @@ namespace NCI.OCPL.Utils.Testing
 
             return path;
         }
+
     }
 }

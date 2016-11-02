@@ -9,18 +9,17 @@ namespace NCI.OCPL.Services.BestBets
     /// <summary>
     /// Represents a BestBetSynonym as returned by CGov XML
     /// </summary>
+    [System.Xml.Serialization.XmlRootAttribute("synonym", Namespace = "", IsNullable = false)]
     public class CancerGovBestBetSynonym : IXmlSerializable, IBestBetSynonym
     {
         /// <summary>
         ///Is this Synonym an exact match? 
         /// </summary>
-        [System.Xml.Serialization.XmlAttribute]
         public bool IsExactMatch { get; set; }
 
         /// <summary>
         /// Gets the text of the synonym
         /// </summary>
-        [System.Xml.Serialization.XmlText]
         public string Text { get; set; }
 
         public XmlSchema GetSchema()
@@ -30,13 +29,22 @@ namespace NCI.OCPL.Services.BestBets
 
         public void ReadXml(XmlReader reader)
         {
+            reader.ReadStartElement("synonym");
+            reader.MoveToAttribute("IsExactMatch");
 
-            
+            IsExactMatch = bool.Parse(reader.Value);
+
+            reader.MoveToContent(); //Move to Value
+
+            Text = reader.ReadContentAsString();
+
+            int i=1;
+
         }
 
         public void WriteXml(XmlWriter writer)
         {
-            writer.WriteAttributeString("IsExactMatch", IsExactMatch.ToString());
+            throw new NotSupportedException("Serialization is not supported for this type.");
         }
     }
 }

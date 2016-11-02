@@ -10,7 +10,7 @@ namespace NCI.OCPL.Services.BestBets
     /// Represents a Best Best for Display
     /// (Example URL https://www.cancer.gov/PublishedContent/BestBets/36012.xml)
     /// </summary>
-[System.Xml.Serialization.XmlRootAttribute("BestBetsCategory", Namespace = "http://www.example.org/CDESchema", IsNullable = false)]
+    [System.Xml.Serialization.XmlRootAttribute("BestBetsCategory", Namespace = "http://www.example.org/CDESchema", IsNullable = false)]
     public class CancerGovBestBet : IXmlSerializable, IBestBetCategory
     {       
         /// <summary>
@@ -131,9 +131,23 @@ namespace NCI.OCPL.Services.BestBets
                         break; 
                     }
                     case "IncludeSynonyms" : {
+                        XmlSerializer synSerializer = new XmlSerializer(typeof (CancerGovBestBetSynonym));
+
+                        List<CancerGovBestBetSynonym> synList = new List<CancerGovBestBetSynonym>();
+
+                        reader.ReadStartElement(); //Move Past List element to first synonyn
+
+                        while (reader.LocalName == "synonym") 
+                        {
+                            CancerGovBestBetSynonym syn = (CancerGovBestBetSynonym)synSerializer.Deserialize(reader);
+                            int i = 1;    
+                        }                        
+
+                        IncludeSynonyms = synList.ToArray();
                         break; 
                     } 
                     case "ExcludeSynonyms" : {
+                        
                         break; 
                     }                                        
                 }
@@ -142,7 +156,7 @@ namespace NCI.OCPL.Services.BestBets
 
         public void WriteXml(XmlWriter writer)
         {
-            
+            throw new NotSupportedException("Serialization is not supported by this type.");
         }         
     }    
 }

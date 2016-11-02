@@ -131,28 +131,52 @@ namespace NCI.OCPL.Services.BestBets
                         break; 
                     }
                     case "IncludeSynonyms" : {
-                        XmlSerializer synSerializer = new XmlSerializer(typeof (CancerGovBestBetSynonym));
+                        IncludeSynonyms = ReadSynonyms(reader);
 
-                        List<CancerGovBestBetSynonym> synList = new List<CancerGovBestBetSynonym>();
-
-                        reader.ReadStartElement(); //Move Past List element to first synonyn
-
-                        while (reader.LocalName == "synonym") 
-                        {
-                            CancerGovBestBetSynonym syn = (CancerGovBestBetSynonym)synSerializer.Deserialize(reader);
-                            int i = 1;    
-                        }                        
-
-                        IncludeSynonyms = synList.ToArray();
                         break; 
-                    } 
+                    }
                     case "ExcludeSynonyms" : {
-                        
+                        ExcludeSynonyms = ReadSynonyms(reader);
+
                         break; 
-                    }                                        
+                    }
                 }
             }
-        }         
+        }
+
+        /// <summary>
+        /// Helper to read a collection of Synonyms.  Used by both IncludeSynonyms and ExcludeSynonyms
+        /// </summary>
+        /// <param name="reader">An XmlReader that is positioned to the collections StartElement</param>
+        /// <returns>An array of CancerGovBestBetSynonym objects</returns>
+        private CancerGovBestBetSynonym[] ReadSynonyms(XmlReader reader) {
+            List<CancerGovBestBetSynonym> synList = new List<CancerGovBestBetSynonym>();
+
+            string arrayName = reader.LocalName;
+
+            XmlSerializer synSerializer = new XmlSerializer(typeof (CancerGovBestBetSynonym));
+
+            //Swallow the wrapping element that surrounds the contents.
+            //E.G. <IncludeSynonyms>
+            reader.ReadStartElement(); 
+
+            //Keep reading while we gots synonyms
+            while (reader.LocalName == "synonym") 
+            {
+                synList.Add((CancerGovBestBetSynonym)synSerializer.Deserialize(reader));
+            }
+
+            //Now we need to swallow the end element.
+            //First fast forward to the end of this grouping
+            while (! ((reader.LocalName == arrayName) && (reader.NodeType == XmlNodeType.EndElement))) {
+                reader.Read();
+            }
+
+            //Second, read the end element
+            reader.ReadEndElement();
+
+            return synList.ToArray();
+        }
 
         public void WriteXml(XmlWriter writer)
         {

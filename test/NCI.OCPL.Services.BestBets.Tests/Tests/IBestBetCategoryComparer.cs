@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Collections;
 
-namespace NCI.OCPL.Services.BestBets.Tests.Tests
+namespace NCI.OCPL.Services.BestBets.Tests
 {
 
     /// <summary>
@@ -34,11 +34,17 @@ namespace NCI.OCPL.Services.BestBets.Tests.Tests
 
         public int GetHashCode(IBestBetSynonym obj)
         {
-            throw new NotImplementedException();
+            int hash = 0;
+            hash ^= obj.IsExactMatch.GetHashCode();
+            hash ^= obj.Text.GetHashCode();
+
+            return hash;
         }
     }
 
-
+    /// <summary>
+    /// A IEqualityComparer for IBestBetCategory
+    /// </summary>
     public class IBestBetCategoryComparer : IEqualityComparer<IBestBetCategory>
     {
             public bool Equals(IBestBetCategory x, IBestBetCategory y)
@@ -59,15 +65,22 @@ namespace NCI.OCPL.Services.BestBets.Tests.Tests
                     && x.ID == y.ID
                     && x.Display == y.Display
                     && x.Weight == y.Weight
+                    //&& x.HTML == y.HTML
                     && x.IsExactMatch == y.IsExactMatch
                     && x.Language == y.Language
                     && AreSynonymListsEqual(x.ExcludeSynonyms, y.ExcludeSynonyms)
                     && AreSynonymListsEqual(x.IncludeSynonyms, y.IncludeSynonyms);
-                    //HTML
+                    
                 
                 return isEqual;                
             }
 
+            /// <summary>
+            /// Helper function to determine if two synonym lists are equal, order does not matter.
+            /// </summary>
+            /// <param name="x">Synonym list 1</param>
+            /// <param name="y">Synonym list 2</param>
+            /// <returns></returns>
             private bool AreSynonymListsEqual(IBestBetSynonym[] x, IBestBetSynonym[] y) {
                 // If the items are both null, or if one or the other is null, return 
                 // the correct response right away.
@@ -90,7 +103,18 @@ namespace NCI.OCPL.Services.BestBets.Tests.Tests
 
             public int GetHashCode(IBestBetCategory obj)
             {
-                throw new NotImplementedException();
+                int hash = 0;
+                hash ^= 
+                    obj.ID.GetHashCode()
+                    ^ obj.Name.GetHashCode()
+                    ^ obj.Display.GetHashCode()
+                    ^ obj.Language.GetHashCode()
+                    ^ obj.IsExactMatch.GetHashCode()
+                    ^ obj.HTML.GetHashCode()
+                    ^ obj.IncludeSynonyms.GetHashCode()
+                    ^ obj.ExcludeSynonyms.GetHashCode();
+
+                return hash;
             }
         
     }

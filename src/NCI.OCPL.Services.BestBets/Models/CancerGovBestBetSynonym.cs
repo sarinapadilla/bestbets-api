@@ -29,16 +29,22 @@ namespace NCI.OCPL.Services.BestBets
 
         public void ReadXml(XmlReader reader)
         {
-            reader.ReadStartElement("synonym");
+            //Read Attribute First
             reader.MoveToAttribute("IsExactMatch");
-
             IsExactMatch = bool.Parse(reader.Value);
 
+            //Then move past the start element
+            reader.ReadStartElement("synonym");
+
+            //This should not do anything as we are already in the content
             reader.MoveToContent(); //Move to Value
 
+            //Get out the inner text
             Text = reader.ReadContentAsString();
 
-            int i=1;
+            //Finish reading and move to the next element... which
+            //means we are done here.            
+            reader.ReadEndElement();
 
         }
 

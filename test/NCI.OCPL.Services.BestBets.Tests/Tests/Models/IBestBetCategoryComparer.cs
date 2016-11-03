@@ -65,7 +65,7 @@ namespace NCI.OCPL.Services.BestBets.Tests
                     && x.ID == y.ID
                     && x.Display == y.Display
                     && x.Weight == y.Weight
-                    //&& x.HTML == y.HTML
+                    && x.HTML?.Trim() == y.HTML?.Trim() //Special case where we will trim on comparison
                     && x.IsExactMatch == y.IsExactMatch
                     && x.Language == y.Language
                     && AreSynonymListsEqual(x.ExcludeSynonyms, y.ExcludeSynonyms)
@@ -110,7 +110,7 @@ namespace NCI.OCPL.Services.BestBets.Tests
                     ^ obj.Display.GetHashCode()
                     ^ obj.Language.GetHashCode()
                     ^ obj.IsExactMatch.GetHashCode()
-                    ^ obj.HTML.GetHashCode()
+                    ^ (obj.HTML?.Trim()).GetHashCode() //Explicitly trim HTML as leading and trailing WS does not matter
                     ^ obj.IncludeSynonyms.GetHashCode()
                     ^ obj.ExcludeSynonyms.GetHashCode();
 

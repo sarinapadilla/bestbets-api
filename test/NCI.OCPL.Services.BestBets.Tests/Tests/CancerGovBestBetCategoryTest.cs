@@ -16,12 +16,6 @@ namespace NCI.OCPL.Services.BestBets.Tests
 
         public class PancoastTumorCategoryTestData : BaseCategoryTestData  
         {
-
-            /// <summary>
-            /// Used for getting theory data.
-            /// </summary>
-            public static IEnumerable<object> TestData => new PancoastTumorCategoryTestData().IntTestData;
-
             public override string TestFilePath => "CGBBCategory.PancoastTumor.xml";
             protected override CancerGovBestBet CoreData => new CancerGovBestBet() 
             {
@@ -38,11 +32,6 @@ namespace NCI.OCPL.Services.BestBets.Tests
 
         public class BreastCancerCategoryTestData : BaseCategoryTestData  
         {
-            /// <summary>
-            /// Used for getting theory data.
-            /// </summary>
-            public static IEnumerable<object> TestData => new PancoastTumorCategoryTestData().IntTestData;
-
             public override string TestFilePath => "CGBBCategory.BreastCancer.xml";
             protected override CancerGovBestBet CoreData => new CancerGovBestBet() {
                 ID = "36408",
@@ -106,10 +95,7 @@ namespace NCI.OCPL.Services.BestBets.Tests
             new object[] { new BreastCancerCategoryTestData() }
         };
 
-        [
-            Theory,
-            MemberData("XmlDeserializingData")
-        ]
+        [Theory, MemberData("XmlDeserializingData")]
         public void Can_Deserialize_XML(BaseCategoryTestData data) 
         {
             //Setup the expected object.

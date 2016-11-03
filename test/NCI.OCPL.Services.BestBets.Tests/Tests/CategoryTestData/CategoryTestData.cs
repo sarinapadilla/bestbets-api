@@ -10,11 +10,6 @@ namespace NCI.OCPL.Services.BestBets.Tests.CategoryTestData
     public abstract class BaseCategoryTestData 
     {
         /// <summary>
-        /// Used for getting theory data.
-        /// </summary>
-        public IEnumerable<object> IntTestData => new object[] { TestFilePath, ExpectedData };
-
-        /// <summary>
         /// Gets the file name containing the actual test data.
         /// </summary>
         /// <returns></returns>
@@ -62,7 +57,7 @@ namespace NCI.OCPL.Services.BestBets.Tests.CategoryTestData
                 }
 
                 //Add inlcude synonyms that ARE exact match
-                foreach (string synName in ExcludeSyn) {
+                foreach (string synName in ExcludeSynExact) {
                     exSyn.Add(
                         new CancerGovBestBetSynonym(){
                             IsExactMatch = true,

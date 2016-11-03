@@ -29,9 +29,12 @@ namespace NCI.OCPL.Services.BestBets
 
         public void ReadXml(XmlReader reader)
         {
-            //Read Attribute First
+            //Read Attribute First 
             reader.MoveToAttribute("IsExactMatch");
-            IsExactMatch = bool.Parse(reader.Value);
+
+            //This will trim up the attribute if it is not null
+            string tmpExact = reader.Value?.Trim();
+            IsExactMatch = bool.Parse(tmpExact);
 
             //Then move past the start element
             reader.ReadStartElement("synonym");

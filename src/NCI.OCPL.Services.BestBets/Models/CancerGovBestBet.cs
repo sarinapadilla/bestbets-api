@@ -164,6 +164,13 @@ namespace NCI.OCPL.Services.BestBets
             while (reader.LocalName == "synonym") 
             {
                 synList.Add((CancerGovBestBetSynonym)synSerializer.Deserialize(reader));
+                
+                // It looks like there is a bunch of whitespace generated in the XML
+                // when the IsExactMatch attribute is true.  We will fastforward to the next
+                // element. (which can be an end element too e.g. </IncludeSynonyms>)  
+                if (reader.NodeType != XmlNodeType.Element) {
+                    reader.MoveToContent();
+                }
             }
 
             //Now we need to swallow the end element.

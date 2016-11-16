@@ -1,7 +1,7 @@
 
 using System.Threading.Tasks;
 
-namespace NCI.OCPL.Services.Bestbets {
+namespace NCI.OCPL.Services.BestBets {
 
     interface IBestBetsClient {
 

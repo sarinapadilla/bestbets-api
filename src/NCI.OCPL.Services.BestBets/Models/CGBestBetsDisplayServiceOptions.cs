@@ -1,6 +1,9 @@
-namespace NCI.OCPL.Services.BestBets.Services
+namespace NCI.OCPL.Services.BestBets
 {
-    public class CancerGovBestBetsClientOptions
+    /// <summary>
+    /// Defines the options for a CGBestBetsDisplayService
+    /// </summary>
+    public class CGBestBetsDisplayServiceOptions
     {
         /// <summary>
         /// This is the host, with protocol, of where to fetch info from.

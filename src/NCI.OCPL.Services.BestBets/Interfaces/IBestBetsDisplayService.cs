@@ -3,7 +3,10 @@ using System.Threading.Tasks;
 
 namespace NCI.OCPL.Services.BestBets {
 
-    interface IBestBetsClient {
+    /// <summary>
+    /// Interface defines the methods of a service to retrieve the BestBets display (e.g. the list of links)
+    /// </summary>
+    public interface IBestBetsDisplayService {
 
         /// <summary>
         /// Asynchronously gets as single Best Bet

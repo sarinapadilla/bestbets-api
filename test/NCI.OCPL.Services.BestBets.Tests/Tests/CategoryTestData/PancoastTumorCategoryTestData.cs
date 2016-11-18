@@ -2,7 +2,8 @@ namespace NCI.OCPL.Services.BestBets.Tests.CategoryTestData
 {
     public class PancoastTumorCategoryTestData : BaseCategoryTestData  
     {
-        public override string TestFilePath => "CGBBCategory.PancoastTumor.xml";
+
+        public override string TestFilePath => "CGBBCategory.PancoastTumor.xml";        
         protected override CancerGovBestBet CoreData => new CancerGovBestBet() 
         {
             ID = "36012",

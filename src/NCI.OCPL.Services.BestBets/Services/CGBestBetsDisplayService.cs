@@ -16,16 +16,16 @@ namespace NCI.OCPL.Services.BestBets.Services
     /// This client is designed to be reused, so don't create a new one for each connection
     /// to cgov.  (And don't make any code that would actually break this...)
     /// </remarks>
-    public class CancerGovBestBetsClient : IBestBetsClient
+    public class CGBestBetsDisplayService : IBestBetsDisplayService
     {
         private HttpClient _client;
-        private CancerGovBestBetsClientOptions _options;
+        private CGBestBetsDisplayServiceOptions _options;
 
         /// <summary>
         /// Creates a new instance of a CancerGovBestBetsClient
         /// </summary>
         /// <param name="client">The client to be used for connections</param>
-        public CancerGovBestBetsClient(HttpClient client, IOptions<CancerGovBestBetsClientOptions> options) {
+        public CGBestBetsDisplayService(HttpClient client, IOptions<CGBestBetsDisplayServiceOptions> options) {
             _client = client;
             _options = options.Value;
         }

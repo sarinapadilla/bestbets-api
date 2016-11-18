@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using Nest;
 using Elasticsearch.Net;
 
+using NCI.OCPL.Services.BestBets.Services;
 
 namespace NCI.OCPL.Services.BestBets
 {
@@ -33,8 +34,14 @@ namespace NCI.OCPL.Services.BestBets
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Add framework services.
-            services.AddMvc();
+            //Turn on the OptionsManager that supports IOptions
+            services.AddOptions();
+
+            //Add the mapping for the BestBets Display Service Configuration
+            services.Configure<CGBestBetsDisplayServiceOptions>(Configuration.GetSection("CGBestBetsDisplayService"));
+
+            //Add our Display Service
+            services.AddTransient<IBestBetsDisplayService, CGBestBetsDisplayService>();
 
             // This will inject an IElasticClient using our configuration into any
             // controllers that take an IElasticClient parameter into its constructor.
@@ -61,7 +68,12 @@ namespace NCI.OCPL.Services.BestBets
                 ConnectionSettings settings = new ConnectionSettings(connectionPool);                                
                 return new ElasticClient(settings);
             });
-            
+
+            //Add our Match Service
+            services.AddTransient<IBestBetsMatchService, ESBestBetsMatchService>();            
+
+            // Add framework services.
+            services.AddMvc();            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

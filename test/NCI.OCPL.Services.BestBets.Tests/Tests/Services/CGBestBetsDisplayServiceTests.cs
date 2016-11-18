@@ -13,7 +13,7 @@ using NCI.OCPL.Services.BestBets.Tests.CategoryTestData;
 
 namespace NCI.OCPL.Services.BestBets.Tests
 {
-    public class CancerGovBestBetsClientTests
+    public class CGBestBetsDisplayServiceTests
     {
         
         public static IEnumerable<object[]> XmlDeserializingData => new[] {
@@ -43,16 +43,16 @@ namespace NCI.OCPL.Services.BestBets.Tests
                 .Respond(System.Net.HttpStatusCode.OK, content);
 
             // Setup the mocked Options
-            Mock<IOptions<CancerGovBestBetsClientOptions>> bbClientOptions = new Mock<IOptions<CancerGovBestBetsClientOptions>>();
+            Mock<IOptions<CGBestBetsDisplayServiceOptions>> bbClientOptions = new Mock<IOptions<CGBestBetsDisplayServiceOptions>>();
             bbClientOptions
                 .SetupGet(opt => opt.Value)
-                .Returns(new CancerGovBestBetsClientOptions(){
+                .Returns(new CGBestBetsDisplayServiceOptions(){
                     Host = "https://www.cancer.gov",
                     BBCategoryPathFormatter = "/PublishedContent/BestBets/{0}.xml"
                 }
             );
 
-            CancerGovBestBetsClient bbClient = new CancerGovBestBetsClient(new HttpClient(mockHttp), bbClientOptions.Object);
+            CGBestBetsDisplayService bbClient = new CGBestBetsDisplayService(new HttpClient(mockHttp), bbClientOptions.Object);
 
             IBestBetDisplay actDisplay = bbClient.GetBestBetForDisplay(data.ExpectedData.ID);
 

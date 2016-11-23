@@ -118,7 +118,7 @@ namespace NCI.OCPL.Services.BestBets.Tests
 
             IBestBetDisplay[] actualItems = controller.Get("en", searchTerm);
 
-            Assert.Equal(actualItems, new IBestBetDisplay[] { data.ExpectedData });
+            Assert.Equal(actualItems, new IBestBetDisplay[] { data.ExpectedData }, new IBestBetDisplayComparer());
         }
 
     }

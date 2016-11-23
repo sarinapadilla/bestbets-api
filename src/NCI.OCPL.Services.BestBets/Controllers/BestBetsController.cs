@@ -52,7 +52,7 @@ namespace NCI.OCPL.Services.BestBets.Controllers
             // Step 1. Remove Punctuation
             string cleanedTerm = CleanTerm(term);
 
-            string[] categoryIDs = _matchService.GetMatches(cleanedTerm, language.ToLower());
+            string[] categoryIDs = _matchService.GetMatches(language.ToLower(), cleanedTerm);
             
             List<IBestBetDisplay> displayItems = new List<IBestBetDisplay>();
 

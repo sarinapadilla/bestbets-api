@@ -25,7 +25,7 @@ namespace NCI.OCPL.Services.BestBets.Tests
             new object[] { 
                 "pancoast", 
                 "en", 
-                new PancoastESMatchConnection(), 
+                new ESMatchConnection("pancoast"), 
                 new string[] { "" } 
             },
             //new object[] { 

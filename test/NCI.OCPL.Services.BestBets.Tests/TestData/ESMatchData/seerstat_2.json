@@ -1,0 +1,30 @@
+{
+  "took": 22,
+  "timed_out": false,
+  "_shards": {
+    "total": 1,
+    "successful": 1,
+    "failed": 0
+  },
+  "hits": {
+    "total": 1,
+    "max_score": 1.0211807,
+    "hits": [
+      {
+        "_index": "bestbets0806",
+        "_type": "synonyms",
+        "_id": "AVZqXu7h_Z-3ooSKAFKd",
+        "_score": 1.0211807,
+        "_source": {
+          "category": "SEER",
+          "synonym": "seer stat",
+          "language": "en",
+          "is_negated": 1,
+          "is_exact": 1,
+          "tokencount": 2,
+          "contentid": "36681"
+        }
+      }
+    ]
+  }
+}

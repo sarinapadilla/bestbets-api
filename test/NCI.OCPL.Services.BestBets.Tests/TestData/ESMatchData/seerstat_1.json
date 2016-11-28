@@ -1,0 +1,90 @@
+{
+  "took": 53,
+  "timed_out": false,
+  "_shards": {
+    "total": 1,
+    "successful": 1,
+    "failed": 0
+  },
+  "hits": {
+    "total": 5,
+    "max_score": 1.0211807,
+    "hits": [
+      {
+        "_index": "bestbets0806",
+        "_type": "synonyms",
+        "_id": "AVZqXu7h_Z-3ooSKAFKd",
+        "_score": 1.0211807,
+        "_source": {
+          "category": "SEER",
+          "synonym": "seer stat",
+          "language": "en",
+          "is_negated": 1,
+          "is_exact": 1,
+          "tokencount": 2,
+          "contentid": "36681"
+        }
+      },
+      {
+        "_index": "bestbets0806",
+        "_type": "synonyms",
+        "_id": "AVZqW7Cg_Z-3ooSKAEgO",
+        "_score": 0.40231594,
+        "_source": {
+          "category": "Fact Sheets",
+          "synonym": "SEER",
+          "language": "en",
+          "is_negated": 1,
+          "is_exact": 0,
+          "tokencount": 1,
+          "contentid": "35912"
+        }
+      },
+      {
+        "_index": "bestbets0806",
+        "_type": "synonyms",
+        "_id": "AVZqXwcE_Z-3ooSKAFL2",
+        "_score": 0.40231594,
+        "_source": {
+          "category": "Tobacco Monographs",
+          "synonym": "SEER",
+          "language": "en",
+          "is_negated": 1,
+          "is_exact": 0,
+          "tokencount": 1,
+          "contentid": "36685"
+        }
+      },
+      {
+        "_index": "bestbets0806",
+        "_type": "synonyms",
+        "_id": "AVZqXuyo_Z-3ooSKAFKW",
+        "_score": 0.38245392,
+        "_source": {
+          "category": "SEER",
+          "synonym": "SEER",
+          "language": "en",
+          "is_negated": 0,
+          "is_exact": 0,
+          "tokencount": 1,
+          "contentid": "36681"
+        }
+      },
+      {
+        "_index": "bestbets0806",
+        "_type": "synonyms",
+        "_id": "AVZqXu2L_Z-3ooSKAFKZ",
+        "_score": 0.38245392,
+        "_source": {
+          "category": "SEER",
+          "synonym": "SEER",
+          "language": "en",
+          "is_negated": 0,
+          "is_exact": 0,
+          "tokencount": 1,
+          "contentid": "36681"
+        }
+      }
+    ]
+  }
+}

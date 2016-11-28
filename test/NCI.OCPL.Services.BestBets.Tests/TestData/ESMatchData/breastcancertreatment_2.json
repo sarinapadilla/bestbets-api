@@ -1,0 +1,75 @@
+{
+  "took": 30,
+  "timed_out": false,
+  "_shards": {
+    "total": 1,
+    "successful": 1,
+    "failed": 0
+  },
+  "hits": {
+    "total": 4,
+    "max_score": 0.3457958,
+    "hits": [
+      {
+        "_index": "bestbets0806",
+        "_type": "synonyms",
+        "_id": "AVZqWY-b_Z-3ooSKAEHB",
+        "_score": 0.3457958,
+        "_source": {
+          "category": "Dietary Fat",
+          "synonym": "breast cancer",
+          "language": "en",
+          "is_negated": 1,
+          "is_exact": 0,
+          "tokencount": 2,
+          "contentid": "35520"
+        }
+      },
+      {
+        "_index": "bestbets0806",
+        "_type": "synonyms",
+        "_id": "AVZqXJe8_Z-3ooSKAEtI",
+        "_score": 0.3457958,
+        "_source": {
+          "category": "NCI-60",
+          "synonym": "breast cancer",
+          "language": "en",
+          "is_negated": 1,
+          "is_exact": 0,
+          "tokencount": 2,
+          "contentid": "36138"
+        }
+      },
+      {
+        "_index": "bestbets0806",
+        "_type": "synonyms",
+        "_id": "AVZqXh5b_Z-3ooSKAE-k",
+        "_score": 0.3457958,
+        "_source": {
+          "category": "Clinical Trials: Patient Care Costs",
+          "synonym": "breast cancer",
+          "language": "en",
+          "is_negated": 1,
+          "is_exact": 0,
+          "tokencount": 2,
+          "contentid": "36431"
+        }
+      },
+      {
+        "_index": "bestbets0806",
+        "_type": "synonyms",
+        "_id": "AVZqXeFc_Z-3ooSKAE7A",
+        "_score": 0.32221895,
+        "_source": {
+          "category": "Breast Cancer",
+          "synonym": "Breast Cancer",
+          "language": "en",
+          "is_negated": 0,
+          "is_exact": 0,
+          "tokencount": 2,
+          "contentid": "36408"
+        }
+      }
+    ]
+  }
+}

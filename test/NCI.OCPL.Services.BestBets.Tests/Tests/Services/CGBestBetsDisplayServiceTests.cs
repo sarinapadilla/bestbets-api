@@ -75,4 +75,43 @@ namespace NCI.OCPL.Services.BestBets.Tests.CGBestBetsDisplayServiceTests
         }
 
     }
+
+    public class GetAllBestBetsForIndexingTests
+    {
+
+        [Fact]
+        public void DataLoading()
+        {
+            string TestFilePath = "CGBBCategory.BestBetsList.json";
+
+            //Setup a mock handler, which is what HttpClient uses under the hood to fetch
+            //data.
+            var mockHttp = new MockHttpMessageHandler();
+
+            string filePath = TestFilePath;
+
+            ByteArrayContent content = new ByteArrayContent(TestingTools.GetTestFileAsBytes(filePath));
+            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+
+            mockHttp
+                .When("https://www.cancer.gov/PublishedContent/List?root=BestBets&fmt=json")
+                .Respond(System.Net.HttpStatusCode.OK, content);
+
+            // Setup the mocked Options
+            Mock<IOptions<CGBestBetsDisplayServiceOptions>> bbClientOptions = new Mock<IOptions<CGBestBetsDisplayServiceOptions>>();
+            bbClientOptions
+                .SetupGet(opt => opt.Value)
+                .Returns(new CGBestBetsDisplayServiceOptions(){
+                    Host = "https://www.cancer.gov",
+                    BBCategoryPathFormatter = "/PublishedContent/List?root=BestBets&fmt=json"
+                }
+            );
+
+            CGBestBetsDisplayService bbClient = new CGBestBetsDisplayService(new HttpClient(mockHttp), bbClientOptions.Object);
+
+            IEnumerable<IBestBetCategory> actualList = bbClient.GetAllBestBetsForIndexing();
+
+            Assert.NotNull(actualList);
+        }
+    }
 }

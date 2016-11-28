@@ -14,6 +14,15 @@ namespace NCI.OCPL.Services.BestBets.Tests.Tests.Services
 {
     public class ESBestBetsMatchServiceTests
     {
+        [Fact]
+        public void GetMatches_BreastCancer()
+        {
+            //Setup the mock ES client.
+
+
+        }
+
+
         
     }
 }

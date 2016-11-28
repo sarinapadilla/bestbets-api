@@ -11,9 +11,9 @@ using NCI.OCPL.Utils.Testing;
 using NCI.OCPL.Services.BestBets.Services;
 using NCI.OCPL.Services.BestBets.Tests.CategoryTestData;
 
-namespace NCI.OCPL.Services.BestBets.Tests
+namespace NCI.OCPL.Services.BestBets.Tests.CGBestBetsDisplayServiceTests
 {
-    public class CGBestBetsDisplayServiceTests
+    public class GetBestBetForDisplayTests
     {
         
         public static IEnumerable<object[]> XmlDeserializingData => new[] {

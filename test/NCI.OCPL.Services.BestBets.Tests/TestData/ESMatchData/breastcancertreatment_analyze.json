@@ -1,0 +1,25 @@
+{
+  "tokens": [
+    {
+      "token": "breast",
+      "start_offset": 0,
+      "end_offset": 6,
+      "type": "<ALPHANUM>",
+      "position": 0
+    },
+    {
+      "token": "cancer",
+      "start_offset": 7,
+      "end_offset": 13,
+      "type": "<ALPHANUM>",
+      "position": 1
+    },
+    {
+      "token": "treatment",
+      "start_offset": 14,
+      "end_offset": 23,
+      "type": "<ALPHANUM>",
+      "position": 2
+    }
+  ]
+}

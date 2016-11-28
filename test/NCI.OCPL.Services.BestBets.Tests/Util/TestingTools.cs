@@ -24,6 +24,22 @@ namespace NCI.OCPL.Utils.Testing
         }
 
         /// <summary>
+        /// Gets a test file from the TestData folder as a stream
+        /// </summary>
+        /// <param name="testFile">The name of the testfile</param>
+        /// <returns></returns>
+        public static Stream GetTestFileAsStream(string testFile) 
+        {
+            //Get the path to the file.
+            string path = GetPathToTestFile(testFile);
+
+            //Get the bytes
+            Stream contents = File.OpenRead(path);
+
+            return contents;            
+        }
+
+        /// <summary>
         /// Deserializes the contents of a test XML file into an object of type T
         /// </summary>
         /// <param name="testFile">The test XML filename</param>

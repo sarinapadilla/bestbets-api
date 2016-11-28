@@ -1,0 +1,45 @@
+{
+  "took": 26,
+  "timed_out": false,
+  "_shards": {
+    "total": 1,
+    "successful": 1,
+    "failed": 0
+  },
+  "hits": {
+    "total": 2,
+    "max_score": 0.32886997,
+    "hits": [
+      {
+        "_index": "bestbets0806",
+        "_type": "synonyms",
+        "_id": "AVZqYABO_Z-3ooSKAFU-",
+        "_score": 0.32886997,
+        "_source": {
+          "category": "Cancer Information Service (CIS)",
+          "synonym": "fact sheets",
+          "language": "en",
+          "is_negated": 1,
+          "is_exact": 0,
+          "tokencount": 2,
+          "contentid": "36832"
+        }
+      },
+      {
+        "_index": "bestbets0806",
+        "_type": "synonyms",
+        "_id": "AVZqW69j_Z-3ooSKAEgJ",
+        "_score": 0.3143859,
+        "_source": {
+          "category": "Fact Sheets",
+          "synonym": "Fact Sheets",
+          "language": "en",
+          "is_negated": 0,
+          "is_exact": 0,
+          "tokencount": 2,
+          "contentid": "35912"
+        }
+      }
+    ]
+  }
+}

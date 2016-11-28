@@ -1,0 +1,30 @@
+{
+  "took": 18,
+  "timed_out": false,
+  "_shards": {
+    "total": 1,
+    "successful": 1,
+    "failed": 0
+  },
+  "hits": {
+    "total": 1,
+    "max_score": 1.0744076,
+    "hits": [
+      {
+        "_index": "bestbets0806",
+        "_type": "synonyms",
+        "_id": "AVZqXC88_Z-3ooSKAEnL",
+        "_score": 1.0744076,
+        "_source": {
+          "category": "Pancoast Tumor",
+          "synonym": "pancoast",
+          "language": "en",
+          "is_negated": 0,
+          "is_exact": 0,
+          "tokencount": 1,
+          "contentid": "36012"
+        }
+      }
+    ]
+  }
+}

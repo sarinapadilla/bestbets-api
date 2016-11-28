@@ -1,0 +1,165 @@
+{
+  "took": 30,
+  "timed_out": false,
+  "_shards": {
+    "total": 1,
+    "successful": 1,
+    "failed": 0
+  },
+  "hits": {
+    "total": 26,
+    "max_score": 0.24076635,
+    "hits": [
+      {
+        "_index": "bestbets0806",
+        "_type": "synonyms",
+        "_id": "AVZqWabT_Z-3ooSKAEIX",
+        "_score": 0.24076635,
+        "_source": {
+          "category": "Carcinosarcoma",
+          "synonym": "breast",
+          "language": "en",
+          "is_negated": 1,
+          "is_exact": 0,
+          "tokencount": 1,
+          "contentid": "35535"
+        }
+      },
+      {
+        "_index": "bestbets0806",
+        "_type": "synonyms",
+        "_id": "AVZqWfC__Z-3ooSKAEMk",
+        "_score": 0.24076635,
+        "_source": {
+          "category": "Tumor Marker Research",
+          "synonym": "breast",
+          "language": "en",
+          "is_negated": 1,
+          "is_exact": 0,
+          "tokencount": 1,
+          "contentid": "35604"
+        }
+      },
+      {
+        "_index": "bestbets0806",
+        "_type": "synonyms",
+        "_id": "AVZqWdrl_Z-3ooSKAELZ",
+        "_score": 0.24076635,
+        "_source": {
+          "category": "Clinical Trials",
+          "synonym": "breast",
+          "language": "en",
+          "is_negated": 1,
+          "is_exact": 0,
+          "tokencount": 1,
+          "contentid": "35571"
+        }
+      },
+      {
+        "_index": "bestbets0806",
+        "_type": "synonyms",
+        "_id": "AVZqWxXx_Z-3ooSKAEYf",
+        "_score": 0.24076635,
+        "_source": {
+          "category": "Understanding Cancer Series",
+          "synonym": "breast",
+          "language": "en",
+          "is_negated": 1,
+          "is_exact": 0,
+          "tokencount": 1,
+          "contentid": "35771"
+        }
+      },
+      {
+        "_index": "bestbets0806",
+        "_type": "synonyms",
+        "_id": "AVZqWyKw_Z-3ooSKAEYz",
+        "_score": 0.24076635,
+        "_source": {
+          "category": "Adenoid Cystic Carcinoma",
+          "synonym": "breast",
+          "language": "en",
+          "is_negated": 1,
+          "is_exact": 0,
+          "tokencount": 1,
+          "contentid": "35774"
+        }
+      },
+      {
+        "_index": "bestbets0806",
+        "_type": "synonyms",
+        "_id": "AVZqWy86_Z-3ooSKAEZc",
+        "_score": 0.24076635,
+        "_source": {
+          "category": "Epidemiology",
+          "synonym": "breast",
+          "language": "en",
+          "is_negated": 1,
+          "is_exact": 0,
+          "tokencount": 1,
+          "contentid": "35785"
+        }
+      },
+      {
+        "_index": "bestbets0806",
+        "_type": "synonyms",
+        "_id": "AVZqW0-A_Z-3ooSKAEbI",
+        "_score": 0.24076635,
+        "_source": {
+          "category": "TNM System",
+          "synonym": "breast",
+          "language": "en",
+          "is_negated": 1,
+          "is_exact": 0,
+          "tokencount": 1,
+          "contentid": "35815"
+        }
+      },
+      {
+        "_index": "bestbets0806",
+        "_type": "synonyms",
+        "_id": "AVZqW8bR_Z-3ooSKAEhf",
+        "_score": 0.24076635,
+        "_source": {
+          "category": "Ordering CDs/DVDs",
+          "synonym": "breast",
+          "language": "en",
+          "is_negated": 1,
+          "is_exact": 0,
+          "tokencount": 1,
+          "contentid": "35916"
+        }
+      },
+      {
+        "_index": "bestbets0806",
+        "_type": "synonyms",
+        "_id": "AVZqW7QG_Z-3ooSKAEgc",
+        "_score": 0.24076635,
+        "_source": {
+          "category": "Fact Sheets",
+          "synonym": "breast",
+          "language": "en",
+          "is_negated": 1,
+          "is_exact": 0,
+          "tokencount": 1,
+          "contentid": "35912"
+        }
+      },
+      {
+        "_index": "bestbets0806",
+        "_type": "synonyms",
+        "_id": "AVZqXYQP_Z-3ooSKAE16",
+        "_score": 0.24076635,
+        "_source": {
+          "category": "Support",
+          "synonym": "breast",
+          "language": "en",
+          "is_negated": 1,
+          "is_exact": 0,
+          "tokencount": 1,
+          "contentid": "36297"
+        }
+      }
+    ]
+  }
+}

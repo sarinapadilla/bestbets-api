@@ -1,0 +1,32 @@
+{
+  "tokens": [
+    {
+      "token": "seer",
+      "start_offset": 0,
+      "end_offset": 4,
+      "type": "<ALPHANUM>",
+      "position": 0
+    },
+    {
+      "token": "stat",
+      "start_offset": 5,
+      "end_offset": 9,
+      "type": "<ALPHANUM>",
+      "position": 1
+    },
+    {
+      "token": "fact",
+      "start_offset": 10,
+      "end_offset": 14,
+      "type": "<ALPHANUM>",
+      "position": 2
+    },
+    {
+      "token": "sheet",
+      "start_offset": 15,
+      "end_offset": 20,
+      "type": "<ALPHANUM>",
+      "position": 3
+    }
+  ]
+}

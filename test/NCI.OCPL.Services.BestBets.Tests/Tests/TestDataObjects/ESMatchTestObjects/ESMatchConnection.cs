@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 using Elasticsearch.Net;
 
 using NCI.OCPL.Utils.Testing;
+using System.Text;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace NCI.OCPL.Services.BestBets.Tests.ESMatchTestData
 {
@@ -78,10 +81,16 @@ namespace NCI.OCPL.Services.BestBets.Tests.ESMatchTestData
 
             switch (requestData.Path) 
             {
-                case "bestbets/_analyze" : {
+                case "bestbets/_analyze" :
+                {
                     SetAnalyzeResponseOnBuilder(builder, requestData);
                     break;
-                } 
+                }
+                case "bestbets/synonyms/_search/template" :
+                {
+                    SetSearchResponseOnBuilder(builder, requestData);
+                    break;
+                }
             }
             
             return builder; 
@@ -106,11 +115,23 @@ namespace NCI.OCPL.Services.BestBets.Tests.ESMatchTestData
         private void SetSearchResponseOnBuilder<T>(ResponseBuilder<T> builder, RequestData requestData)
             where T : class
         {
-            builder.Stream = TestingTools.GetTestFileAsStream(GetAnalyzeFileName());
 
-            //Let's find the matchtokens for this request.
-            int numTokens = 1;
-                        
+            String postBody = string.Empty;
+
+            using (MemoryStream stream = new MemoryStream())
+            {
+
+                //requestData.PostBody
+                requestData.PostData.Write(stream, requestData.ConnectionSettings);
+
+                postBody = Encoding.UTF8.GetString(stream.ToArray());
+
+            }
+
+            dynamic postObj = JObject.Parse(postBody);
+
+            int numTokens = postObj["params"].matchedtokencount;
+                
             builder.Stream = TestingTools.GetTestFileAsStream(GetTestFileName(numTokens));
         }
 

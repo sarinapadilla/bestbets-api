@@ -7,7 +7,7 @@
         {
             "taskName": "build",
             "args": [
-                "${workspaceRoot}/src/NCI.OCPL.Services.BestBets/project.json"
+                "${workspaceRoot}/src/NCI.OCPL.Api.BestBets/project.json"
             ],
             "isBuildCommand": true,
             "problemMatcher": "$msCompile"
@@ -15,7 +15,7 @@
         {
             "taskName": "fish",
             "args": [
-                "${workspaceRoot}/src/NCI.OCPL.Services.BestBets/project.json"
+                "${workspaceRoot}/src/NCI.OCPL.Api.BestBets/project.json"
             ],
             "isBuildCommand": true,
             "problemMatcher": "$msCompile"
@@ -23,7 +23,7 @@
         {
             "taskName": "test",
             "args": [
-                "${workspaceRoot}/test/NCI.OCPL.Services.BestBets.Tests/project.json"
+                "${workspaceRoot}/test/NCI.OCPL.Api.BestBets.Tests/project.json"
             ],
             "isBuildCommand": false,
             "problemMatcher": "$msCompile"            

@@ -6,7 +6,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceRoot}/src/NCI.OCPL.Services.BestBets/bin/Debug/netcoreapp1.0/NCI.OCPL.Services.BestBets.dll",
+            "program": "${workspaceRoot}/src/NCI.OCPL.Api.BestBets/bin/Debug/netcoreapp1.0/NCI.OCPL.Api.BestBets.dll",
             "args": [],
             "cwd": "${workspaceRoot}",
             "stopAtEntry": false,

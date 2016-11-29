@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NCI.OCPL.Services.BestBets", "src\NCI.OCPL.Services.BestBets\NCI.OCPL.Services.BestBets.xproj", "{A79E25B7-5813-437D-A957-0DB177FC3B9B}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NCI.OCPL.Api.BestBets", "src\NCI.OCPL.Api.BestBets\NCI.OCPL.Api.BestBets.xproj", "{A79E25B7-5813-437D-A957-0DB177FC3B9B}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NCI.OCPL.Services.BestBets.Tests", "test\NCI.OCPL.Services.BestBets.Tests\NCI.OCPL.Services.BestBets.Tests.xproj", "{0BD06D1D-9D17-4450-9F73-8F68A5DF99D1}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NCI.OCPL.Api.BestBets.Tests", "test\NCI.OCPL.Api.BestBets.Tests\NCI.OCPL.Api.BestBets.Tests.xproj", "{0BD06D1D-9D17-4450-9F73-8F68A5DF99D1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -8,8 +8,8 @@
 
 def folderName  = 'BestBets-Svc'    // Jenkins folder where the jbos will be placed.
 
-def sourcePath = 'src/NCI.OCPL.Services.BestBets'       // Source code path relative to the working directory
-def testPath = 'test/NCI.OCPL.Services.BestBets.Tests'  // Unit test code path relative to the working directory  
+def sourcePath = 'src/NCI.OCPL.Api.BestBets'       // Source code path relative to the working directory
+def testPath = 'test/NCI.OCPL.Api.BestBets.Tests'  // Unit test code path relative to the working directory  
 
 def GH_REPO_NAME = 'bestbets-svc'    // The project's repository name (as used in the URL).
 def GH_ORGANIZATION_NAME = 'NCIOCPL'   // GitHub Organization name (as used in the URL/userid).

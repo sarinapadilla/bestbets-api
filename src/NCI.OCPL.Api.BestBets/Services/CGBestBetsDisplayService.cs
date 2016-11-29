@@ -58,19 +58,20 @@ namespace NCI.OCPL.Api.BestBets.Services
                     {
                         return (IBestBetDisplay)serializer.Deserialize(xmlReader);
                     }
-                } catch (Exception ex) {
-                    //TODO: Replace this with better exception.
-                    throw new Exception("Bad XML");
+                } catch (Exception) {
+                    throw new APIErrorException(500, "Bad XML Structure.");
                 }
             } 
             else 
             {
-                //TODO: Replace this with better exception.
-                throw new Exception(string.Format("Could not retrieve {0}", requestUrl));
+               throw new APIErrorException(500, string.Format("Could not retrieve {0}", requestUrl));
             }
         }
 
-        public IEnumerable<IBestBetCategory> GetAllBestBetsForIndexing()
+        /// <summary>
+        /// Retrieves metadata for all existing best bets for indexing.
+        /// </summary>
+        public IEnumerable<PublishedContentInfo> GetAllBestBetsForIndexing()
         {
             string requestUrl = _options.Host;
             requestUrl += _options.BBCategoryPathFormatter;
@@ -80,34 +81,28 @@ namespace NCI.OCPL.Api.BestBets.Services
             //Only process the message if it was successful
             if (message.IsSuccessStatusCode) 
             {
-                try {
+                PublishedContentListing list = null;
 
+                try 
+                {
+                    // Get the content from the response message and return the deserialized object.
+                    string jsonData = message.Content.ReadAsStringAsync().Result;
+                    list = JsonConvert.DeserializeObject<PublishedContentListing>(jsonData);
+                }
+                catch (Exception)
+                {
+                    throw new APIErrorException(500, "Bad Data Structure.");
+                }
 
-                    // Create the serializer
-                    //XmlSerializer serializer = new XmlSerializer(typeof(CancerGovBestBet), "cde");
-
-                    //Get the content from the response message and return the deserialized object.
-                    using (TextReader reader = new StreamReader(message.Content.ReadAsStreamAsync().Result)) 
-                    {
-
-                        PublishedContentListing list = JsonConvert.DeserializeObject<PublishedContentListing>(reader.ToString());
-                        
-//                        return (IBestBetDisplay)serializer.Deserialize(xmlReader);
-                            return null;
-                    }
-                } catch (Exception ex) {
-                    //TODO: Replace this with better exception.
-                    throw new Exception("Bad XML");
+                foreach(PublishedContentInfo file in list.Files)
+                {
+                    yield return file;
                 }
             } 
             else 
             {
-                //TODO: Replace this with better exception.
-                throw new Exception(string.Format("Could not retrieve {0}", requestUrl));
+                throw new APIErrorException(500, "Error connecting to search servers");
             }
-            return null;           
-
-            //throw new NotImplementedException();
         }
         
     }

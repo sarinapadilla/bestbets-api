@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using Microsoft.Extensions.Options;
@@ -76,9 +77,15 @@ namespace NCI.OCPL.Api.BestBets.Tests.CGBestBetsDisplayServiceTests
 
     }
 
+    /// <summary>
+    /// Implements tests for CGBestBetsDisplayService.GetAllBestBetsForIndexing().
+    /// </summary>
     public class GetAllBestBetsForIndexingTests
     {
 
+        /// <summary>
+        /// Test that data is retrieved from GetAllBestBetsForIndexing()
+        /// </summary>
         [Fact]
         public void DataLoading()
         {
@@ -109,9 +116,58 @@ namespace NCI.OCPL.Api.BestBets.Tests.CGBestBetsDisplayServiceTests
 
             CGBestBetsDisplayService bbClient = new CGBestBetsDisplayService(new HttpClient(mockHttp), bbClientOptions.Object);
 
-            IEnumerable<IBestBetCategory> actualList = bbClient.GetAllBestBetsForIndexing();
+            IEnumerable<PublishedContentInfo> actualList = bbClient.GetAllBestBetsForIndexing();
 
+            /// TODO: Make this a list comparison.
             Assert.NotNull(actualList);
+        }
+
+        /// <summary>
+        /// Negative Test for Handling HTTP status errors from CancerGov.  (e.g. 404, 500, etc)
+        /// Does GetAllBestBetsForIndexing() throw the expected exception?
+        /// </summary>
+        [Theory]
+        [InlineData(System.Net.HttpStatusCode.InternalServerError)]
+        //[InlineData(System.Net.HttpStatusCode.Forbidden)]
+        //[InlineData(System.Net.HttpStatusCode.NotFound)]
+        public void GetBestBetForDisplay_HttpStatusError(System.Net.HttpStatusCode status) 
+        {
+            string TestFilePath = "CGBBCategory.BestBetsList.json";
+
+            //Setup a mock handler, which is what HttpClient uses under the hood to fetch
+            //data.
+            var mockHttp = new MockHttpMessageHandler();
+
+            string filePath = TestFilePath;
+
+            ByteArrayContent content = new ByteArrayContent(TestingTools.GetTestFileAsBytes(filePath));
+            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+
+            mockHttp
+                .When("https://www.cancer.gov/PublishedContent/List?root=BestBets&fmt=json")
+                .Respond(status, content);
+
+            // Setup the mocked Options
+            Mock<IOptions<CGBestBetsDisplayServiceOptions>> bbClientOptions = new Mock<IOptions<CGBestBetsDisplayServiceOptions>>();
+            bbClientOptions
+                .SetupGet(opt => opt.Value)
+                .Returns(new CGBestBetsDisplayServiceOptions(){
+                    Host = "https://www.cancer.gov",
+                    BBCategoryPathFormatter = "/PublishedContent/List?root=BestBets&fmt=json"
+                }
+            );
+
+            CGBestBetsDisplayService bbClient = new CGBestBetsDisplayService(new HttpClient(mockHttp), bbClientOptions.Object);
+
+            Exception ex = Assert.Throws<APIErrorException>(
+                // We don't care about the return value, only that an exception occured.
+                () => {
+                    IEnumerable<PublishedContentInfo> actualList = bbClient.GetAllBestBetsForIndexing();
+                }
+            );
+
+            // All errors should return a status 500.
+            Assert.Equal(400, ((APIErrorException)ex).HttpStatusCode);
         }
     }
 }

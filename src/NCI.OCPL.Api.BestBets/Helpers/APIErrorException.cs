@@ -1,7 +1,3 @@
-using System;
-
-using Nest;
-
 namespace NCI.OCPL.Api.BestBets
 {
     /// <summary>

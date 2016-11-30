@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace NCI.OCPL.Services.CDE.PublishedContentListing
 {
-    interface IPublishedContentListingService
+    public interface IPublishedContentListingService
     {
         // TODO return type
         IEnumerable<IPathListInfo> ListAvailablePaths();

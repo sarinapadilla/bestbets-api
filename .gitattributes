@@ -1,1 +1,1 @@
-*.cs -crlf
+*.cs text eol=lf

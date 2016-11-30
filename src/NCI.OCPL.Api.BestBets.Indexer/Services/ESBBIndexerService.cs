@@ -28,7 +28,25 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Services
 
         public string CreateTimeStampedIndex()
         {
-            throw new NotImplementedException();
+            if (String.IsNullOrWhiteSpace(this._config.AliasName))
+            {
+                throw new ArgumentNullException("CreateTimeStampedIndex: The name of the alias is required.");
+            }
+
+            //Get timestamp
+            String timeStamp = DateTime.Now.ToString("yyyyMMddHHmmss");
+
+            //Setup the index name
+            String indexName = String.Join("", this._config.AliasName, timeStamp);
+
+            //Create the index.  Since we are using a index template, there are no
+            //actual parameters.
+            var response = _client.CreateIndex(indexName, id => id);
+
+            if (!response.IsValid)
+                throw new Exception("Error creating Time Stamped Index, " + indexName);
+
+            return indexName;
         }
 
         public void DeleteOldIndices(DateTime olderThan)

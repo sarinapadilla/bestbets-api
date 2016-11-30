@@ -1,3 +1,4 @@
+
 using System.Collections.Generic;
 
 using Microsoft.Extensions.Logging;
@@ -7,6 +8,9 @@ using Nest;
 
 namespace NCI.OCPL.Api.BestBets.Services
 {
+    //TODO: Remove APIExceptions from this class and make them regular exceptions.  
+    //TODO: Maybe remove the logger too as this class no longer needs to log, the calling class should.  
+
     /// <summary>
     /// Class represents an Elasticsearch based Best Bets Match Service
     /// </summary>
@@ -30,7 +34,7 @@ namespace NCI.OCPL.Api.BestBets.Services
         /// <param name="language">The two-character language code to constrain the matches to</param>
         /// <param name="cleanedTerm">A term that have been cleaned of punctuation and special characters</param>
         /// <returns>An array of category ids</returns>
-        public string[] GetMatches(string language, string cleanedTerm) 
+        public string[] GetMatches(string language, string cleanedTerm)
         {
 
             // Step 2. Get Number of Tokens in the term
@@ -45,7 +49,7 @@ namespace NCI.OCPL.Api.BestBets.Services
 
             // Step 5. Process the matches and extract only the category IDs we will
             // be returning to the client
-            string[] validCategories = FilterValidCategories(matches, numTokens); 
+            string[] validCategories = FilterValidCategories(matches, numTokens);
 
             return validCategories;
         }
@@ -57,7 +61,7 @@ namespace NCI.OCPL.Api.BestBets.Services
         /// <param name="matches">A list of matches</param>
         /// <param name="numTokens">The number of tokens in the search term</param>
         /// <returns>An array of category ids</returns>
-        private string[] FilterValidCategories(IEnumerable<BestBetsMatch> matches, int numTokens) 
+        private string[] FilterValidCategories(IEnumerable<BestBetsMatch> matches, int numTokens)
         {
             //CatIDs to ignore because of a negation
             List<string> excludedIDs = new List<string>();
@@ -68,14 +72,15 @@ namespace NCI.OCPL.Api.BestBets.Services
             // Iterate through ALL the matches and extract the categories that
             // should be displayed.  There may be multiple matches for a single
             // category, the probability increase with the number of tokens. 
-            foreach (BestBetsMatch match in matches) {
-                
+            foreach (BestBetsMatch match in matches)
+            {
+
                 //Exact matches need to match the exact number of tokens as well.
                 //Exact matches can be used for both inclusion and exclusion
                 if (match.IsExact && (match.TokenCount != numTokens))
                     continue;
 
-                
+
                 if (match.IsNegated)
                 {
                     // A negated match will remove a category from the display.
@@ -89,22 +94,22 @@ namespace NCI.OCPL.Api.BestBets.Services
                     {
                         excludedIDs.Add(match.ContentID);
                     }
-                    
+
                     matchedIDs.Remove(match.ContentID);
                 }
                 else
                 {
                     // Just a normal match.  Let's make sure that we are not excluding
                     // that category first, otherwise, add it to the list of matches.
-                    if (!matchedIDs.Contains(match.ContentID) 
+                    if (!matchedIDs.Contains(match.ContentID)
                         && !excludedIDs.Contains(match.ContentID))
                     {
-                        matchedIDs.Add(match.ContentID);                                        
+                        matchedIDs.Add(match.ContentID);
                     }
                 }
             }
 
-            return matchedIDs.ToArray();            
+            return matchedIDs.ToArray();
         }
 
         /// <summary>
@@ -114,8 +119,8 @@ namespace NCI.OCPL.Api.BestBets.Services
         /// <param name="isSpanish">Is this term spanish or not</param>
         /// <param name="numTokens">The number of tokens an analyzer would break this up into</param>
         /// <returns>IEnumerable<BestBetsMatch> suitable for iterating through</returns>
-        private IEnumerable<BestBetsMatch> GetBestBetMatches(string cleanedTerm, string language, int numTokens) 
-        {            
+        private IEnumerable<BestBetsMatch> GetBestBetMatches(string cleanedTerm, string language, int numTokens)
+        {
             string templateFileName = "bestbets_bestbets_cgov_" + language;
 
             //We need to perform a separate query for each of the number of matches.
@@ -133,7 +138,7 @@ namespace NCI.OCPL.Api.BestBets.Services
                             .Add("searchstring", cleanedTerm)
                             .Add("searchtokencount", numTokens)
                             .Add("matchedtokencount", i);
-                        
+
                         return pd;
                     });
 
@@ -141,15 +146,16 @@ namespace NCI.OCPL.Api.BestBets.Services
                 });
 
                 //Test if response is valid
-                if (!response.IsValid) {
+                if (!response.IsValid)
+                {
                     _logger.LogError("Elasticsearch Response is Not Valid.  Term '{0}'", cleanedTerm);
                     throw new APIErrorException(500, "Errors Occurred.");
                 }
 
-                if (response.Total > 0) 
+                if (response.Total > 0)
                 {
                     foreach (BestBetsMatch match in response.Documents)
-                    {                        
+                    {
                         yield return match;
                     }
                 }
@@ -162,7 +168,7 @@ namespace NCI.OCPL.Api.BestBets.Services
         /// </summary>
         /// <param name="term">The term to get token count</param>
         /// <returns>The number of tokens in the term</returns>
-        private int GetTokenCount(string term) 
+        private int GetTokenCount(string term)
         {
             var analyzeResponse = this._elasticClient.Analyze(
                 a => a
@@ -171,13 +177,19 @@ namespace NCI.OCPL.Api.BestBets.Services
                 .Text(term)
             );
 
+            if (!analyzeResponse.IsValid)
+            {
+                _logger.LogError("Elasticsearch Response for GetTokenCount is Not Valid.  Term '{0}'", term);
+                throw new APIErrorException(500, "Errors Occurred.");
+            }
+
             int numberOfTokens = 0;
             if (analyzeResponse.Tokens != null)
             {
                 foreach (AnalyzeToken t in analyzeResponse.Tokens)
                 {
                     numberOfTokens++;
-                }              
+                }
             }
 
             return numberOfTokens;

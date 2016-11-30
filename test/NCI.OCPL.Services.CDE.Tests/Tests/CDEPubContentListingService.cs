@@ -14,7 +14,7 @@ namespace NCI.OCPL.Services.CDE.Tests.CDEPubContentListingServiceTests
 {
 
     /// <summary>
-    /// Tests for CDEPubContentListingService.GetItemsForPath()
+    /// Tests for CDEPubContentListingService.ListAvailablePaths()
     /// </summary>
     public class ListAvailablePaths
     {

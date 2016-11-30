@@ -130,7 +130,7 @@ namespace NCI.OCPL.Api.BestBets.Tests.CGBestBetsDisplayServiceTests
         [InlineData(System.Net.HttpStatusCode.InternalServerError)]
         //[InlineData(System.Net.HttpStatusCode.Forbidden)]
         //[InlineData(System.Net.HttpStatusCode.NotFound)]
-        public void GetBestBetForDisplay_HttpStatusError(System.Net.HttpStatusCode status) 
+        public void HttpStatusError(System.Net.HttpStatusCode status) 
         {
             string TestFilePath = "CGBBCategory.BestBetsList.json";
 
@@ -163,6 +163,10 @@ namespace NCI.OCPL.Api.BestBets.Tests.CGBestBetsDisplayServiceTests
                 // We don't care about the return value, only that an exception occured.
                 () => {
                     IEnumerable<PublishedContentInfo> actualList = bbClient.GetAllBestBetsForIndexing();
+                    foreach (PublishedContentInfo item in actualList)
+                    {
+                        continue;
+                    }
                 }
             );
 

@@ -68,42 +68,5 @@ namespace NCI.OCPL.Api.BestBets.Services
             }
         }
 
-        /// <summary>
-        /// Retrieves metadata for all existing best bets for indexing.
-        /// </summary>
-        public IEnumerable<PublishedContentInfo> GetAllBestBetsForIndexing()
-        {
-            string requestUrl = _options.Host;
-            requestUrl += _options.BBCategoryPathFormatter;
-
-            HttpResponseMessage message = _client.GetAsync(requestUrl).Result;
-
-            //Only process the message if it was successful
-            if (message.IsSuccessStatusCode) 
-            {
-                PublishedContentListing list = null;
-
-                try 
-                {
-                    // Get the content from the response message and return the deserialized object.
-                    string jsonData = message.Content.ReadAsStringAsync().Result;
-                    list = JsonConvert.DeserializeObject<PublishedContentListing>(jsonData);
-                }
-                catch (Exception)
-                {
-                    throw new APIErrorException(500, "Bad Data Structure.");
-                }
-
-                foreach(PublishedContentInfo file in list.Files)
-                {
-                    yield return file;
-                }
-            } 
-            else 
-            {
-                throw new APIErrorException(500, "Error connecting to search servers");
-            }
-        }
-        
     }
 }

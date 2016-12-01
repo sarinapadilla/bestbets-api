@@ -19,9 +19,49 @@ namespace NCI.OCPL.Services.CDE.PublishedContentListing
             _options = options.Value;
         }
 
+        /// <summary>
+        /// Retrieves content metadata files for a named root.
+        /// </summary>
+        /// <param name="root">The specific root to retrieve for.</param>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Valid root values are reflected as the root parameter in the Url portion of
+        /// the structure returned by ListAvailablePaths().
+        /// </remarks>
         public IPublishedContentListing GetItemsForPath(string root, string path)
         {
-            throw new NotImplementedException();
+            UriBuilder requestUri = new UriBuilder(_options.Host);
+            requestUri.Path = _options.ListRoot;
+            requestUri.Query = string.Format(_options.SpecificListPathFormatter, root, path);
+
+
+
+            // Perform the actual request
+            HttpResponseMessage message = _client.GetAsync(requestUri.Uri).Result;
+
+            //Only process the message if it was successful
+            if (message.IsSuccessStatusCode)
+            {
+                PublishedContentListing pclData = null;
+
+                try
+                {
+                    // Get the content from the response message and return the deserialized object.
+                    string jsonData = message.Content.ReadAsStringAsync().Result;
+                    pclData = JsonConvert.DeserializeObject<PublishedContentListing>(jsonData);
+                }
+                catch (Exception)
+                {
+                    throw new APIErrorException(500, "Bad Data Structure.");
+                }
+
+                return pclData;
+            }
+            else
+            {
+                throw new APIErrorException(500, "Error connecting to search servers");
+            }
         }
 
         /// <summary>
@@ -58,7 +98,6 @@ namespace NCI.OCPL.Services.CDE.PublishedContentListing
             {
                 throw new APIErrorException(500, "Error connecting to search servers");
             }
-
         }
     }
 }

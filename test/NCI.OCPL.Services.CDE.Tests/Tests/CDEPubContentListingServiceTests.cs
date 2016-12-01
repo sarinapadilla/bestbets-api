@@ -114,6 +114,48 @@ namespace NCI.OCPL.Services.CDE.Tests.CDEPubContentListingServiceTests
     /// </summary>
     public class GetItemsForPath
     {
+        /// <summary>
+        /// Test that a list of available paths is loaded.
+        /// </summary>
+        [Theory]
+        [InlineData("BestBets", "/")]
+        public void DataLoading(string rootName, string dataPath)
+        {
+            // TODO: Create a TestData object.
+            string TestFilePath = "CDEPubContentListingService.BestBets.json";
+
+            //Setup a mock handler, which is what HttpClient uses under the hood to fetch
+            //data.
+            var mockHttp = new MockHttpMessageHandler();
+
+            string filePath = TestFilePath;
+
+            ByteArrayContent content = new ByteArrayContent(TestingTools.GetTestFileAsBytes(filePath));
+            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+
+            mockHttp
+                .When(string.Format("https://www.cancer.gov/PublishedContent/List?root={0}&path={1}&fmt=json", rootName, dataPath))
+                .Respond(System.Net.HttpStatusCode.OK, content);
+
+            // Setup the mocked Options
+            Mock<IOptions<PublishedContentListingServiceOptions>> clientOptions = new Mock<IOptions<PublishedContentListingServiceOptions>>();
+            clientOptions
+                .SetupGet(opt => opt.Value)
+                .Returns(new PublishedContentListingServiceOptions()
+                {
+                    Host = "https://www.cancer.gov",
+                    ListRoot = "/PublishedContent/List",
+                    SpecificListPathFormatter = "?root={0}&path={1}&fmt=json"
+                }
+            );
+
+            IPublishedContentListingService listClient = new CDEPubContentListingService(new HttpClient(mockHttp), clientOptions.Object);
+
+            IPublishedContentListing actualList = listClient.GetItemsForPath(rootName, dataPath);
+
+            /// TODO: Make this a list comparison.
+            Assert.NotNull(actualList);
+        }
 
     }
 

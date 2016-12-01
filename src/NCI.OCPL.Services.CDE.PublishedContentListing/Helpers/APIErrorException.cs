@@ -1,4 +1,4 @@
-namespace NCI.OCPL.Api.BestBets
+namespace NCI.OCPL.Services.CDE.PublishedContentListing
 {
     /// TODO: APIErrorException should only be defined once.
 

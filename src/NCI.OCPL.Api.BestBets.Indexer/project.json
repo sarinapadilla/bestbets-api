@@ -20,6 +20,7 @@
       "version": "1.0.1"
     },
     "NCI.OCPL.Api.BestBets": "1.0.0-*",
+    "NCI.OCPL.Services.CDE.PublishedContentListing": "1.0.0-*",
     "NEST": "2.4.6"
   },
 

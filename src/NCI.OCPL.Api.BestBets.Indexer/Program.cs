@@ -11,7 +11,7 @@ using Nest;
 using Elasticsearch.Net;
 
 using NCI.OCPL.Api.BestBets.Indexer.Services;
-
+using NCI.OCPL.Services.CDE.PublishedContentListing;
 
 namespace NCI.OCPL.Api.BestBets.Indexer
 {
@@ -53,27 +53,29 @@ namespace NCI.OCPL.Api.BestBets.Indexer
                 services.AddOptions();
 
                 services.Configure<CGBestBetsDisplayServiceOptions>(Configuration.GetSection("CGBestBetsDisplayService"));
+                services.Configure<ESBBIndexerService>(Configuration.GetSection("ESBBIndexerService"));
+                services.Configure<CDEPubContentListingService>(Configuration.GetSection("CDEPubContentListingService"));
 
                 services.AddTransient<IElasticClient>(p =>
                 {
-                // Get the ElasticSearch credentials.
-                string username = Configuration["Elasticsearch:Userid"];
+                    // Get the ElasticSearch credentials.
+                    string username = Configuration["Elasticsearch:Userid"];
                     string password = Configuration["Elasticsearch:Password"];
 
-                //Get the ElasticSearch servers that we will be connecting to.
-                List<Uri> uris = GetServerUriList();
+                    //Get the ElasticSearch servers that we will be connecting to.
+                    List<Uri> uris = GetServerUriList();
 
-                // Create the connection pool, the SniffingConnectionPool will 
-                // keep tabs on the health of the servers in the cluster and
-                // probe them to ensure they are healthy.  This is how we handle
-                // redundancy and load balancing.
-                var connectionPool = new SniffingConnectionPool(uris);
+                    // Create the connection pool, the SniffingConnectionPool will 
+                    // keep tabs on the health of the servers in the cluster and
+                    // probe them to ensure they are healthy.  This is how we handle
+                    // redundancy and load balancing.
+                    var connectionPool = new SniffingConnectionPool(uris);
 
-                //Return a new instance of an ElasticClient with our settings
-                ConnectionSettings settings = new ConnectionSettings(connectionPool);
+                    //Return a new instance of an ElasticClient with our settings
+                    ConnectionSettings settings = new ConnectionSettings(connectionPool);
 
-                //Let's only try and use credentials if the username is set.
-                if (!string.IsNullOrWhiteSpace(username))
+                    //Let's only try and use credentials if the username is set.
+                    if (!string.IsNullOrWhiteSpace(username))
                     {
                         settings.BasicAuthentication(username, password);
                     }
@@ -83,6 +85,7 @@ namespace NCI.OCPL.Api.BestBets.Indexer
 
                 //Add others
                 services.AddSingleton<IBBIndexerService, ESBBIndexerService>();
+                services.AddSingleton<IPublishedContentListingService, CDEPubContentListingService>();
             }
 
             /// <summary>
@@ -129,9 +132,10 @@ namespace NCI.OCPL.Api.BestBets.Indexer
                 IBBIndexerService indexer = ServiceProvider.GetRequiredService<IBBIndexerService>();
 
                 //Create new index
-                string indexName = indexer.CreateTimeStampedIndex();                
+                string indexName = indexer.CreateTimeStampedIndex();
 
                 //Fetch bunch of BB
+                IPublishedContentListing bestBetList = LoadBestBetList();
 
                 //Index the BB
 
@@ -143,6 +147,12 @@ namespace NCI.OCPL.Api.BestBets.Indexer
 
                 //Clean Up old.
 
+            }
+
+            private IPublishedContentListing LoadBestBetList()
+            {
+                IPublishedContentListingService pcService = ServiceProvider.GetRequiredService<IPublishedContentListingService>();
+                return pcService.GetItemsForPath("BestBets", "/");
             }
         }
 

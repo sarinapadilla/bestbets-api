@@ -19,6 +19,19 @@ namespace NCI.OCPL.Api.BestBets.Controllers
         private readonly ILogger<BestBetsController> _logger;
 
         /// <summary>
+        /// Represents a IBestBetDisplay as returned by the get method.
+        /// </summary>
+        private class BestBetAPIGetResult : IBestBetDisplay
+        {
+            public string HTML { get; set; }
+            public string ID { get; set; }
+
+            public string Name { get; set; }
+
+            public int Weight { get; set; }
+        }
+
+        /// <summary>
         /// Creates a new instance of a BestBetsController
         /// </summary>
         /// <param name="matchService">An IBestBetsMatchService for getting matched best bets categories</param>
@@ -54,11 +67,19 @@ namespace NCI.OCPL.Api.BestBets.Controllers
 
             string[] categoryIDs = _matchService.GetMatches(language.ToLower(), cleanedTerm);
             
-            List<IBestBetDisplay> displayItems = new List<IBestBetDisplay>();
+            List<IBestBetDisplay> displayItems = new List<IBestBetDisplay>();            
 
             //Now get categories for ID.
-            foreach (string categoryID in categoryIDs) {
-                displayItems.Add(_displayService.GetBestBetForDisplay(categoryID));
+            foreach (string categoryID in categoryIDs)
+            {
+                IBestBetDisplay item = _displayService.GetBestBetForDisplay(categoryID);
+                displayItems.Add(new BestBetAPIGetResult()
+                {
+                    ID = item.ID,
+                    Name = item.Name,
+                    Weight = item.Weight,
+                    HTML = item.HTML
+                });
             }
 
             return displayItems.ToArray();

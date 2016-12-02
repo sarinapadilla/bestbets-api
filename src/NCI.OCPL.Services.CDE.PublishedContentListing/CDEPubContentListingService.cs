@@ -99,5 +99,12 @@ namespace NCI.OCPL.Services.CDE.PublishedContentListing
                 throw new APIErrorException(500, "Error connecting to search servers");
             }
         }
+
+        public IPublishedFile GetPublishedFile(Type model, string path)
+        {
+            // TODO: Deserialize arbitrary content type.
+
+            throw new NotImplementedException();
+        }
     }
 }

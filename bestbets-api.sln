@@ -13,7 +13,7 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NCI.OCPL.Services.CDE.Publi
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NCI.OCPL.Api.BestBets.Indexer.Tests", "test\NCI.OCPL.Api.BestBets.Indexer.Tests\NCI.OCPL.Api.BestBets.Indexer.Tests.xproj", "{2CA1A6EC-F632-4EE8-A484-7E28BB5D7D20}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NCI.OCPL.Services.CDE.Tests", "test\NCI.OCPL.Services.CDE.Tests\NCI.OCPL.Services.CDE.Tests.xproj", "{5D1F7510-63CE-457E-9B32-04EC91479510}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NCI.OCPL.Services.CDE.PublishedContentListingTests", "test\NCI.OCPL.Services.CDE.PublishedContentListing.Tests\NCI.OCPL.Services.CDE.PublishedContentListingTests.xproj", "{5D1F7510-63CE-457E-9B32-04EC91479510}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

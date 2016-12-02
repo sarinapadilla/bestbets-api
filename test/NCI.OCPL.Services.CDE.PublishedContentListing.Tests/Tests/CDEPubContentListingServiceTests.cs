@@ -159,4 +159,51 @@ namespace NCI.OCPL.Services.CDE.Tests.CDEPubContentListingServiceTests
 
     }
 
+    /// <summary>
+    /// Tests for CDEPubContentListingService.GetPublishedFile()
+    /// </summary>
+    public class GetPublishedFile
+    {
+        /// <summary>
+        /// Test that a BestBets entry can be loaded
+        /// </summary>
+        [Fact]
+        public void BestBetsEntry()
+        {
+            // TODO: Create a TestData object.
+            string TestFilePath = "CDEPubContentListingService.BestBetsEntry.xml";
+
+            //Setup a mock handler, which is what HttpClient uses under the hood to fetch
+            //data.
+            var mockHttp = new MockHttpMessageHandler();
+
+            string filePath = TestFilePath;
+
+            ByteArrayContent content = new ByteArrayContent(TestingTools.GetTestFileAsBytes(filePath));
+            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/xml");
+
+            mockHttp
+                .When(filePath)
+                .Respond(System.Net.HttpStatusCode.OK, content);
+
+            // Setup the mocked Options
+            Mock<IOptions<PublishedContentListingServiceOptions>> clientOptions = new Mock<IOptions<PublishedContentListingServiceOptions>>();
+            clientOptions
+                .SetupGet(opt => opt.Value)
+                .Returns(new PublishedContentListingServiceOptions()
+                {
+                    Host = "https://www.cancer.gov"
+                }
+            );
+
+            IPublishedContentListingService publishedContentClient = new CDEPubContentListingService(new HttpClient(mockHttp), clientOptions.Object);
+
+            IPublishedFile actualFile = publishedContentClient.GetPublishedFile(typeof(BestBetsFile), "/PublishedContent/BestBets/1045389.xml");
+
+            /// TODO: Make this a list comparison.
+            Assert.NotNull(actualFile);
+        }
+
+    }
+
 }

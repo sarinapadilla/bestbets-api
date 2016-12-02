@@ -7,10 +7,12 @@ namespace NCI.OCPL.Services.CDE.PublishedContentListing
 {
     public interface IPublishedContentListingService
     {
-        // TODO return type
+
+        IPublishedFile GetPublishedFile(Type model, string path);
+
         IEnumerable<IPathListInfo> ListAvailablePaths();
 
-        // TODO return type
+
         IPublishedContentListing GetItemsForPath(string root, string path);
     }
 }

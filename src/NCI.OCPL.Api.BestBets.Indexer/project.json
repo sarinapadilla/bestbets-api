@@ -1,7 +1,12 @@
 {
   "version": "1.0.0-*",
+
   "buildOptions": {
-    "emitEntryPoint": true
+    "emitEntryPoint": true,
+    "copyToOutput": {
+      "include": [ "appsettings.json" ]
+    },
+    "debugType": "portable"
   },
 
   "dependencies": {
@@ -19,7 +24,6 @@
       "type": "platform",
       "version": "1.0.1"
     },
-    "NCI.OCPL.Api.BestBets": "1.0.0-*",
     "NCI.OCPL.Services.CDE.PublishedContentListing": "1.0.0-*",
     "NEST": "2.4.6"
   },

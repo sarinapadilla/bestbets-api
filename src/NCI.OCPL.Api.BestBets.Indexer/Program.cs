@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Configuration;
@@ -12,6 +13,7 @@ using Elasticsearch.Net;
 
 using NCI.OCPL.Api.BestBets.Indexer.Services;
 using NCI.OCPL.Services.CDE.PublishedContentListing;
+using Microsoft.Extensions.Options;
 
 namespace NCI.OCPL.Api.BestBets.Indexer
 {
@@ -53,71 +55,20 @@ namespace NCI.OCPL.Api.BestBets.Indexer
                 services.AddOptions();
 
                 services.Configure<CGBestBetsDisplayServiceOptions>(Configuration.GetSection("CGBestBetsDisplayService"));
-                services.Configure<ESBBIndexerService>(Configuration.GetSection("ESBBIndexerService"));
-                services.Configure<CDEPubContentListingService>(Configuration.GetSection("CDEPubContentListingService"));
+                services.Configure<ESBBIndexerServiceOptions>(Configuration.GetSection("ESBBIndexerService"));
+                services.Configure<ElasticSearchOptions>(Configuration.GetSection("Elasticsearch"));
+                services.Configure<PublishedContentListingServiceOptions>(Configuration.GetSection("CDEPubContentListingService"));
 
-                services.AddTransient<IElasticClient>(p =>
-                {
-                    // Get the ElasticSearch credentials.
-                    string username = Configuration["Elasticsearch:Userid"];
-                    string password = Configuration["Elasticsearch:Password"];
+                services.AddSingleton<ConfiguredElasticClientFactory, ConfiguredElasticClientFactory>();
+                services.AddTransient<IElasticClient>(p => p.GetRequiredService<ConfiguredElasticClientFactory>().GetInstance());
 
-                    //Get the ElasticSearch servers that we will be connecting to.
-                    List<Uri> uris = GetServerUriList();
+                services.AddSingleton<HttpClient, HttpClient>();
 
-                    // Create the connection pool, the SniffingConnectionPool will 
-                    // keep tabs on the health of the servers in the cluster and
-                    // probe them to ensure they are healthy.  This is how we handle
-                    // redundancy and load balancing.
-                    var connectionPool = new SniffingConnectionPool(uris);
+                services.AddTransient<IPublishedContentListingService, CDEPubContentListingService>();
 
-                    //Return a new instance of an ElasticClient with our settings
-                    ConnectionSettings settings = new ConnectionSettings(connectionPool);
-
-                    //Let's only try and use credentials if the username is set.
-                    if (!string.IsNullOrWhiteSpace(username))
-                    {
-                        settings.BasicAuthentication(username, password);
-                    }
-
-                    return new ElasticClient(settings);
-                });
-
+               
                 //Add others
                 services.AddSingleton<IBBIndexerService, ESBBIndexerService>();
-                services.AddSingleton<IPublishedContentListingService, CDEPubContentListingService>();
-            }
-
-            /// <summary>
-            /// Retrieves a list of Elasticsearch server URIs from the configuration's Elasticsearch:Servers setting. 
-            /// </summary>
-            /// <returns>Returns a list of one or more Uri objects representing the configured set of Elasticsearch servers</returns>
-            /// <remarks>
-            /// The configuration's Elasticsearch:Servers property is required to contain URIs for one or more Elasticsearch servers.
-            /// Each URI must include a protocol (http or https), a server name, and optionally, a port number.
-            /// Multiple URIs are separated by a comma.  (e.g. "https://fred:9200, https://george:9201, https://ginny:9202")
-            /// 
-            /// Throws ConfigurationException if no servers are configured.
-            ///
-            /// Throws UriFormatException if any of the configured server URIs are not formatted correctly.
-            /// </remarks>
-            private List<Uri> GetServerUriList()
-            {
-                List<Uri> uris = new List<Uri>();
-
-                string serverList = Configuration["Elasticsearch:Servers"];
-                if (!String.IsNullOrWhiteSpace(serverList))
-                {
-                    // Convert the list of servers into a list of Uris.
-                    string[] names = serverList.Split(',');
-                    uris.AddRange(names.Select(server => new Uri(server)));
-                }
-                else
-                {
-                    throw new Exception("No servers configured");
-                }
-
-                return uris;
             }
 
             /// <summary>

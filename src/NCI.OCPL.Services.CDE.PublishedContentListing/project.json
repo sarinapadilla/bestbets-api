@@ -5,7 +5,9 @@
       "version": "1.0.1",
       "type": "platform"
     },
-    "Newtonsoft.Json": "9.0.1"
+    "NCI.OCPL.Api.BestBets": "1.0.0-*",
+    "Newtonsoft.Json": "9.0.1",
+    "System.Xml.XmlSerializer": "4.0.11"
   },
 
   "frameworks": {

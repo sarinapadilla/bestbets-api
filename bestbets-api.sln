@@ -13,7 +13,13 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NCI.OCPL.Services.CDE.Publi
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NCI.OCPL.Api.BestBets.Indexer.Tests", "test\NCI.OCPL.Api.BestBets.Indexer.Tests\NCI.OCPL.Api.BestBets.Indexer.Tests.xproj", "{2CA1A6EC-F632-4EE8-A484-7E28BB5D7D20}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NCI.OCPL.Services.CDE.Tests", "test\NCI.OCPL.Services.CDE.Tests\NCI.OCPL.Services.CDE.Tests.xproj", "{5D1F7510-63CE-457E-9B32-04EC91479510}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NCI.OCPL.Services.CDE.PublishedContentListingTests", "test\NCI.OCPL.Services.CDE.PublishedContentListing.Tests\NCI.OCPL.Services.CDE.PublishedContentListingTests.xproj", "{5D1F7510-63CE-457E-9B32-04EC91479510}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_NCI.OCPL.Api.BestBets", "_NCI.OCPL.Api.BestBets", "{49C28C64-6959-4A30-8C9F-E96A27380665}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_NCI.OCPL.Api.BestBets.Indexer", "_NCI.OCPL.Api.BestBets.Indexer", "{B03B2452-BF46-4F3A-8468-C0B43DAB60BD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_NCI.OCPL.Services.CDE.PublishedContentListing", "_NCI.OCPL.Services.CDE.PublishedContentListing", "{A637FF0A-2A5D-430A-8ED7-61E30A5E42FB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -48,5 +54,13 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A79E25B7-5813-437D-A957-0DB177FC3B9B} = {49C28C64-6959-4A30-8C9F-E96A27380665}
+		{0BD06D1D-9D17-4450-9F73-8F68A5DF99D1} = {49C28C64-6959-4A30-8C9F-E96A27380665}
+		{66E9E7ED-84B1-4907-885A-9F9C065FC720} = {B03B2452-BF46-4F3A-8468-C0B43DAB60BD}
+		{6666E50A-C28C-496C-90E4-F41B6B15CADD} = {A637FF0A-2A5D-430A-8ED7-61E30A5E42FB}
+		{2CA1A6EC-F632-4EE8-A484-7E28BB5D7D20} = {B03B2452-BF46-4F3A-8468-C0B43DAB60BD}
+		{5D1F7510-63CE-457E-9B32-04EC91479510} = {A637FF0A-2A5D-430A-8ED7-61E30A5E42FB}
 	EndGlobalSection
 EndGlobal

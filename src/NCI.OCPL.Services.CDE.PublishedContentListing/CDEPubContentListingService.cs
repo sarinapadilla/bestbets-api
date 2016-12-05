@@ -5,6 +5,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
 
 namespace NCI.OCPL.Services.CDE.PublishedContentListing
 {
@@ -102,10 +103,15 @@ namespace NCI.OCPL.Services.CDE.PublishedContentListing
 
         public TModel GetPublishedFile<TModel>(string path) where TModel : class
         {
+            return GetPublishedFileAsync<TModel>(path).Result;
+        }
+
+        async public Task<TModel> GetPublishedFileAsync<TModel>(string path) where TModel : class
+        {
             UriBuilder requestUri = new UriBuilder(_options.Host);
             requestUri.Path = path;
 
-            HttpResponseMessage message = _client.GetAsync(requestUri.Uri).Result;
+            HttpResponseMessage message = await _client.GetAsync(requestUri.Uri);
 
             //Only process the message if it was successful
             if (message.IsSuccessStatusCode)

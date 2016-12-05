@@ -8,8 +8,9 @@ namespace NCI.OCPL.Services.CDE.PublishedContentListing
 {
     public interface IPublishedContentListingService
     {
-
         TModel GetPublishedFile<TModel>(string path) where TModel : class;
+
+        Task<TModel> GetPublishedFileAsync<TModel>(string path) where TModel : class;
 
         IEnumerable<IPathListInfo> ListAvailablePaths();
 

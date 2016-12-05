@@ -13,6 +13,7 @@ using NCI.OCPL.Api.BestBets.Tests;
 using NCI.OCPL.Api.BestBets.Tests.CategoryTestData;
 using NCI.OCPL.Utils.Testing;
 using NCI.OCPL.Services.CDE.PublishedContentListing;
+using System.Threading.Tasks;
 
 namespace NCI.OCPL.Services.CDE.Tests.CDEPubContentListingServiceTests
 {

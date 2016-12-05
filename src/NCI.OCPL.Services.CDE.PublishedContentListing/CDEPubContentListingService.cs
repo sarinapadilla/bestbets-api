@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
-
+using System.Xml;
+using System.Xml.Serialization;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-
 
 namespace NCI.OCPL.Services.CDE.PublishedContentListing
 {
@@ -100,11 +100,38 @@ namespace NCI.OCPL.Services.CDE.PublishedContentListing
             }
         }
 
-        public IPublishedFile GetPublishedFile(Type model, string path)
+        public TModel GetPublishedFile<TModel>(string path) where TModel : class
         {
-            // TODO: Deserialize arbitrary content type.
+            UriBuilder requestUri = new UriBuilder(_options.Host);
+            requestUri.Path = path;
 
-            throw new NotImplementedException();
+            HttpResponseMessage message = _client.GetAsync(requestUri.Uri).Result;
+
+            //Only process the message if it was successful
+            if (message.IsSuccessStatusCode)
+            {
+                try
+                {
+                    // Create the serializer
+                    XmlSerializer serializer = new XmlSerializer(typeof(TModel), "cde");
+
+                    //Get the content from the response message and return the deserialized object.
+                    using (XmlReader xmlReader = XmlReader.Create(message.Content.ReadAsStreamAsync().Result))
+                    {
+                        return (TModel)serializer.Deserialize(xmlReader);
+                    }
+                }
+                catch (Exception)
+                {
+                    throw new APIErrorException(500, "Bad XML Structure.");
+                }
+            }
+            else
+            {
+                throw new APIErrorException(500, string.Format("Could not retrieve {0}", requestUri.Uri));
+            }
+
         }
+
     }
 }

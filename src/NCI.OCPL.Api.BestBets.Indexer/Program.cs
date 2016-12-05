@@ -86,9 +86,10 @@ namespace NCI.OCPL.Api.BestBets.Indexer
                 string indexName = indexer.CreateTimeStampedIndex();
 
                 //Fetch bunch of BB
-                IPublishedContentListing bestBetList = LoadBestBetList();
+                IPublishedContentListing bestBetsList = GetBestBetsList();
 
                 //Index the BB
+                IndexBestBets(bestBetsList);
 
                 //Test the collection?
 
@@ -100,10 +101,22 @@ namespace NCI.OCPL.Api.BestBets.Indexer
 
             }
 
-            private IPublishedContentListing LoadBestBetList()
+            private IPublishedContentListing GetBestBetsList()
             {
                 IPublishedContentListingService pcService = ServiceProvider.GetRequiredService<IPublishedContentListingService>();
                 return pcService.GetItemsForPath("BestBets", "/");
+            }
+
+            private void IndexBestBets(IPublishedContentListing bestBetsList)
+            {
+                // TODO: Batch size as a setting.
+                // TODO: Use IPublishedContentListingService.GetPublishedFileAsync() to improve performance.
+
+                // Create new index
+                // Loop through the list of best bets in batches of size X
+                //  Load the best bet file.
+                //  Add to the batch
+                //  Bulk save.
             }
         }
 

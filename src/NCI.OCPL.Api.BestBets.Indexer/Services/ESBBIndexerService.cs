@@ -41,7 +41,7 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Services
 
             //Create the index.  Since we are using a index template, there are no
             //actual parameters.
-            var response = _client.CreateIndex(indexName, id => id);
+            var response = _client.CreateIndex(indexName);
 
             if (!response.IsValid)
                 throw new Exception("Error creating Time Stamped Index, " + indexName);

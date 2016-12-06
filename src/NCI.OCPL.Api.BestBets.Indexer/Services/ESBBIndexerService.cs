@@ -62,7 +62,37 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Services
 
         public void MakeIndexCurrentAlias(string indexName)
         {
+            //Get the Indices assigned to an Alias
+            string[] indicesToRemove = GetIndicesForAlias();
+
+            
+
+
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Gets the indices that are mapped to an alias.
+        /// </summary>
+        /// <param name="alias"></param>
+        public string[] GetIndicesForAlias()
+        {
+            //Soo, if we ask for alias where the index name is that alias,
+            //then it is like we asked for host/<alias>/_aliases and then
+            //it will return only those indices mapped to that alias.
+            var response = _client.GetAlias(ga => 
+                ga
+                .Index(_config.AliasName)
+            );
+
+            if (!response.IsValid)
+            {
+                throw new Exception("Error getting Indices for alias");
+            }
+            else
+            {
+                return response.Indices.Keys.ToArray();
+            }
         }
 
         public void OptimizeIndex(string indexName)

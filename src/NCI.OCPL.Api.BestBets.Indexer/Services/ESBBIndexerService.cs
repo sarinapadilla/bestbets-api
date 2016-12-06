@@ -56,6 +56,7 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Services
 
         public void IndexBestBetsMatches(string indexName, IEnumerable<BestBetsMatch> matches)
         {
+            //_client.Bulk
             throw new NotImplementedException();
         }
 

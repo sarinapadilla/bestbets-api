@@ -15,7 +15,7 @@ using NCI.OCPL.Api.BestBets.Tests.Util;
 
 namespace NCI.OCPL.Api.BestBets.Indexer.Tests
 {
-    public class ESBBIndexerServiceTests_DeleteOldIndices
+    public class ESBBIndexerServiceTests_DeleteOldIndices : ESBBIndexerServiceTests__Base
     {
         [Fact]
         public void TEST()

@@ -15,7 +15,7 @@ using NCI.OCPL.Api.BestBets.Tests.Util;
 
 namespace NCI.OCPL.Api.BestBets.Indexer.Tests
 {
-    public class ESBBIndexerServiceTests_MakeIndexCurrentAlias
+    public class ESBBIndexerServiceTests_MakeIndexCurrentAlias : ESBBIndexerServiceTests__Base
     {
         [Fact]
         public void TEST()

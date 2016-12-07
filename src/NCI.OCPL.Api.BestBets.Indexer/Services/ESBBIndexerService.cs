@@ -64,10 +64,42 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Services
             //Get the Indices assigned to an Alias
             string[] indicesToRemove = GetIndicesForAlias();
 
-            
+            //So the alias command is a bulk operation and
+            //is not done on a single index or alias, but 
+            //it is a series of add/remove commands of which
+            //require an alias name and an index.  So we need
+            //to do a bit more with our command descriptor than
+            //we usually do.  Always remember that for the compiler
+            //that 
+            // command(x => x.Param()); 
+            // is the same as
+            // command(x => { x.Param(); return x });
+            var response = _client.Alias(a =>
+            {
+                //Add the new index
+                a.Add(add => add
+                    .Index(indexName)
+                    .Alias(this._config.AliasName)
+                );
 
+                //Remove any old ones
+                foreach (string oldIndex in indicesToRemove)
+                {
+                    a.Remove(del => del
+                        .Index(oldIndex)
+                        .Alias(this._config.AliasName)
+                    );
+                }
 
-            throw new NotImplementedException();
+                return a;
+            });
+
+            if (response.IsValid)
+            {
+                throw new Exception("Error swapping indices for alias: " + this._config.AliasName, response.OriginalException);
+            }
+
+            //This returns the acknowledge true thing...
         }
 
         /// <summary>
@@ -76,27 +108,57 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Services
         /// <param name="alias"></param>
         public string[] GetIndicesForAlias()
         {
-            //Soo, if we ask for alias where the index name is that alias,
-            //then it is like we asked for host/<alias>/_aliases and then
-            //it will return only those indices mapped to that alias.
-            var response = _client.GetAlias(ga => 
-                ga
-                .Index(_config.AliasName)
-            );
-
-            if (!response.IsValid)
+            if (_client.AliasExists(aed => aed.Name(this._config.AliasName)).Exists)
             {
-                throw new Exception("Error getting Indices for alias");
-            }
+
+                //Soo, if we ask for alias where the index name is that alias,
+                //then it is like we asked for host/<alias>/_aliases and then
+                //it will return only those indices mapped to that alias.
+                var response = _client.GetAlias(ga =>
+                    ga
+                    .Index(_config.AliasName)
+                );
+
+                if (!response.IsValid)
+                {
+                    throw new Exception("Error getting Indices for alias: " + this._config.AliasName, response.OriginalException);
+                }
+                else
+                {
+                    return response.Indices.Keys.ToArray();
+                }
+            } 
             else
             {
-                return response.Indices.Keys.ToArray();
+                return new string[] { };
             }
         }
 
         public void OptimizeIndex(string indexName)
         {
-            throw new NotImplementedException();
+            var response = _client.ForceMerge(
+                Indices.Index(indexName), 
+                fmd => fmd
+                    .MaxNumSegments(1)
+                    .WaitForMerge(true)
+                    .Index(indexName)
+                    .RequestConfiguration(rcd => rcd.RequestTimeout(TimeSpan.FromSeconds(90)))
+            );
+
+            if (!response.IsValid)
+            {
+                throw new Exception("Error Optimizing index, " + indexName, response.OriginalException);
+            }
+
+            //An expected response has 1 shard that was successful.
+            if (
+                response.Shards.Total != 1 
+                || response.Shards.Successful != 1 
+                || response.Shards.Failed != 0
+            )
+            {
+                throw new Exception("Error Optimizing index," + indexName + " optimize finished unexpected response");
+            }
         }
     }
 }

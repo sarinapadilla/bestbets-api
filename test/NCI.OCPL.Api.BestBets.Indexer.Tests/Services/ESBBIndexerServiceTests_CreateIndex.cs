@@ -15,7 +15,7 @@ using NCI.OCPL.Api.BestBets.Tests.Util;
 
 namespace NCI.OCPL.Api.BestBets.Indexer.Tests
 {
-    public class ESBBIndexerServiceTests_CreateIndex
+    public class ESBBIndexerServiceTests_CreateIndex : ESBBIndexerServiceTests__Base
     {
         [Fact]
         public void CreateIndex_Response()
@@ -26,37 +26,18 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Tests
         [Fact]
         public void CreateIndex_QueryValidation()
         {
-
-            RequestData actualRequest = null;
             string aliasName = "TestAlias";
 
-            //Create connection and handle request.
-            ElasticsearchInterceptingConnection interceptConnection = new ElasticsearchInterceptingConnection();            
-            interceptConnection.RegisterRequestHandlerForType<Nest.CreateIndexResponse>((req, res) =>
-            {
-                res.StatusCode = 200;
-                res.Stream = TestingTools.GetTestFileAsStream("ES_Acknowledged_True_Response.json");
-            });
-
-            Mock<IOptions<ESBBIndexerServiceOptions>> options = new Mock<IOptions<ESBBIndexerServiceOptions>>();
-            options
-                .SetupGet(o => o.Value)
-                .Returns(new ESBBIndexerServiceOptions()
+            ESBBIndexerService service = this.GetIndexerService(
+                aliasName,
+                conn =>
                 {
-                    AliasName = aliasName
-                });
-                
-            //While this has a URI, it does not matter, an InMemoryConnection never requests
-            //from the server.
-            var pool = new SingleNodeConnectionPool(new Uri("http://localhost:9200"));
-
-            var connectionSettings = new ConnectionSettings(pool, interceptConnection);
-
-            IElasticClient client = new ElasticClient(connectionSettings);
-
-            ESBBIndexerService service = new ESBBIndexerService(
-                client,
-                options.Object
+                    conn.RegisterRequestHandlerForType<Nest.CreateIndexResponse>((req, res) =>
+                    {
+                        res.StatusCode = 200;
+                        res.Stream = TestingTools.GetTestFileAsStream("ES_Acknowledged_True_Response.json");
+                    });
+                }
             );
 
             string currTimeStamp = DateTime.Now.ToString("yyyyMMddHHmmss");

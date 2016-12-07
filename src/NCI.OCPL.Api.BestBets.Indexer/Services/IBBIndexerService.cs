@@ -34,6 +34,12 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Services
         void MakeIndexCurrentAlias(string indexName);
 
         /// <summary>
+        /// Gets a list of indices currently associated with an alias
+        /// </summary>
+        /// <returns>A list of index names.</returns>
+        string[] GetIndicesForAlias();
+
+        /// <summary>
         /// This will remove any 
         /// </summary>
         /// <param name="removeBefore"></param>

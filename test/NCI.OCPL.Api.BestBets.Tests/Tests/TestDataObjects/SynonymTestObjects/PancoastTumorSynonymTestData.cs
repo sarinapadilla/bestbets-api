@@ -7,6 +7,7 @@ namespace NCI.OCPL.Api.BestBets.Tests.CategoryTestData
 {
     public class PancoastTumorSynonymTestData : BaseSynonymTestData
     {
+        // These object contents are copied from the PancoastTumorCategoryTestData class
 
         public override string TestFilePath => "CGBBCategory.PancoastTumor.xml";
         protected override CancerGovBestBet CoreData => new CancerGovBestBet()

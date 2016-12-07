@@ -9,7 +9,7 @@ namespace NCI.OCPL.Api.BestBets.Tests.CategoryTestData
     {
         public abstract string TestFilePath { get; }
 
-        public IEnumerable<BestBetsMatch> ExpectedData
+        public IEnumerable<BestBetsMatch> ExpectedMatches
         {
             get
             {
@@ -28,7 +28,7 @@ namespace NCI.OCPL.Api.BestBets.Tests.CategoryTestData
                     from name in ExcludeSyn
                     select new { Name = name, IsExact = false, IsNegated = true };
                 var ExcludeExact =
-                    from name in IncludeSynExact
+                    from name in ExcludeSynExact
                     select new { Name = name, IsExact = true, IsNegated = true };
 
                 IEnumerable<BestBetsMatch> data =

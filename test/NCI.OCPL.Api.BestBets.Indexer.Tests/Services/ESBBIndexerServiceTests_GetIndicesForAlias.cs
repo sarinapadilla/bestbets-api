@@ -132,7 +132,7 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Tests
 
                         //Setup Response
                         res.StatusCode = 200;
-                        res.Stream = TestingTools.GetTestFileAsStream("GetIndicesForAlias_SingleItemResponse.json");
+                        res.Stream = TestingTools.GetTestFileAsStream("GetIndicesForAlias_MultiItemResponse.json");
                     });
                 }
             );

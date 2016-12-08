@@ -49,18 +49,18 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Services
             return indexName;
         }
 
-        public void DeleteOldIndices(DateTime olderThan)
+        public bool DeleteOldIndices(DateTime olderThan)
         {
             throw new NotImplementedException();
         }
 
-        public void IndexBestBetsMatches(string indexName, IEnumerable<BestBetsMatch> matches)
+        public int IndexBestBetsMatches(string indexName, IEnumerable<BestBetsMatch> matches)
         {
             //_client.Bulk
             throw new NotImplementedException();
         }
 
-        public void MakeIndexCurrentAlias(string indexName)
+        public bool MakeIndexCurrentAlias(string indexName)
         {
             //Get the Indices assigned to an Alias
             string[] indicesToRemove = GetIndicesForAlias();
@@ -100,7 +100,7 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Services
                 throw new Exception("Error swapping indices for alias: " + this._config.AliasName, response.OriginalException);
             }
 
-            //This returns the acknowledge true thing...
+            return true;
         }
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Services
             }
         }
 
-        public void OptimizeIndex(string indexName)
+        public bool OptimizeIndex(string indexName)
         {
             var response = _client.ForceMerge(
                 Indices.Index(indexName), 
@@ -160,6 +160,8 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Services
             {
                 throw new Exception("Error Optimizing index," + indexName + " optimize finished unexpected response");
             }
+
+            return true; //The task succeeded.
         }
     }
 }

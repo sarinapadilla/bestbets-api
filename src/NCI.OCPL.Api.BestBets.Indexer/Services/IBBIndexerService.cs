@@ -19,19 +19,22 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Services
         /// </summary>
         /// <param name="indexName">The name of the index where the matches should be placed.</param>
         /// <param name="matches">A collection of BestBetsMatch items.</param>
-        void IndexBestBetsMatches(string indexName, IEnumerable<BestBetsMatch> matches);
+        /// <returns>The number of items successfully indexed</returns>
+        int IndexBestBetsMatches(string indexName, IEnumerable<BestBetsMatch> matches);
 
         /// <summary>
         /// Optimizes an index.  This ensures consistent scoring across servers.
         /// </summary>
         /// <param name="indexName">The name of the index to optimize.</param>
-        void OptimizeIndex(string indexName);
+        /// <returns>A bool indicating success</returns>
+        bool OptimizeIndex(string indexName);
 
         /// <summary>
         /// This will repoint the alias to the supplied index name.
         /// </summary>
         /// <param name="indexName">The name of the index to make current</param>
-        void MakeIndexCurrentAlias(string indexName);
+        /// <returns>A bool indicating success</returns>
+        bool MakeIndexCurrentAlias(string indexName);
 
         /// <summary>
         /// Gets a list of indices currently associated with an alias
@@ -43,7 +46,8 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Services
         /// This will remove any 
         /// </summary>
         /// <param name="removeBefore"></param>
-        void DeleteOldIndices(DateTime olderThan);
+        /// <returns>A bool indicating success</returns>
+        bool DeleteOldIndices(DateTime olderThan);
 
     }
 }

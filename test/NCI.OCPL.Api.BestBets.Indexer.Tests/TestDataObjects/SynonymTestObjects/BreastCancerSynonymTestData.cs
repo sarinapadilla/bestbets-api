@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace NCI.OCPL.Api.BestBets.Tests.CategoryTestData
+﻿namespace NCI.OCPL.Api.BestBets.Indexer.Tests.CategoryTestData
 {
     public class BreastCancerSynonymTestData : BaseSynonymTestData
     {

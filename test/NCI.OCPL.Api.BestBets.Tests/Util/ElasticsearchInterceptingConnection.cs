@@ -46,6 +46,12 @@ namespace NCI.OCPL.Api.BestBets.Tests.Util
             if (!_callbackHandlers.ContainsKey(typeof(TReturn)) && _defCallbackHandler == null)
                 throw new ArgumentOutOfRangeException("There is no callback handler for defined for type, " + typeof(TReturn).ToString());
 
+            //It looks like, based on the code and use of the code, not because of actual commeents, that MadeItToResponse gets set
+            //once the Connection was able to get a response from a server.  I am going to set it here, but we may need to update later
+            //if we want to test connection failures. 
+            requestData.MadeItToResponse = true;
+
+            //Either call the callback for the specific response type, OR the default callback.
             if (_callbackHandlers.ContainsKey(typeof(TReturn))) {
                 Action<RequestData, ResponseBuilder<TReturn>> callback =
                     (Action<RequestData, ResponseBuilder<TReturn>>)_callbackHandlers[typeof(TReturn)];
@@ -61,6 +67,19 @@ namespace NCI.OCPL.Api.BestBets.Tests.Util
                     requestData,
                     builder
                 );
+            }
+
+
+
+            //Basically all requests, even HEAD requests (e.g. AliasExists) need to have a stream to work correctly.
+            //Note, a stream of nothing is still a stream.  So if you did not set a stream, we will do it for you.
+            //I am sure this will cause issues when trying to test failures of other kinds...  Good use of 4hrs tracking
+            //this stupid issue down.
+            if (builder.Stream == null) 
+            {
+                using (MemoryStream stream = new MemoryStream(new byte[0])) {
+                    builder.Stream = stream;
+                }
             }
         }
 

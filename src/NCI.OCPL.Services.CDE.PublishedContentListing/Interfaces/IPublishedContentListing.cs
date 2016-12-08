@@ -7,8 +7,8 @@ namespace NCI.OCPL.Services.CDE.PublishedContentListing
 {
     public interface IPublishedContentListing
     {
-        IEnumerable<string> Directories { get; set; }
+        IEnumerable<string> Directories { get; }
 
-        IEnumerable<IPublishedContentInfo> Files { get; set; }
+        IEnumerable<IPublishedContentInfo> Files { get; }
     }
 }

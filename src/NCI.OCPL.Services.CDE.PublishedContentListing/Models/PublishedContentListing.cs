@@ -17,12 +17,7 @@ namespace NCI.OCPL.Services.CDE.PublishedContentListing
         {
             get
             {
-                throw new NotImplementedException();
-            }
-
-            set
-            {
-                throw new NotImplementedException();
+                return this.Directories;
             }
         }
 
@@ -30,12 +25,7 @@ namespace NCI.OCPL.Services.CDE.PublishedContentListing
         {
             get
             {
-                throw new NotImplementedException();
-            }
-
-            set
-            {
-                throw new NotImplementedException();
+                return this.Files;
             }
         }
     }

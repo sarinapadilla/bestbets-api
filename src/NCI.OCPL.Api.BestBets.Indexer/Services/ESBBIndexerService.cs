@@ -95,7 +95,7 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Services
                 return a;
             });
 
-            if (response.IsValid)
+            if (!response.IsValid)
             {
                 throw new Exception("Error swapping indices for alias: " + this._config.AliasName, response.OriginalException);
             }

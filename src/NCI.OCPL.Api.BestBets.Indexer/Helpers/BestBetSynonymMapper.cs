@@ -2,10 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
-// TODO: Move to NCI.OCPL.Api.BestBetsIndexer
-namespace NCI.OCPL.Api.BestBets
+using NCI.OCPL.Api.BestBets;
+
+namespace NCI.OCPL.Api.BestBetsIndexer
 {
     /// <summary>
     /// Provides mapping functions to map a CancerGovBestBet object
@@ -42,7 +42,9 @@ namespace NCI.OCPL.Api.BestBets
                 select new { Synonym = item.Text, IsExact = _bestBet.IsExactMatch, IsNegated = true };
 
             // Combine the lists and return the actual BestBetMatch objects.
-            foreach(var item in mainList.Union(includeList).Union(excludeList))
+            // NOTE: The assumption is that there are no duplicates. Union would
+            //       remove duplicates, but at the cost of additional processing.
+            foreach(var item in mainList.Concat(includeList).Concat(excludeList))
             {
                 // Return a new object each time rather than update an existing object
                 // that might be referenced/used somewhere else.

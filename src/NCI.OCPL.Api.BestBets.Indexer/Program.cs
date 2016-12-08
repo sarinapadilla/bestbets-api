@@ -76,29 +76,38 @@ namespace NCI.OCPL.Api.BestBets.Indexer
             /// </summary>
             public void Run()
             {
-                //This needs to be pulled into its own testable method.
+                try
+                {
+                    //This needs to be pulled into its own testable method.
 
 
-                //Get the IBBIndexingService reference
-                IBBIndexerService indexer = ServiceProvider.GetRequiredService<IBBIndexerService>();
+                    //Get the IBBIndexingService reference
+                    IBBIndexerService indexer = ServiceProvider.GetRequiredService<IBBIndexerService>();
 
-                //Create new index
-                string indexName = indexer.CreateTimeStampedIndex();
+                    //Create new index
+                    string indexName = indexer.CreateTimeStampedIndex();
 
-                //Fetch bunch of BB
-                IPublishedContentListing bestBetsList = GetBestBetsList();
+                    //Fetch bunch of BB
+                    IPublishedContentListing bestBetsList = GetBestBetsList();
 
-                //Index the BB
-                IndexBestBets(bestBetsList);
+                    //Index the BB
+                    int numBBIndexed = indexer.IndexBestBetsMatches(indexName, GetBestBetMatchesFromListing(bestBetsList));
 
-                //Test the collection?
+                    //Test the collection?
 
-                //Optimize
+                    //Optimize
+                    bool didOptimize = indexer.OptimizeIndex(indexName);
 
-                //Swap Alias
+                    //Swap Alias
+                    bool didSwap = indexer.MakeIndexCurrentAlias(indexName);
 
-                //Clean Up old.
-
+                    Console.WriteLine("Indexed " + numBBIndexed.ToString());
+                    //Clean Up old.
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("We should really have a logger for this error.", ex);
+                }
             }
 
             private IPublishedContentListing GetBestBetsList()
@@ -107,16 +116,27 @@ namespace NCI.OCPL.Api.BestBets.Indexer
                 return pcService.GetItemsForPath("BestBets", "/");
             }
 
-            private void IndexBestBets(IPublishedContentListing bestBetsList)
+            /// <summary>
+            /// Gets the best bet matches from a IPublishedContentListing.
+            /// </summary>
+            /// <param name="bestBetsList">The best bets list.</param>
+            /// <returns>IEnumerator&lt;BestBetsMatch&gt;.</returns>
+            private IEnumerable<BestBetsMatch> GetBestBetMatchesFromListing(IPublishedContentListing bestBetsList)
             {
-                // TODO: Batch size as a setting.
-                // TODO: Use IPublishedContentListingService.GetPublishedFileAsync() to improve performance.
+                IPublishedContentListingService pcService = ServiceProvider.GetRequiredService<IPublishedContentListingService>();
 
-                // Create new index
-                // Loop through the list of best bets in batches of size X
-                //  Load the best bet file.
-                //  Add to the batch
-                //  Bulk save.
+                foreach (IPublishedContentInfo item in bestBetsList.Files)
+                {
+                    //Fetch Item
+                    CancerGovBestBet bbCategory = pcService.GetPublishedFile<CancerGovBestBet>(item.FullWebPath);
+
+                    //Do we really need a mapper that does this per category?  
+                    BestBetSynonymMapper mapper = new BestBetSynonymMapper(bbCategory);
+                    foreach (BestBetsMatch match in mapper)
+                    {
+                        yield return match;
+                    }
+                }
             }
         }
 
@@ -129,6 +149,8 @@ namespace NCI.OCPL.Api.BestBets.Indexer
         {
             Worker program = new Worker();
             program.Run();
+           
+            Console.Read();
         }
 
     }

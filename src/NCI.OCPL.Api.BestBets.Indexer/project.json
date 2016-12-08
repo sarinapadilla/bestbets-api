@@ -24,6 +24,7 @@
       "type": "platform",
       "version": "1.0.1"
     },
+    "morelinq": "2.0.0-beta06",
     "NCI.OCPL.Services.CDE.PublishedContentListing": "1.0.0-*",
     "NEST": "2.4.6"
   },

@@ -20,7 +20,7 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Services
         /// <param name="indexName">The name of the index where the matches should be placed.</param>
         /// <param name="matches">A collection of BestBetsMatch items.</param>
         /// <returns>The number of items successfully indexed</returns>
-        int IndexBestBetsMatches(string indexName, IEnumerable<BestBetsMatch> matches);
+        int IndexBestBetsMatches(string indexName, IEnumerable<BestBetsMatch> matches, int batchSize = 1000);
 
         /// <summary>
         /// Optimizes an index.  This ensures consistent scoring across servers.

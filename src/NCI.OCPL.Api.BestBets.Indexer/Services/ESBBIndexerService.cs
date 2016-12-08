@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 using Nest;
 using Microsoft.Extensions.Options;
+using MoreLinq; //Adds .Batch used for indexing terms
 
 namespace NCI.OCPL.Api.BestBets.Indexer.Services
 {
@@ -54,10 +55,32 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Services
             throw new NotImplementedException();
         }
 
-        public int IndexBestBetsMatches(string indexName, IEnumerable<BestBetsMatch> matches)
+        public int IndexBestBetsMatches(string indexName, IEnumerable<BestBetsMatch> matches, int batchSize = 1000)
         {
-            //_client.Bulk
-            throw new NotImplementedException();
+
+            int totalIndexed = 0;
+
+            //Note: IEnumerable<T>.Batch comes from moreLinq.
+            foreach(IEnumerable<BestBetsMatch> matchGroup in matches.Batch(batchSize))
+            {
+                var res = _client.IndexMany<BestBetsMatch>(matchGroup, index: indexName);
+
+                if (!res.IsValid)
+                {
+                    //You know what, there was an error.
+                    //res.DebugInformation will tell us why
+                    //res.ItemsWithErrors is a collection of the items, with an error message for each.
+                    //for now, stuff broke, exit.
+                    throw new Exception("Error occurred while indexing matches to " + indexName);
+                }
+                else
+                {
+                    //Update the number of items added.
+                    totalIndexed += res.Items.Count();
+                }
+            }
+
+            return totalIndexed;
         }
 
         public bool MakeIndexCurrentAlias(string indexName)
@@ -163,5 +186,6 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Services
 
             return true; //The task succeeded.
         }
+
     }
 }

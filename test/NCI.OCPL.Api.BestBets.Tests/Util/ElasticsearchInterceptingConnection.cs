@@ -107,7 +107,7 @@ namespace NCI.OCPL.Api.BestBets.Tests.Util
         /// </summary>
         /// <param name="requestData"></param>
         /// <returns></returns>
-        public object GetRequestPost(RequestData requestData)
+        public JObject GetRequestPost(RequestData requestData)
         {
             //Some requests can have this as null.  That is ok...
             if (requestData.PostData == null)
@@ -125,9 +125,7 @@ namespace NCI.OCPL.Api.BestBets.Tests.Util
 
             }
 
-            dynamic postObj = JObject.Parse(postBody);
-
-            return postObj;
+            return JObject.Parse(postBody);
         }
     }
 }

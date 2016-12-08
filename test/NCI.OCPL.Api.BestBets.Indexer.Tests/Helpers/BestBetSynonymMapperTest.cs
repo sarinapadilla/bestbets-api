@@ -9,7 +9,6 @@ using NCI.OCPL.Utils.Testing;
 using NCI.OCPL.Api.BestBets.Tests.Util;
 
 using NCI.OCPL.Api.BestBets.Indexer.Tests.CategoryTestData;
-using NCI.OCPL.Api.BestBetsIndexer;
 
 namespace NCI.OCPL.Api.BestBets.Indexer.Tests
 

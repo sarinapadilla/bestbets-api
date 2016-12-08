@@ -5,7 +5,7 @@ using System.Linq;
 
 using NCI.OCPL.Api.BestBets;
 
-namespace NCI.OCPL.Api.BestBetsIndexer
+namespace NCI.OCPL.Api.BestBets.Indexer
 {
     /// <summary>
     /// Provides mapping functions to map a CancerGovBestBet object

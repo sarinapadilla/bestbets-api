@@ -34,12 +34,12 @@ namespace NCI.OCPL.Api.BestBets.Indexer
             // Create a list for each of the Include synonyms
             var includeList =
                 from item in _bestBet.IncludeSynonyms
-                select new { Synonym = item.Text, IsExact = _bestBet.IsExactMatch, IsNegated = false };
+                select new { Synonym = item.Text, IsExact = item.IsExactMatch, IsNegated = false };
 
            // Create a list for each of the Exclude synonyms
            var excludeList=
                 from item in _bestBet.ExcludeSynonyms
-                select new { Synonym = item.Text, IsExact = _bestBet.IsExactMatch, IsNegated = true };
+                select new { Synonym = item.Text, IsExact = item.IsExactMatch, IsNegated = true };
 
             // Combine the lists and return the actual BestBetMatch objects.
             // NOTE: The assumption is that there are no duplicates. Union would

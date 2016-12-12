@@ -11,7 +11,8 @@ using System.Threading.Tasks;
 using NCI.OCPL.Utils.Testing;
 using NCI.OCPL.Api.BestBets.Indexer.Services;
 using Microsoft.Extensions.Options;
-using NCI.OCPL.Api.BestBets.Tests.Util;
+
+using NCI.OCPL.Api.BestBets.Indexer.Tests.Util;
 
 namespace NCI.OCPL.Api.BestBets.Indexer.Tests
 {
@@ -57,18 +58,20 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Tests
 
             //Make sure the Request is the expected request
             //Params for this are actual query params.
-            
+   
+            // Hostname doesn't matter, just needed so we have an absolute Uri (relative Uri allows very few operations).
+
             Uri actualReqUri = new Uri(
-                actualPath,
-                UriKind.Relative);
+                "http://localhost" + actualPath,
+                UriKind.Absolute);
+
 
             Uri expectedUri = new Uri(
-                indexName + "/_forcemerge?wait_for_merge=true&max_num_segments=1",
-                UriKind.Relative);
+                "http://localhost" + indexName + "/_forcemerge?wait_for_merge=true&max_num_segments=1",
+                UriKind.Absolute);
 
             //Check the path/parameters are as expected
-            //TODO: Need parameter order independent comparer - I swapped the params on purpose.           
-            Assert.Equal(expectedUri, actualReqUri);
+            Assert.Equal(expectedUri, actualReqUri, new UriComparer());
 
             //Check that there was not request body
             Assert.Null(actualRequestOptions);

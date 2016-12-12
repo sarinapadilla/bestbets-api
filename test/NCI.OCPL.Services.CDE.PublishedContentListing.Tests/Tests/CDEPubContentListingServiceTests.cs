@@ -14,6 +14,7 @@ using NCI.OCPL.Api.BestBets.Tests.CategoryTestData;
 using NCI.OCPL.Utils.Testing;
 using NCI.OCPL.Services.CDE.PublishedContentListing;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging.Testing;
 
 namespace NCI.OCPL.Services.CDE.Tests.CDEPubContentListingServiceTests
 {
@@ -55,7 +56,9 @@ namespace NCI.OCPL.Services.CDE.Tests.CDEPubContentListingServiceTests
                 }
             );
 
-            IPublishedContentListingService listClient = new CDEPubContentListingService(new HttpClient(mockHttp), clientOptions.Object);
+            IPublishedContentListingService listClient = new CDEPubContentListingService(new HttpClient(mockHttp),
+                clientOptions.Object,
+                NullLogger<CDEPubContentListingService>.Instance);
 
             IEnumerable<IPathListInfo> actualList = listClient.ListAvailablePaths();
 
@@ -99,7 +102,9 @@ namespace NCI.OCPL.Services.CDE.Tests.CDEPubContentListingServiceTests
                 }
             );
 
-            IPublishedContentListingService listClient = new CDEPubContentListingService(new HttpClient(mockHttp), clientOptions.Object);
+            IPublishedContentListingService listClient = new CDEPubContentListingService(new HttpClient(mockHttp),
+                clientOptions.Object,
+                NullLogger<CDEPubContentListingService>.Instance);
 
             Exception ex = Assert.Throws<NCI.OCPL.Services.CDE.PublishedContentListing.APIErrorException>(
                 // We don't care about the return value, only that an exception occured.
@@ -153,7 +158,9 @@ namespace NCI.OCPL.Services.CDE.Tests.CDEPubContentListingServiceTests
                 }
             );
 
-            IPublishedContentListingService listClient = new CDEPubContentListingService(new HttpClient(mockHttp), clientOptions.Object);
+            IPublishedContentListingService listClient = new CDEPubContentListingService(new HttpClient(mockHttp),
+                clientOptions.Object,
+                NullLogger<CDEPubContentListingService>.Instance);
 
             IPublishedContentListing actualList = listClient.GetItemsForPath(rootName, dataPath);
 
@@ -204,7 +211,9 @@ namespace NCI.OCPL.Services.CDE.Tests.CDEPubContentListingServiceTests
             );
 
 
-            IPublishedContentListingService publishedContentClient = new CDEPubContentListingService(new HttpClient(mockHttp), clientOptions.Object);
+            IPublishedContentListingService publishedContentClient = new CDEPubContentListingService(new HttpClient(mockHttp),
+                clientOptions.Object,
+                NullLogger<CDEPubContentListingService>.Instance);
 
             CancerGovBestBet actualReturn = publishedContentClient.GetPublishedFile<CancerGovBestBet>(String.Format("/PublishedContent/BestBets/{0}", filePath));
 

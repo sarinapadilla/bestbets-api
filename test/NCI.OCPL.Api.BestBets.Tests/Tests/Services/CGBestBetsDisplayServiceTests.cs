@@ -11,6 +11,7 @@ using NCI.OCPL.Utils.Testing;
 
 using NCI.OCPL.Api.BestBets.Services;
 using NCI.OCPL.Api.BestBets.Tests.CategoryTestData;
+using Microsoft.Extensions.Logging.Testing;
 
 namespace NCI.OCPL.Api.BestBets.Tests.CGBestBetsDisplayServiceTests
 {
@@ -53,7 +54,9 @@ namespace NCI.OCPL.Api.BestBets.Tests.CGBestBetsDisplayServiceTests
                 }
             );
 
-            CGBestBetsDisplayService bbClient = new CGBestBetsDisplayService(new HttpClient(mockHttp), bbClientOptions.Object);
+            CGBestBetsDisplayService bbClient = new CGBestBetsDisplayService(new HttpClient(mockHttp),
+                bbClientOptions.Object,
+                NullLogger<CGBestBetsDisplayService>.Instance);
 
             IBestBetDisplay actDisplay = bbClient.GetBestBetForDisplay(data.ExpectedData.ID);
 

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace NCI.OCPL.Services.CDE.PublishedContentListing
 {
@@ -13,11 +15,15 @@ namespace NCI.OCPL.Services.CDE.PublishedContentListing
     {
         private HttpClient _client;
         private PublishedContentListingServiceOptions _options;
+        private readonly ILogger<CDEPubContentListingService> _logger;
 
-        public CDEPubContentListingService(HttpClient client, IOptions<PublishedContentListingServiceOptions> options)
+        public CDEPubContentListingService(HttpClient client,
+            IOptions<PublishedContentListingServiceOptions> options,
+            ILogger<CDEPubContentListingService> logger)
         {
             _client = client;
             _options = options.Value;
+            _logger = logger;
         }
 
         /// <summary>
@@ -52,8 +58,9 @@ namespace NCI.OCPL.Services.CDE.PublishedContentListing
                     string jsonData = message.Content.ReadAsStringAsync().Result;
                     pclData = JsonConvert.DeserializeObject<PublishedContentListing>(jsonData);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    _logger.LogError("Bad Data Structure.\n{0}", ex.Message);
                     throw new APIErrorException(500, "Bad Data Structure.");
                 }
 
@@ -61,7 +68,8 @@ namespace NCI.OCPL.Services.CDE.PublishedContentListing
             }
             else
             {
-                throw new APIErrorException(500, "Error connecting to search servers");
+                _logger.LogError("Error connecting to search servers.\nStatus: {0}, '{1}'\n{2}", message.StatusCode, message.ReasonPhrase, requestUri.Uri.ToString());
+                throw new APIErrorException(500, "Error connecting to search servers.");
             }
         }
 
@@ -88,8 +96,9 @@ namespace NCI.OCPL.Services.CDE.PublishedContentListing
                     string jsonData = message.Content.ReadAsStringAsync().Result;
                     pathList = JsonConvert.DeserializeObject<PathListInfo[]>(jsonData);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    _logger.LogError("Bad Data Structure.\n{0}", ex.Message);
                     throw new APIErrorException(500, "Bad Data Structure.");
                 }
 
@@ -97,6 +106,7 @@ namespace NCI.OCPL.Services.CDE.PublishedContentListing
             }
             else
             {
+                _logger.LogError("Error connecting to search servers.\nStatus: {0}, '{1}'\n{2}", message.StatusCode, message.ReasonPhrase, requestUri.Uri.ToString());
                 throw new APIErrorException(500, "Error connecting to search servers");
             }
         }
@@ -127,13 +137,17 @@ namespace NCI.OCPL.Services.CDE.PublishedContentListing
                         return (TModel)serializer.Deserialize(xmlReader);
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    _logger.LogError("Bad Data Structure.\n{0}", ex.Message);
                     throw new APIErrorException(500, "Bad XML Structure.");
                 }
             }
             else
             {
+                // No need to log invalid requests
+                if (message.StatusCode != HttpStatusCode.NotFound)
+                    _logger.LogError("Could not retrieve {0},\n'{1}' {2}", requestUri.Uri, message.StatusCode, message.ReasonPhrase);
                 throw new APIErrorException(500, string.Format("Could not retrieve {0}", requestUri.Uri));
             }
 

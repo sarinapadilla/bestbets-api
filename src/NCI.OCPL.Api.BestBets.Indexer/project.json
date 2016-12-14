@@ -6,7 +6,7 @@
     "copyToOutput": {
       "include": [ "appsettings.json" ]
     },
-    "debugType": "portable"
+    "debugType": "full"
   },
 
   "dependencies": {

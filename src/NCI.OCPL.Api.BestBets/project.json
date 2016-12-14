@@ -39,7 +39,7 @@
     "emitEntryPoint": true,
     "preserveCompilationContext": true,
     "outputName": "NCI.OCPL.Api.BestBets",
-    "debugType": "full"
+    "debugType": "portable"
   },
 
   "runtimeOptions": {

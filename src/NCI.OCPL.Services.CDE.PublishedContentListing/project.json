@@ -1,6 +1,6 @@
 {
   "buildOptions": {
-    "debugType": "full"
+    "debugType": "portable"
   },
 
   "dependencies": {

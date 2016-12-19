@@ -1,13 +1,24 @@
 #!/bin/sh
-# This is the template for a development (integration) build.
-# Command Line Parameters:
-#   $1 - Source path
-#   $2 - Unit Test path
+# Development (integration) build.
 
-SRC_PATH=$1      # $1 - Source path
-TEST_PATH=$2     # $2 - Unit Test path
+export SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+export PROJECT_HOME="$(cd $SCRIPT_PATH/../.. && pwd)"
+export TEST_ROOT=${PROJECT_HOME}/test
+export CURDIR=`pwd`
+
 
 echo Running Integration Build.
+
+# Go to the project home foldder and restore packages
+cd $PROJECT_HOME
+echo Restoring packages
 dotnet restore
-dotnet build $TEST_PATH # Build unit test and dependencies.
-dotnet test $TEST_PATH
+
+# Build and run unit tests.
+echo Executing unit tests
+for test in $(ls -d ${TEST_ROOT}/*/); do
+    dotnet test $test
+done
+
+# Put things back the way we found them.
+cd $CURDIR

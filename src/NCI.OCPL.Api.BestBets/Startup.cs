@@ -4,9 +4,12 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Cors.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -81,7 +84,10 @@ namespace NCI.OCPL.Api.BestBets
             });
 
             //Add our Match Service
-            services.AddTransient<IBestBetsMatchService, ESBestBetsMatchService>();            
+            services.AddTransient<IBestBetsMatchService, ESBestBetsMatchService>();
+
+            // Create CORS policies.
+            services.AddCors();
 
             // Add framework services.
             services.AddMvc();            
@@ -92,6 +98,9 @@ namespace NCI.OCPL.Api.BestBets
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
+
+            // Allow use from anywhere.
+            app.UseCors(builder => builder.AllowAnyOrigin());
 
             // This is equivelant to the old Global.asax OnError event handler.
             // It will handle any unhandled exception and return a status code to the

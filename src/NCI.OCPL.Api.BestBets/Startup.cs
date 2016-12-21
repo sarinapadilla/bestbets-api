@@ -83,6 +83,9 @@ namespace NCI.OCPL.Api.BestBets
                 return new ElasticClient(settings);
             });
 
+            //Add in the token analyzer
+            services.AddTransient<ITokenAnalyzerService, ESTokenAnalyzerService>();
+
             //Add our Match Service
             services.AddTransient<IBestBetsMatchService, ESBestBetsMatchService>();
 

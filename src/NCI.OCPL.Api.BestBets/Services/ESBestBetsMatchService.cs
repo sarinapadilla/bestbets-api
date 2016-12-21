@@ -17,14 +17,16 @@ namespace NCI.OCPL.Api.BestBets.Services
     public class ESBestBetsMatchService : IBestBetsMatchService
     {
         private IElasticClient _elasticClient;
+        private ITokenAnalyzerService _tokenAnalyzer;
         private readonly ILogger<ESBestBetsMatchService> _logger;
 
         /// <summary>
         /// Creates a new instance of a ESBestBetsMatchService
         /// </summary>        
-        public ESBestBetsMatchService(IElasticClient client, ILogger<ESBestBetsMatchService> logger) //Needs someway to get an IElasticClient 
+        public ESBestBetsMatchService(IElasticClient client, ITokenAnalyzerService tokenAnalyzer, ILogger<ESBestBetsMatchService> logger) //Needs someway to get an IElasticClient 
         {
             _elasticClient = client;
+            _tokenAnalyzer = tokenAnalyzer;
             _logger = logger;
         }
 
@@ -38,7 +40,7 @@ namespace NCI.OCPL.Api.BestBets.Services
         {
 
             // Step 2. Get Number of Tokens in the term
-            int numTokens = GetTokenCount(cleanedTerm);
+            int numTokens = _tokenAnalyzer.GetTokenCount(cleanedTerm);
 
             // Step 4. Iterate over the matches    
             IEnumerable<BestBetsMatch> matches = GetBestBetMatches(
@@ -128,6 +130,7 @@ namespace NCI.OCPL.Api.BestBets.Services
             {
                 var response = _elasticClient.SearchTemplate<BestBetsMatch>(sd => {
                     sd = sd
+                    //TODO: Configure alias and not hardcode
                     .Index("bestbets")
                     .Type("synonyms")
                     .File(templateFileName)
@@ -161,40 +164,5 @@ namespace NCI.OCPL.Api.BestBets.Services
                 }
             }
         }
-
-
-        /// <summary>
-        /// Gets a count of the number of tokens as tokenized by elasticsearch
-        /// </summary>
-        /// <param name="term">The term to get token count</param>
-        /// <returns>The number of tokens in the term</returns>
-        private int GetTokenCount(string term)
-        {
-            var analyzeResponse = this._elasticClient.Analyze(
-                a => a
-                .Index("bestbets")
-                .Analyzer("nostem")
-                .Text(term)
-            );
-
-            if (!analyzeResponse.IsValid)
-            {
-                _logger.LogError("Elasticsearch Response for GetTokenCount is Not Valid.  Term '{0}'", term);
-                throw new APIErrorException(500, "Errors Occurred.");
-            }
-
-            int numberOfTokens = 0;
-            if (analyzeResponse.Tokens != null)
-            {
-                foreach (AnalyzeToken t in analyzeResponse.Tokens)
-                {
-                    numberOfTokens++;
-                }
-            }
-
-            return numberOfTokens;
-        }
-
-
     }
 }

@@ -9,6 +9,12 @@
     "debugType": "portable"
   },
 
+  "publishOptions": {
+    "include": [
+      "appsettings.json"
+    ]
+  },
+
   "dependencies": {
     "Elasticsearch.Net": "2.4.6",
     "Microsoft.Extensions.Configuration": "1.0.0",

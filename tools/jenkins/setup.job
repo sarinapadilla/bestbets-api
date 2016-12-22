@@ -6,7 +6,7 @@
 */
 
 
-def folderName  = 'BestBets-Svc'    // Jenkins folder where the jbos will be placed.
+def folderName  = 'best-bets-api'    // Jenkins folder where the jbos will be placed.
 
 def sourcePath = 'src/NCI.OCPL.Api.BestBets'       // Source code path relative to the working directory
 def testPath = 'test/NCI.OCPL.Api.BestBets.Tests'  // Unit test code path relative to the working directory  
@@ -17,7 +17,7 @@ def GH_USER_KEY = 'NCIOCPL-GitHub'    // Jenkins ID of the credential string con
 def GH_USER_TOKEN_KEY = 'NCIOCPL-GitHub-Token'    // Jenkins ID of the credential string containing the GitHub access token for creating releases.
 
 def VERSION_NUMBER = '0.1.5'            // Project version number, following semantic versioning.
-def PROJECT_NAME = 'BestBets-Svc'     // Project name.
+def PROJECT_NAME = 'best-bets-api'     // Project name.
 
 def sourceRepository = "$GH_ORGANIZATION_NAME/$GH_REPO_NAME"
 
@@ -33,16 +33,16 @@ def releaseToProd = 'release-to-prod'
 folder(folderName)
 
 
-job("${folderName}/${devBuild}") {
+job("${folderName}/_lower/${devBuild}") {
     scm {
         github(sourceRepository)
     }
     steps {
-        shell("./build/${devBuild}.sh ${sourcePath} ${testPath}")
+        shell("./tools/build/${devBuild}.sh")
     }
 }
 
-job("${folderName}/${releaseBuild}") {
+job("${folderName}/_lower/${releaseBuild}") {
     // Set up GitHub security token as a variable in the job.
     // It ends up being passed to the shell script. 
     wrappers {
@@ -62,24 +62,24 @@ job("${folderName}/${releaseBuild}") {
         github(sourceRepository)
     }
     steps {
-        shell("./build/${releaseBuild}.sh ${sourcePath} ${testPath}" + ' $RELEASE_TOKEN')
+        shell("./tools/build/${releaseBuild}.sh ${sourcePath} ${testPath}" + ' $RELEASE_TOKEN')
     }
 }
 
-job("${folderName}/${releaseToStage}") {
+job("${folderName}/_upper/${releaseToStage}") {
     scm {
         github(sourceRepository)
     }
     steps {
-        shell("./build/${releaseToStage}.sh ${sourcePath} ${testPath}")
+        shell("./tools/build/${releaseToStage}.sh ${sourcePath} ${testPath}")
     }
 }
 
-job("${folderName}/${releaseToProd}") {
+job("${folderName}/_upper/${releaseToProd}") {
     scm {
         github(sourceRepository)
     }
     steps {
-        shell("./build/${releaseToProd}.sh ${sourcePath} ${testPath}")
+        shell("./tools/build/${releaseToProd}.sh ${sourcePath} ${testPath}")
     }
 }

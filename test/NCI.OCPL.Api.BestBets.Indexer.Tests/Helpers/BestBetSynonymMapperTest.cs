@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
+using Moq;
 using Xunit;
 using NCI.OCPL.Utils.Testing;
 using NCI.OCPL.Api.BestBets.Tests.Util;
@@ -14,17 +16,16 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Tests
     public class BestBetSynonymMapperTest
     {
         public static IEnumerable<object[]> MappingData => new[] {
-            new object[] { new PancoastTumorSynonymTestData() },
-            new object[] { new BreastCancerSynonymTestData() }
+            new object[] { SynonymTestData.LoadTestData("CGBBSynonyms.PancoastTumor.json") },
+            new object[] { SynonymTestData.LoadTestData("CGBBSynonyms.BreastCancer.json") }
         };
-
 
         /// <summary>
         /// Verify that the correct number of synonmyms is created.
         /// </summary>
         /// <param name="data">The BaseSynonymTestData containing reference data.</param>
         [Theory, MemberData("MappingData")]
-        void CorrectNumberOfSynonymsFound(BaseSynonymTestData data)
+        void CorrectNumberOfSynonymsFound(SynonymTestData data)
         {
             // Load test BestBet object
             string filePath = data.TestFilePath;
@@ -33,7 +34,10 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Tests
             int expectedCount = data.ExpectedMatches.Count();
 
             // Create a BestBetMapper from a test BestBet.
-            BestBetSynonymMapper mapper = new BestBetSynonymMapper(testData);
+            BestBetSynonymMapper mapper = new BestBetSynonymMapper(
+                GetTokenizerServiceForData(data), 
+                testData
+            );
 
             int actualCount = mapper.Count();
 
@@ -46,7 +50,7 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Tests
         /// </summary>
         /// <param name="data"></param>
         [Theory, MemberData("MappingData")]
-        void SynonymsMappedCorrectly(BaseSynonymTestData data)
+        void SynonymsMappedCorrectly(SynonymTestData data)
         {
             // Load test BestBet object
             string filePath = data.TestFilePath;
@@ -58,7 +62,10 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Tests
                 dictExpectedMatches.Add(item.Synonym, item);
 
             // Create a BestBetMapper from a test BestBet.
-            BestBetSynonymMapper mapper = new BestBetSynonymMapper(testData);
+            BestBetSynonymMapper mapper = new BestBetSynonymMapper(
+                GetTokenizerServiceForData(data), 
+                testData
+            );
 
             Assert.All(mapper, match => {
                 string synonym = match.Synonym;
@@ -66,5 +73,23 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Tests
                 Assert.Equal(dictExpectedMatches[synonym], match, new BestBetsMatchComparer());
             });
         }
+
+        private ITokenAnalyzerService GetTokenizerServiceForData(SynonymTestData data)
+        {
+            
+
+            Mock<ITokenAnalyzerService> mockTokenService = new Mock<ITokenAnalyzerService>();
+            mockTokenService
+                .Setup(ts => ts.GetTokenCount(
+                    It.IsAny<string>()
+                 ))
+                 .Returns((string input) =>
+                 {
+                     return data.GetTokenCount(input);
+                 });
+
+            return mockTokenService.Object;
+        }
+
     }
 }

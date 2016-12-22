@@ -32,117 +32,62 @@ namespace NCI.OCPL.Api.BestBets.Indexer
             /// </summary>
             public Worker()
             {
-                var builder = new ConfigurationBuilder()
-                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                    .AddEnvironmentVariables();
-                Configuration = builder.Build();
-
-                ServiceCollection services = new ServiceCollection();
-
-                this.ConfigureServices(services);
-
-                ServiceProvider = services.BuildServiceProvider();
             }
 
-            public IConfigurationRoot Configuration { get; }
 
-            public IServiceProvider ServiceProvider { get; }
-
-            // This method gets called by the runtime. Use this method to add services to the container.
-            public void ConfigureServices(IServiceCollection services)
-            {
-
-                services.AddLogging();
-                services.AddOptions();
-
-                services.Configure<CGBestBetsDisplayServiceOptions>(Configuration.GetSection("CGBestBetsDisplayService"));
-                services.Configure<ESBBIndexerServiceOptions>(Configuration.GetSection("ESBBIndexerService"));
-                services.Configure<ElasticSearchOptions>(Configuration.GetSection("Elasticsearch"));
-                services.Configure<PublishedContentListingServiceOptions>(Configuration.GetSection("CDEPubContentListingService"));
-
-                services.AddSingleton<ConfiguredElasticClientFactory, ConfiguredElasticClientFactory>();
-                services.AddTransient<IElasticClient>(p => p.GetRequiredService<ConfiguredElasticClientFactory>().GetInstance());
-
-                services.AddSingleton<HttpClient, HttpClient>();
-                services.AddTransient<ITokenAnalyzerService, ESTokenAnalyzerService>();
-
-                services.AddTransient<IPublishedContentListingService, CDEPubContentListingService>();
-
-               
-                //Add others
-                services.AddSingleton<IBBIndexerService, ESBBIndexerService>();
-            }
-
-            /// <summary>
-            /// This actually runs the program.
-            /// </summary>
-            public void Run()
-            {
-                try
-                {
-                    //This needs to be pulled into its own testable method.
-
-
-                    //Get the IBBIndexingService reference
-                    IBBIndexerService indexer = ServiceProvider.GetRequiredService<IBBIndexerService>();
-
-                    //Create new index
-                    string indexName = indexer.CreateTimeStampedIndex();
-
-                    //Fetch bunch of BB
-                    IPublishedContentListing bestBetsList = GetBestBetsList();
-
-                    //Index the BB
-                    int numBBIndexed = indexer.IndexBestBetsMatches(indexName, GetBestBetMatchesFromListing(bestBetsList));
-
-                    //Test the collection?
-
-                    //Optimize
-                    bool didOptimize = indexer.OptimizeIndex(indexName);
-
-                    //Swap Alias
-                    bool didSwap = indexer.MakeIndexCurrentAlias(indexName);
-
-                    Console.WriteLine("Indexed " + numBBIndexed.ToString());
-                    //Clean Up old.
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception("We should really have a logger for this error.", ex);
-                }
-            }
-
-            private IPublishedContentListing GetBestBetsList()
-            {
-                IPublishedContentListingService pcService = ServiceProvider.GetRequiredService<IPublishedContentListingService>();
-                return pcService.GetItemsForPath("BestBets", "/");
-            }
-
-            /// <summary>
-            /// Gets the best bet matches from a IPublishedContentListing.
-            /// </summary>
-            /// <param name="bestBetsList">The best bets list.</param>
-            /// <returns>IEnumerator&lt;BestBetsMatch&gt;.</returns>
-            private IEnumerable<BestBetsMatch> GetBestBetMatchesFromListing(IPublishedContentListing bestBetsList)
-            {
-                IPublishedContentListingService pcService = ServiceProvider.GetRequiredService<IPublishedContentListingService>();
-                ITokenAnalyzerService tokenService = ServiceProvider.GetRequiredService<ITokenAnalyzerService>();
-
-                foreach (IPublishedContentInfo item in bestBetsList.Files)
-                {
-                    //Fetch Item
-                    CancerGovBestBet bbCategory = pcService.GetPublishedFile<CancerGovBestBet>(item.FullWebPath);
-
-                    //Do we really need a mapper that does this per category?  
-                    BestBetSynonymMapper mapper = new BestBetSynonymMapper(tokenService, bbCategory);
-                    foreach (BestBetsMatch match in mapper)
-                    {
-                        yield return match;
-                    }
-                }
-            }
         }
 
+        public Program()
+        {
+            var builder = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables();
+            Configuration = builder.Build();
+
+            ServiceCollection services = new ServiceCollection();
+
+            this.ConfigureServices(services);
+
+            ServiceProvider = services.BuildServiceProvider();
+        }
+
+        public IConfigurationRoot Configuration { get; }
+
+        public IServiceProvider ServiceProvider { get; }
+
+        // This method gets called by the runtime. Use this method to add services to the container.
+        public void ConfigureServices(IServiceCollection services)
+        {
+
+            services.AddLogging();
+            services.AddOptions();
+
+            services.Configure<CGBestBetsDisplayServiceOptions>(Configuration.GetSection("CGBestBetsDisplayService"));
+            services.Configure<ESBBIndexerServiceOptions>(Configuration.GetSection("ESBBIndexerService"));
+            services.Configure<ElasticSearchOptions>(Configuration.GetSection("Elasticsearch"));
+            services.Configure<PublishedContentListingServiceOptions>(Configuration.GetSection("CDEPubContentListingService"));
+
+            services.AddSingleton<ConfiguredElasticClientFactory, ConfiguredElasticClientFactory>();
+            services.AddTransient<IElasticClient>(p => p.GetRequiredService<ConfiguredElasticClientFactory>().GetInstance());
+
+            services.AddSingleton<HttpClient, HttpClient>();
+            services.AddTransient<ITokenAnalyzerService, ESTokenAnalyzerService>();
+
+            services.AddTransient<IPublishedContentListingService, CDEPubContentListingService>();
+
+
+            //Add others
+            services.AddSingleton<IBBIndexerService, ESBBIndexerService>();
+
+            //Add the indexer, this is so all those wonderful services above can be 
+            //injected into a new BestBetsIndexer instance.
+            services.AddTransient<BestBetsIndexer, BestBetsIndexer>();
+        }
+
+        private void Run()
+        {
+            BestBetsIndexer indexer = ServiceProvider.GetRequiredService<BestBetsIndexer>();
+        }
 
         /// <summary>
         /// Main entry point into this program.
@@ -150,9 +95,10 @@ namespace NCI.OCPL.Api.BestBets.Indexer
         /// <param name="args"></param>
         public static void Main(string[] args)
         {
-            Worker program = new Worker();
+            Program program = new Program();
             program.Run();
-           
+
+
             Console.Read();
         }
 

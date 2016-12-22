@@ -29,9 +29,6 @@ def releaseBuild = 'release-build'
 def releaseToStage = 'release-to-stage'
 def releaseToProd = 'release-to-prod'
 
-// Create the folder where all the jobs will be created.
-folder(folderName)
-
 
 job("${folderName}/_lower/${devBuild}") {
     scm {

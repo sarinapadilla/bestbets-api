@@ -1,0 +1,761 @@
+﻿{
+  "TestFilePath": "CGBBCategory.BreastCancer.xml",
+  "ID": "36408",
+  "Name": "Breast Cancer",
+  "Weight": 19,
+  "IsExactMatch": false,
+  "Language": "en",
+  "Display": true,
+  "HTML": "<div class=\"managed list\">\n<ul>\n<li class=\"general-list-item general list-item\">\n<!-- cgvSnListItemGeneral -->\n<!-- Image -->\n<!-- End Image -->\n<div class=\"title-and-desc title desc container\"><a class=\"title\" href=\"/types/breast\">Breast Cancer—Patient Version</a><div class=\"description\"><p class=\"body\">NCI's gateway for information about breast cancer.</p></div><!-- end description --></div><!-- end title & desc container -->\n</li><li class=\"general-list-item general list-item\">\n<!-- cgvSnListItemGeneral -->\n<!-- Image -->\n<!-- End Image -->\n<div class=\"title-and-desc title desc container\"><a class=\"title\" href=\"/research/progress/snapshots/breast\">A Snapshot of Breast Cancer</a><div class=\"description\"><p class=\"body\">Information on trends in incidence, mortality, and NCI funding for breast cancer; examples of related NCI initiatives and selected research advances.</p></div><!-- end description --></div><!-- end title & desc container -->\n</li></ul>\n</div>",
+  "CategoryTokenCount": 2,
+  "IncludeSyn": [
+    {
+      "Term": "brest",
+      "TokenCount": 1
+    },
+    {
+      "Term": "breastcancer",
+      "TokenCount": 1
+    },
+    {
+      "Term": "bresat",
+      "TokenCount": 1
+    },
+    {
+      "Term": "breast",
+      "TokenCount": 1
+    },
+    {
+      "Term": "brast",
+      "TokenCount": 1
+    },
+    {
+      "Term": "ductal carcinoma",
+      "TokenCount": 2
+    },
+    {
+      "Term": "breat",
+      "TokenCount": 1
+    },
+    {
+      "Term": "braest",
+      "TokenCount": 1
+    },
+    {
+      "Term": "beast",
+      "TokenCount": 1
+    },
+    {
+      "Term": "breats",
+      "TokenCount": 1
+    },
+    {
+      "Term": "ductual carcinoma",
+      "TokenCount": 2
+    },
+    {
+      "Term": "ductile carcinoma",
+      "TokenCount": 2
+    },
+    {
+      "Term": "lobular carcinoma",
+      "TokenCount": 2
+    }
+  ],
+  "IncludeSynExact": [
+    {
+      "Term": "mammary",
+      "TokenCount": 1
+    },
+    {
+      "Term": "mammary carcinoma",
+      "TokenCount": 2
+    }
+  ],
+  "ExcludeSyn": [
+    {
+      "Term": "wyntk",
+      "TokenCount": 1
+    },
+    {
+      "Term": "nodule",
+      "TokenCount": 1
+    },
+    {
+      "Term": "symtoms",
+      "TokenCount": 1
+    },
+    {
+      "Term": "fibrocystic",
+      "TokenCount": 1
+    },
+    {
+      "Term": "insitu",
+      "TokenCount": 1
+    },
+    {
+      "Term": "cyst",
+      "TokenCount": 1
+    },
+    {
+      "Term": "DVD",
+      "TokenCount": 1
+    },
+    {
+      "Term": "symptoms",
+      "TokenCount": 1
+    },
+    {
+      "Term": "bands",
+      "TokenCount": 1
+    },
+    {
+      "Term": "common",
+      "TokenCount": 1
+    },
+    {
+      "Term": "risk",
+      "TokenCount": 1
+    },
+    {
+      "Term": "lavage",
+      "TokenCount": 1
+    },
+    {
+      "Term": "sister",
+      "TokenCount": 1
+    },
+    {
+      "Term": "ultrasound",
+      "TokenCount": 1
+    },
+    {
+      "Term": "size",
+      "TokenCount": 1
+    },
+    {
+      "Term": "survey",
+      "TokenCount": 1
+    },
+    {
+      "Term": "milk",
+      "TokenCount": 1
+    },
+    {
+      "Term": "surgery",
+      "TokenCount": 1
+    },
+    {
+      "Term": "colloid",
+      "TokenCount": 1
+    },
+    {
+      "Term": "picture",
+      "TokenCount": 1
+    },
+    {
+      "Term": "tool",
+      "TokenCount": 1
+    },
+    {
+      "Term": "exam",
+      "TokenCount": 1
+    },
+    {
+      "Term": "wristbands",
+      "TokenCount": 1
+    },
+    {
+      "Term": "testing",
+      "TokenCount": 1
+    },
+    {
+      "Term": "braclets",
+      "TokenCount": 1
+    },
+    {
+      "Term": "calculator",
+      "TokenCount": 1
+    },
+    {
+      "Term": "implant",
+      "TokenCount": 1
+    },
+    {
+      "Term": "test",
+      "TokenCount": 1
+    },
+    {
+      "Term": "inflammitory",
+      "TokenCount": 1
+    },
+    {
+      "Term": "symptons",
+      "TokenCount": 1
+    },
+    {
+      "Term": "Consortium",
+      "TokenCount": 1
+    },
+    {
+      "Term": "disparities",
+      "TokenCount": 1
+    },
+    {
+      "Term": "pregnancy",
+      "TokenCount": 1
+    },
+    {
+      "Term": "memory",
+      "TokenCount": 1
+    },
+    {
+      "Term": "atypical",
+      "TokenCount": 1
+    },
+    {
+      "Term": "bracelet",
+      "TokenCount": 1
+    },
+    {
+      "Term": "reduction",
+      "TokenCount": 1
+    },
+    {
+      "Term": "Long Island",
+      "TokenCount": 2
+    },
+    {
+      "Term": "Avastin",
+      "TokenCount": 1
+    },
+    {
+      "Term": "inflamitory",
+      "TokenCount": 1
+    },
+    {
+      "Term": "braclet",
+      "TokenCount": 1
+    },
+    {
+      "Term": "hyperplasia",
+      "TokenCount": 1
+    },
+    {
+      "Term": "endoscopy",
+      "TokenCount": 1
+    },
+    {
+      "Term": "angiosarcoma",
+      "TokenCount": 1
+    },
+    {
+      "Term": "augmentation",
+      "TokenCount": 1
+    },
+    {
+      "Term": "month",
+      "TokenCount": 1
+    },
+    {
+      "Term": "mri",
+      "TokenCount": 1
+    },
+    {
+      "Term": "Group",
+      "TokenCount": 1
+    },
+    {
+      "Term": "feeding",
+      "TokenCount": 1
+    },
+    {
+      "Term": "mucinous",
+      "TokenCount": 1
+    },
+    {
+      "Term": "calcifications",
+      "TokenCount": 1
+    },
+    {
+      "Term": "changes",
+      "TokenCount": 1
+    },
+    {
+      "Term": "schwanoma",
+      "TokenCount": 1
+    },
+    {
+      "Term": "papillary",
+      "TokenCount": 1
+    },
+    {
+      "Term": "mass",
+      "TokenCount": 1
+    },
+    {
+      "Term": "tenderness",
+      "TokenCount": 1
+    },
+    {
+      "Term": "history",
+      "TokenCount": 1
+    },
+    {
+      "Term": "nutrition",
+      "TokenCount": 1
+    },
+    {
+      "Term": "cells",
+      "TokenCount": 1
+    },
+    {
+      "Term": "calcium",
+      "TokenCount": 1
+    },
+    {
+      "Term": "Moving Beyond",
+      "TokenCount": 2
+    },
+    {
+      "Term": "photo",
+      "TokenCount": 1
+    },
+    {
+      "Term": "syptoms",
+      "TokenCount": 1
+    },
+    {
+      "Term": "cancer center",
+      "TokenCount": 1
+    },
+    {
+      "Term": "brachytherapy",
+      "TokenCount": 1
+    },
+    {
+      "Term": "examination",
+      "TokenCount": 1
+    },
+    {
+      "Term": "slides",
+      "TokenCount": 1
+    },
+    {
+      "Term": "inflammatory",
+      "TokenCount": 1
+    },
+    {
+      "Term": "bilateral",
+      "TokenCount": 1
+    },
+    {
+      "Term": "inflamatory",
+      "TokenCount": 1
+    },
+    {
+      "Term": "thermography",
+      "TokenCount": 1
+    },
+    {
+      "Term": "alcohol",
+      "TokenCount": 1
+    },
+    {
+      "Term": "itchy",
+      "TokenCount": 1
+    },
+    {
+      "Term": "symtems",
+      "TokenCount": 1
+    },
+    {
+      "Term": "triplenegative",
+      "TokenCount": 1
+    },
+    {
+      "Term": "DCIS",
+      "TokenCount": 1
+    },
+    {
+      "Term": "rash",
+      "TokenCount": 1
+    },
+    {
+      "Term": "screening",
+      "TokenCount": 1
+    },
+    {
+      "Term": "imflamatory",
+      "TokenCount": 1
+    },
+    {
+      "Term": "elderly",
+      "TokenCount": 1
+    },
+    {
+      "Term": "tubular",
+      "TokenCount": 1
+    },
+    {
+      "Term": "reconstruction",
+      "TokenCount": 1
+    },
+    {
+      "Term": "self-examination",
+      "TokenCount": 2
+    },
+    {
+      "Term": "tea",
+      "TokenCount": 1
+    },
+    {
+      "Term": "itching",
+      "TokenCount": 1
+    },
+    {
+      "Term": "symtons",
+      "TokenCount": 1
+    },
+    {
+      "Term": "survivors",
+      "TokenCount": 1
+    },
+    {
+      "Term": "Paget",
+      "TokenCount": 1
+    },
+    {
+      "Term": "HRT",
+      "TokenCount": 1
+    },
+    {
+      "Term": "hormone therapy",
+      "TokenCount": 2
+    },
+    {
+      "Term": "soy",
+      "TokenCount": 1
+    },
+    {
+      "Term": "HER2",
+      "TokenCount": 1
+    },
+    {
+      "Term": "obesity",
+      "TokenCount": 1
+    },
+    {
+      "Term": "density",
+      "TokenCount": 1
+    },
+    {
+      "Term": "osteosarcoma",
+      "TokenCount": 1
+    },
+    {
+      "Term": "marker",
+      "TokenCount": 1
+    },
+    {
+      "Term": "myths",
+      "TokenCount": 1
+    },
+    {
+      "Term": "vaccine",
+      "TokenCount": 1
+    },
+    {
+      "Term": "occult",
+      "TokenCount": 1
+    },
+    {
+      "Term": "imflammatory",
+      "TokenCount": 1
+    },
+    {
+      "Term": "infiltrante",
+      "TokenCount": 1
+    },
+    {
+      "Term": "Living Each Day",
+      "TokenCount": 3
+    },
+    {
+      "Term": "swelling",
+      "TokenCount": 1
+    },
+    {
+      "Term": "detection",
+      "TokenCount": 1
+    },
+    {
+      "Term": "metaplastic",
+      "TokenCount": 1
+    },
+    {
+      "Term": "dense",
+      "TokenCount": 1
+    },
+    {
+      "Term": "How do you get",
+      "TokenCount": 4
+    },
+    {
+      "Term": "cost",
+      "TokenCount": 1
+    },
+    {
+      "Term": "pain",
+      "TokenCount": 1
+    },
+    {
+      "Term": "young women",
+      "TokenCount": 2
+    },
+    {
+      "Term": "stereotactic",
+      "TokenCount": 1
+    },
+    {
+      "Term": "diet",
+      "TokenCount": 1
+    },
+    {
+      "Term": "biopsy",
+      "TokenCount": 1
+    },
+    {
+      "Term": "discharge",
+      "TokenCount": 1
+    },
+    {
+      "Term": "basal",
+      "TokenCount": 1
+    },
+    {
+      "Term": "multifocal",
+      "TokenCount": 1
+    },
+    {
+      "Term": "quiz",
+      "TokenCount": 1
+    },
+    {
+      "Term": "schwannoma",
+      "TokenCount": 1
+    },
+    {
+      "Term": "adenoid cystic",
+      "TokenCount": 2
+    },
+    {
+      "Term": "advanced",
+      "TokenCount": 1
+    },
+    {
+      "Term": "prosthesis",
+      "TokenCount": 1
+    },
+    {
+      "Term": "IMRT",
+      "TokenCount": 1
+    },
+    {
+      "Term": "massage",
+      "TokenCount": 1
+    },
+    {
+      "Term": "walk",
+      "TokenCount": 1
+    },
+    {
+      "Term": "microcalcifications",
+      "TokenCount": 1
+    },
+    {
+      "Term": "asymmetry",
+      "TokenCount": 1
+    },
+    {
+      "Term": "reconstructive",
+      "TokenCount": 1
+    },
+    {
+      "Term": "stamp",
+      "TokenCount": 1
+    },
+    {
+      "Term": "video",
+      "TokenCount": 1
+    },
+    {
+      "Term": "anatomy",
+      "TokenCount": 1
+    },
+    {
+      "Term": "exercise",
+      "TokenCount": 1
+    },
+    {
+      "Term": "surveillance",
+      "TokenCount": 1
+    },
+    {
+      "Term": "ribbon",
+      "TokenCount": 1
+    },
+    {
+      "Term": "signs",
+      "TokenCount": 1
+    },
+    {
+      "Term": "African",
+      "TokenCount": 1
+    },
+    {
+      "Term": "lump",
+      "TokenCount": 1
+    },
+    {
+      "Term": "genetics of breast ovarian",
+      "TokenCount": 3
+    },
+    {
+      "Term": "lupron",
+      "TokenCount": 1
+    },
+    {
+      "Term": "vitamin",
+      "TokenCount": 1
+    },
+    {
+      "Term": "lymphedema",
+      "TokenCount": 1
+    },
+    {
+      "Term": "support",
+      "TokenCount": 1
+    },
+    {
+      "Term": "specialists",
+      "TokenCount": 1
+    },
+    {
+      "Term": "pathophysiology",
+      "TokenCount": 1
+    },
+    {
+      "Term": "premenopausal",
+      "TokenCount": 1
+    },
+    {
+      "Term": "abortion",
+      "TokenCount": 1
+    },
+    {
+      "Term": "assessment",
+      "TokenCount": 1
+    },
+    {
+      "Term": "self-exam",
+      "TokenCount": 2
+    },
+    {
+      "Term": "smoking",
+      "TokenCount": 1
+    },
+    {
+      "Term": "fibroids",
+      "TokenCount": 1
+    },
+    {
+      "Term": "medullary",
+      "TokenCount": 1
+    },
+    {
+      "Term": "infection",
+      "TokenCount": 1
+    },
+    {
+      "Term": "probability",
+      "TokenCount": 1
+    },
+    {
+      "Term": "pathology",
+      "TokenCount": 1
+    },
+    {
+      "Term": "benign",
+      "TokenCount": 1
+    },
+    {
+      "Term": "in situ",
+      "TokenCount": 1
+    },
+    {
+      "Term": "epidemiology",
+      "TokenCount": 1
+    },
+    {
+      "Term": "partial",
+      "TokenCount": 1
+    },
+    {
+      "Term": "adjuvant",
+      "TokenCount": 1
+    },
+    {
+      "Term": "questionnaire",
+      "TokenCount": 1
+    },
+    {
+      "Term": "excisional",
+      "TokenCount": 1
+    },
+    {
+      "Term": "lymphoma",
+      "TokenCount": 1
+    },
+    {
+      "Term": "contralateral",
+      "TokenCount": 1
+    },
+    {
+      "Term": "multicentric",
+      "TokenCount": 1
+    },
+    {
+      "Term": "papilloma",
+      "TokenCount": 1
+    },
+    {
+      "Term": "gene",
+      "TokenCount": 1
+    },
+    {
+      "Term": "sarcoma",
+      "TokenCount": 1
+    },
+    {
+      "Term": "melanoma",
+      "TokenCount": 1
+    },
+    {
+      "Term": "triple-negative",
+      "TokenCount": 2
+    },
+    {
+      "Term": "triple negative",
+      "TokenCount": 1
+    },
+    {
+      "Term": "fna",
+      "TokenCount": 1
+    },
+    {
+      "Term": "imaging",
+      "TokenCount": 1
+    }
+  ]
+}

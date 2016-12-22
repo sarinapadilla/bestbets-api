@@ -14,10 +14,8 @@ namespace NCI.OCPL.Api.BestBets.Tests.Util
                 && x.Synonym == y.Synonym
                 && x.Language == y.Language
                 && x.IsNegated == y.IsNegated
-                && x.IsExact == y.IsExact;
-
-                // TODO: Reinstate check for TokenCount
-                //&& x.TokenCount == y.TokenCount;
+                && x.IsExact == y.IsExact
+                && x.TokenCount == y.TokenCount;
         }
 
         public int GetHashCode(BestBetsMatch obj)

@@ -14,14 +14,16 @@ namespace NCI.OCPL.Api.BestBets.Indexer
     public class BestBetSynonymMapper : IEnumerable<BestBetsMatch>
     {
         private CancerGovBestBet _bestBet;
+        private readonly ITokenAnalyzerService _tokenAnalyzer = null;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="source">The CancerGovBestBet which is being mapped to other objects.</param>
-        public BestBetSynonymMapper(CancerGovBestBet source)
+        public BestBetSynonymMapper(ITokenAnalyzerService tokenAnalyzer, CancerGovBestBet source)
         {
             _bestBet = source;
+            _tokenAnalyzer = tokenAnalyzer;
         }
 
         public IEnumerator<BestBetsMatch> GetEnumerator()
@@ -46,6 +48,9 @@ namespace NCI.OCPL.Api.BestBets.Indexer
             //       remove duplicates, but at the cost of additional processing.
             foreach(var item in mainList.Concat(includeList).Concat(excludeList))
             {
+                //TODO: Uh, do we need to clean the synonym?????????
+                int tokenCount = _tokenAnalyzer.GetTokenCount(item.Synonym);
+
                 // Return a new object each time rather than update an existing object
                 // that might be referenced/used somewhere else.
                 yield return new BestBetsMatch()
@@ -56,7 +61,7 @@ namespace NCI.OCPL.Api.BestBets.Indexer
                     Language = _bestBet.Language,
                     IsNegated = item.IsNegated,
                     IsExact = item.IsExact,
-                    TokenCount = -5   // TODO: Needs logic to set this from elastic search.
+                    TokenCount = tokenCount
                 };
             }
 

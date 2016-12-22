@@ -11,3 +11,4 @@ echo Running Integration Build.
 dotnet restore
 dotnet build $TEST_PATH # Build unit test and dependencies.
 dotnet test $TEST_PATH
+

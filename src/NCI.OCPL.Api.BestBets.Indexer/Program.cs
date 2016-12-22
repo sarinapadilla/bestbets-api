@@ -49,6 +49,12 @@ namespace NCI.OCPL.Api.BestBets.Indexer
             this.ConfigureServices(services);
 
             ServiceProvider = services.BuildServiceProvider();
+
+            //Setup the logger
+            var loggerFactory = ServiceProvider.GetRequiredService<ILoggerFactory>();
+            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+            loggerFactory.AddDebug();
+
         }
 
         public IConfigurationRoot Configuration { get; }
@@ -87,6 +93,7 @@ namespace NCI.OCPL.Api.BestBets.Indexer
         private void Run()
         {
             BestBetsIndexer indexer = ServiceProvider.GetRequiredService<BestBetsIndexer>();
+            indexer.Run();
         }
 
         /// <summary>

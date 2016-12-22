@@ -16,13 +16,13 @@ namespace NCI.OCPL.Api.BestBets.Indexer
         private readonly IBBIndexerService _indexerSvc = null;
         private readonly IPublishedContentListingService _listSvc = null;
         private readonly ITokenAnalyzerService _tokenService = null;
-        private readonly Logger<BestBetsIndexer> _logger = null;
+        private readonly ILogger<BestBetsIndexer> _logger = null;
 
         public BestBetsIndexer(
             IBBIndexerService indexerSvc, 
             IPublishedContentListingService listSvc,
             ITokenAnalyzerService tokenService,
-            Logger<BestBetsIndexer> logger
+            ILogger<BestBetsIndexer> logger
         ) {
             _indexerSvc = indexerSvc;
             _listSvc = listSvc;
@@ -38,9 +38,10 @@ namespace NCI.OCPL.Api.BestBets.Indexer
             try
             {
                 //This needs to be pulled into its own testable method.
-
+                
                 //Create new index
                 string indexName = _indexerSvc.CreateTimeStampedIndex();
+                _logger.LogInformation("Created Index {0}", indexName);
 
                 //Fetch bunch of BB
                 IPublishedContentListing bestBetsList = _listSvc.GetItemsForPath("BestBets", "/");
@@ -52,11 +53,14 @@ namespace NCI.OCPL.Api.BestBets.Indexer
 
                 //Optimize
                 bool didOptimize = _indexerSvc.OptimizeIndex(indexName);
+                _logger.LogInformation("Optimized Index {0}", indexName);
 
                 //Swap Alias
                 bool didSwap = _indexerSvc.MakeIndexCurrentAlias(indexName);
+                _logger.LogInformation("Swapped Alias {0}");
 
-                Console.WriteLine("Indexed " + numBBIndexed.ToString());
+
+                _logger.LogDebug("Indexed {0} Best Bets", numBBIndexed.ToString());
                 //Clean Up old.
             }
             catch (Exception ex)
@@ -75,7 +79,10 @@ namespace NCI.OCPL.Api.BestBets.Indexer
             foreach (IPublishedContentInfo item in bestBetsList.Files)
             {
                 //Fetch Item
+                _logger.LogDebug("Fetching Category: {0}", item.FileName);
                 CancerGovBestBet bbCategory = _listSvc.GetPublishedFile<CancerGovBestBet>(item.FullWebPath);
+
+                _logger.LogDebug("Mapping Category: {0}", bbCategory.Name);
 
                 //Do we really need a mapper that does this per category?  
                 BestBetSynonymMapper mapper = new BestBetSynonymMapper(_tokenService, bbCategory);

@@ -11,7 +11,7 @@ def folderName  = 'best-bets-api'    // Jenkins folder where the jbos will be pl
 def sourcePath = 'src/NCI.OCPL.Api.BestBets'       // Source code path relative to the working directory
 def testPath = 'test/NCI.OCPL.Api.BestBets.Tests'  // Unit test code path relative to the working directory  
 
-def GH_REPO_NAME = 'bestbets-svc'    // The project's repository name (as used in the URL).
+def GH_REPO_NAME = 'best-bets-api'    // The project's repository name (as used in the URL).
 def GH_ORGANIZATION_NAME = 'NCIOCPL'   // GitHub Organization name (as used in the URL/userid).
 def GH_USER_KEY = 'NCIOCPL-GitHub'    // Jenkins ID of the credential string containing the GitHub userid which creates releases.
 def GH_USER_TOKEN_KEY = 'NCIOCPL-GitHub-Token'    // Jenkins ID of the credential string containing the GitHub access token for creating releases.

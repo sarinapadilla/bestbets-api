@@ -27,6 +27,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
                 "pancoast", 
                 "en", 
                 new ESMatchConnection("pancoast"), 
+                new ESMatchTokenizerConnection("pancoast"),
                 new string[] { "36012" } 
             },
             // "breast cancer" is more complicated, it has 1 hit, 2 words, and the BB category
@@ -34,7 +35,8 @@ namespace NCI.OCPL.Api.BestBets.Tests
             new object[] { 
                 "breast cancer", 
                 "en", 
-                new ESMatchConnection("breastcancer"), 
+                new ESMatchConnection("breastcancer"),
+                new ESMatchTokenizerConnection("breastcancer"),
                 new string[] { "36408" } 
             },
             // "breast cancer treatment" is more complicated, it has 1 hit, 3 words, and no results for last page.
@@ -43,6 +45,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
                 "breast cancer treatment",
                 "en",
                 new ESMatchConnection("breastcancertreatment"),
+                new ESMatchTokenizerConnection("breastcancertreatment"),
                 new string[] { "36408" }
             },
             // "seer stat" is a negated exact match test.  SEER should not be returned
@@ -50,6 +53,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
                 "seer stat",
                 "en",
                 new ESMatchConnection("seerstat"),
+                new ESMatchTokenizerConnection("seerstat"),
                 new string[] { }
             },
             // "seer stat fact sheet" is a test to make sure the "seer stat" exact match is not hit because
@@ -58,6 +62,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
                 "seer stat fact sheet",
                 "en",
                 new ESMatchConnection("seerstatfactsheet"),
+                new ESMatchTokenizerConnection("seerstatfactsheet"),
                 new string[] { "36681" }
             },
         };
@@ -68,24 +73,43 @@ namespace NCI.OCPL.Api.BestBets.Tests
             string searchTerm, 
             string lang, 
             ESMatchConnection connection, 
+            ESMatchTokenizerConnection tokenizerConn,
             string[] expectedCategories
         )
         {
             //Use real ES client, with mocked connection.
 
-            //While this has a URI, it does not matter, an InMemoryConnection never requests
-            //from the server.
-            var pool = new SingleNodeConnectionPool(new Uri("http://localhost:9200"));
 
-            var connectionSettings = new ConnectionSettings(pool, connection);            
-            
-            IElasticClient client = new ElasticClient(connectionSettings);
-
-            ESBestBetsMatchService service = new ESBestBetsMatchService(client, new NullLogger<ESBestBetsMatchService>());
+            ESTokenAnalyzerService tokenService = GetTokenizerService(tokenizerConn);
+            ESBestBetsMatchService service = GetMatchService(tokenService, connection);
 
             string[] actualMatches = service.GetMatches(lang, searchTerm);
 
             Assert.Equal(expectedCategories, actualMatches);
+        }
+
+        private ESTokenAnalyzerService GetTokenizerService(IConnection connection)
+        {
+            //While this has a URI, it does not matter, an InMemoryConnection never requests
+            //from the server.
+            var pool = new SingleNodeConnectionPool(new Uri("http://localhost:9200"));
+
+            var connectionSettings = new ConnectionSettings(pool, connection);
+            IElasticClient client = new ElasticClient(connectionSettings);
+
+            return new ESTokenAnalyzerService(client, new NullLogger<ESTokenAnalyzerService>());
+        }
+
+        private ESBestBetsMatchService GetMatchService(ESTokenAnalyzerService tokenService, IConnection connection)
+        {
+            //While this has a URI, it does not matter, an InMemoryConnection never requests
+            //from the server.
+            var pool = new SingleNodeConnectionPool(new Uri("http://localhost:9200"));
+
+            var connectionSettings = new ConnectionSettings(pool, connection);
+            IElasticClient client = new ElasticClient(connectionSettings);
+
+            return new ESBestBetsMatchService(client, tokenService, new NullLogger<ESBestBetsMatchService>());
         }
 
 

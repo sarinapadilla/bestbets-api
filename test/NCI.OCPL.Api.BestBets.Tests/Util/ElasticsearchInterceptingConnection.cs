@@ -7,6 +7,7 @@ using Elasticsearch.Net;
 using System.IO;
 using System.Text;
 using Newtonsoft.Json.Linq;
+using System.Reflection;
 
 namespace NCI.OCPL.Api.BestBets.Tests.Util
 {
@@ -22,13 +23,41 @@ namespace NCI.OCPL.Api.BestBets.Tests.Util
 
         /// <summary>
         /// Register a Request Handler for a Given return type.
+        /// NOTE: DO NOT REGISTER BOTH A CLASS AND ITS BASE CLASS!!!
         /// </summary>
         /// <typeparam name="TReturn"></typeparam>
         /// <param name="callback"></param>
         public void RegisterRequestHandlerForType<TReturn>(Action<RequestData, ResponseBuilder<TReturn>> callback)
             where TReturn : class
         {
-            _callbackHandlers.Add(typeof(TReturn), (object)callback);
+            Type returnType = typeof(TReturn);
+            Type handlerType = null;
+
+            //Loop through the register handlers and see if our type is registered, OR
+            //if a base class is registered.  
+            foreach (Type type in _callbackHandlers.Keys)
+            {
+                if (returnType == type || returnType.GetTypeInfo().IsSubclassOf(type))
+                {
+                    handlerType = type;
+                    break;
+                }
+            }
+
+            //If there is no handler, then add one.
+            //If there is one, then error out
+            if (handlerType == null)
+            {
+                _callbackHandlers.Add(typeof(TReturn), (object)callback);
+            } else
+            {
+                throw new ArgumentException(
+                    String.Format(
+                        "There is already a handler defined that would be called for type. Trying to add for: {0}, Already Existing: {1}",
+                        returnType.ToString(),
+                        handlerType.ToString()
+                    ));
+            }
         }
 
         public void RegisterDefaultHandler(Action<RequestData, object> callback)
@@ -42,7 +71,40 @@ namespace NCI.OCPL.Api.BestBets.Tests.Util
         private void ProcessRequest<TReturn>(RequestData requestData, ResponseBuilder<TReturn> builder)
             where TReturn : class
         {
-            //TODO: Fix this to handle proper type inheritance...
+            Type returnType = typeof(TReturn);
+            bool foundHandler = false;
+
+            //Loop through the register handlers and see if our type is registered, OR
+            //if a base class is registered.  
+            foreach (Type type in _callbackHandlers.Keys)
+            {
+                if (returnType == type || returnType.GetTypeInfo().IsSubclassOf(type))
+                {
+                    foundHandler = true;
+
+                    Action<RequestData, ResponseBuilder<TReturn>> callback =
+                        (Action<RequestData, ResponseBuilder<TReturn>>)_callbackHandlers[typeof(TReturn)];
+
+                    callback(
+                        requestData,
+                        builder
+                    );
+
+                    break;
+                }
+            }
+
+            //If we did not find one, then fallback to the default.
+            if (!foundHandler && _defCallbackHandler != null)
+            {
+                foundHandler = true;
+                _defCallbackHandler(
+                    requestData,
+                    builder
+                );
+            }
+
+            //If we did not find any, throw an exception
             if (!_callbackHandlers.ContainsKey(typeof(TReturn)) && _defCallbackHandler == null)
                 throw new ArgumentOutOfRangeException("There is no callback handler for defined for type, " + typeof(TReturn).ToString());
 
@@ -50,26 +112,6 @@ namespace NCI.OCPL.Api.BestBets.Tests.Util
             //once the Connection was able to get a response from a server.  I am going to set it here, but we may need to update later
             //if we want to test connection failures. 
             requestData.MadeItToResponse = true;
-
-            //Either call the callback for the specific response type, OR the default callback.
-            if (_callbackHandlers.ContainsKey(typeof(TReturn))) {
-                Action<RequestData, ResponseBuilder<TReturn>> callback =
-                    (Action<RequestData, ResponseBuilder<TReturn>>)_callbackHandlers[typeof(TReturn)];
-
-                callback(
-                    requestData,
-                    builder
-                );
-            }
-            else
-            {
-                _defCallbackHandler(
-                    requestData,
-                    builder
-                );
-            }
-
-
 
             //Basically all requests, even HEAD requests (e.g. AliasExists) need to have a stream to work correctly.
             //Note, a stream of nothing is still a stream.  So if you did not set a stream, we will do it for you.

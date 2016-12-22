@@ -37,24 +37,10 @@ namespace NCI.OCPL.Api.BestBets.Tests
                 IndentChars = "\t"
             };
 
-
-            string TestFilePath = "CGBBCategory.BreastCancer.xml";
-            MemoryStream stream = new MemoryStream();
-            StreamWriter writer = new StreamWriter(stream);
-            XmlWriter xmlWriter = XmlWriter.Create(writer);
-            try
-            {
-                bestBetSyn.WriteXml(xmlWriter);
-            }
-            catch (System.NotSupportedException)
-            {
-                // Expecting bestBet.WriteXml to throw a NotSupportedException
-            }
-            catch (Exception)
-            {
-                // If a NotSupportedException was NOT thrown, the test fails.
-                Assert.True(false, "Exception thrown was not");
-            }
+            XmlWriter xmlWriter = XmlWriter.Create(new StringWriter());
+                
+            Assert.Throws<NotSupportedException>(() => bestBetSyn.WriteXml(xmlWriter));
+            
         }
     }
 }

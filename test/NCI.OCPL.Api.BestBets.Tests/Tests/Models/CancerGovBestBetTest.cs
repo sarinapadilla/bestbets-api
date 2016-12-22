@@ -1,10 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-
 using Xunit;
-
 using NCI.OCPL.Utils.Testing;
-
 using NCI.OCPL.Api.BestBets.Tests.CategoryTestData;
 using System.Xml;
 using System.IO;

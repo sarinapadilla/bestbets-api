@@ -31,11 +31,6 @@ namespace NCI.OCPL.Api.BestBets.Tests
         public void WriteXML_ThrowsNotSupportedException()
         {
             CancerGovBestBetSynonym bestBetSyn = new CancerGovBestBetSynonym();
-            XmlWriterSettings settings = new XmlWriterSettings()
-            {
-                Indent = true,
-                IndentChars = "\t"
-            };
 
             XmlWriter xmlWriter = XmlWriter.Create(new StringWriter());
                 

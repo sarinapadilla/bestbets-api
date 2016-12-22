@@ -43,30 +43,10 @@ namespace NCI.OCPL.Api.BestBets.Tests
         public void WriteXML_ThrowsNotSupportedException()
         {
             CancerGovBestBet bestBet = new CancerGovBestBet();
-            XmlWriterSettings settings = new XmlWriterSettings()
-            {
-                Indent = true,
-                IndentChars = "\t"
-            };
+            
+            XmlWriter xmlWriter = XmlWriter.Create(new StringWriter());
 
-
-            string TestFilePath = "CGBBCategory.BreastCancer.xml";
-            MemoryStream stream = new MemoryStream();
-            StreamWriter writer = new StreamWriter(stream);
-            XmlWriter xmlWriter = XmlWriter.Create(writer);
-            try
-            {
-                bestBet.WriteXml(xmlWriter);
-            }
-            catch (System.NotSupportedException)
-            {
-                // Expecting bestBet.WriteXml to throw a NotSupportedException
-            }
-            catch (Exception)
-            {
-                // If a NotSupportedException was NOT thrown, the test fails.
-                Assert.True(false, "Exception thrown was not");
-            }
+            Assert.Throws<NotSupportedException>(() => bestBet.WriteXml(xmlWriter));
         }
     }
 }

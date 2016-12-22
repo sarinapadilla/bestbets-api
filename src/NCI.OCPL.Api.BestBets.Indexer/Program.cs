@@ -14,6 +14,7 @@ using Elasticsearch.Net;
 using NCI.OCPL.Api.BestBets.Indexer.Services;
 using NCI.OCPL.Services.CDE.PublishedContentListing;
 using Microsoft.Extensions.Options;
+using NCI.OCPL.Api.BestBets.Services;
 
 namespace NCI.OCPL.Api.BestBets.Indexer
 {
@@ -63,6 +64,7 @@ namespace NCI.OCPL.Api.BestBets.Indexer
                 services.AddTransient<IElasticClient>(p => p.GetRequiredService<ConfiguredElasticClientFactory>().GetInstance());
 
                 services.AddSingleton<HttpClient, HttpClient>();
+                services.AddTransient<ITokenAnalyzerService, ESTokenAnalyzerService>();
 
                 services.AddTransient<IPublishedContentListingService, CDEPubContentListingService>();
 
@@ -124,6 +126,7 @@ namespace NCI.OCPL.Api.BestBets.Indexer
             private IEnumerable<BestBetsMatch> GetBestBetMatchesFromListing(IPublishedContentListing bestBetsList)
             {
                 IPublishedContentListingService pcService = ServiceProvider.GetRequiredService<IPublishedContentListingService>();
+                ITokenAnalyzerService tokenService = ServiceProvider.GetRequiredService<ITokenAnalyzerService>();
 
                 foreach (IPublishedContentInfo item in bestBetsList.Files)
                 {
@@ -131,7 +134,7 @@ namespace NCI.OCPL.Api.BestBets.Indexer
                     CancerGovBestBet bbCategory = pcService.GetPublishedFile<CancerGovBestBet>(item.FullWebPath);
 
                     //Do we really need a mapper that does this per category?  
-                    BestBetSynonymMapper mapper = new BestBetSynonymMapper(bbCategory);
+                    BestBetSynonymMapper mapper = new BestBetSynonymMapper(tokenService, bbCategory);
                     foreach (BestBetsMatch match in mapper)
                     {
                         yield return match;

@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 
 using Moq;
 using Xunit;
-
 using NCI.OCPL.Utils.Testing;
 using NCI.OCPL.Api.BestBets.Tests.Util;
 

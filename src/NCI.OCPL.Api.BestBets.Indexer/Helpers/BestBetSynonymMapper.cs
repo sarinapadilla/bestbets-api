@@ -48,8 +48,19 @@ namespace NCI.OCPL.Api.BestBets.Indexer
             //       remove duplicates, but at the cost of additional processing.
             foreach(var item in mainList.Concat(includeList).Concat(excludeList))
             {
-                //TODO: Uh, do we need to clean the synonym?????????
-                int tokenCount = _tokenAnalyzer.GetTokenCount(item.Synonym);
+                int tokenCount = -1;
+
+                try
+                {
+                    //TODO: Uh, do we need to clean the synonym?????????
+                    tokenCount = _tokenAnalyzer.GetTokenCount(item.Synonym);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(
+                        "Error in getting token count for: " 
+                        + _bestBet.Name + ", Synonym: ," + item.Synonym, ex);
+                }
 
                 // Return a new object each time rather than update an existing object
                 // that might be referenced/used somewhere else.

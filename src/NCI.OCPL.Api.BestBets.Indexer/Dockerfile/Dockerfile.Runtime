@@ -1,0 +1,15 @@
+##
+## This Dockerfile is used for creating the application to be deployed.
+##
+
+FROM nciwebcomm/dotnet-docker:runtime
+
+COPY . /app
+
+WORKDIR /app
+
+RUN ["dotnet", "restore"]
+
+RUN ["dotnet", "build"]
+
+CMD echo "This Dockerfile is a placeholder"

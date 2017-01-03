@@ -43,9 +43,13 @@ if [ $ERRORS == 1 ]; then
     exit 127
 fi
 
-# Publish individual projects to temporary location and create archives for uploading to GitHub
+#===================================================================================
+#  BEST BETS API
+#===================================================================================
+
+# Publish API to temporary location and create archives for uploading to GitHub
 TMPDIR=`mktemp -d` || exit 1
-dotnet publish src/NCI.OCPL.Api.SiteWideSearch/ -o $TMPDIR
+dotnet publish src/NCI.OCPL.Api.BestBets/ -o $TMPDIR
 
 # Creating the archive in the publishing folder prevents the parent directory being included
 # in the archive.
@@ -58,14 +62,53 @@ cd $PROJECT_HOME
 echo "Creating release '${VERSION_NUMBER}' in github"
 github-release release --user ${GH_ORGANIZATION_NAME} --repo ${GH_REPO_NAME} --tag ${VERSION_NUMBER} --name "${VERSION_NUMBER}"
 
-echo "Uploading the artifacts into github"
+echo "Uploading BestBets API artifacts into github"
 github-release upload --user ${GH_ORGANIZATION_NAME} --repo ${GH_REPO_NAME} --tag ${VERSION_NUMBER} --name "${PROJECT_NAME}-${VERSION_NUMBER}.zip" --file $TMPDIR/project-release.zip
 
 # Clean up
 rm -rf $TMPDIR
 
+
 # Create and push SDK image
-#docker build --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/sitewide-search-svc:sdk -f src/NCI.OCPL.Api.SiteWideSearch/Dockerfile/Dockerfile.SDK .
+#docker build --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/bestbets-api:sdk -f src/NCI.OCPL.Api.BestBets/Dockerfile/Dockerfile.SDK .
 
 # Create and push Release image
-#docker build --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/sitewide-search-svc:sdk -f src/NCI.OCPL.Api.SiteWideSearch/Dockerfile/Dockerfile.Release .
+#docker build --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/bestbets-api:release -f src/NCI.OCPL.Api.BestBets/Dockerfile/Dockerfile.Release .
+
+
+
+
+
+#===================================================================================
+#  BEST BETS INDEXER
+#===================================================================================
+
+# Publish API to temporary location and create archives for uploading to GitHub
+TMPDIR=`mktemp -d` || exit 1
+dotnet publish src/NCI.OCPL.Api.BestBets.Indexer/ -o $TMPDIR
+
+# Creating the archive in the publishing folder prevents the parent directory being included
+# in the archive.
+echo "Creating release archive"
+cd $TMPDIR
+zip -r project-release.zip .
+cd $PROJECT_HOME
+
+## Create GitHub release with build artifacts.
+# echo "Creating release '${VERSION_NUMBER}' in github"
+# github-release release --user ${GH_ORGANIZATION_NAME} --repo ${GH_REPO_NAME} --tag ${VERSION_NUMBER} --name "${VERSION_NUMBER}"
+
+echo "Uploading BestBets Indexer artifacts into github"
+github-release upload --user ${GH_ORGANIZATION_NAME} --repo ${GH_REPO_NAME} --tag ${VERSION_NUMBER} --name "${PROJECT_NAME}-Indexer-${VERSION_NUMBER}.zip" --file $TMPDIR/proj$
+
+# Clean up
+rm -rf $TMPDIR
+
+
+# Create and push SDK image
+#docker build --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/bestbets-indexer:sdk -f src/NCI.OCPL.Api.BestBets.Indexer/Dockerfile/Dockerfile.SDK .
+
+# Create and push Release image
+#docker build --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/bestbets-indexer:release -f src/NCI.OCPL.Api.BestBets.Indexer/Dockerfile/Dockerfile.Release .
+
+

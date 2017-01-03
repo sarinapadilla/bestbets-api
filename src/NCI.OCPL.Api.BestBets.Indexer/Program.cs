@@ -20,22 +20,6 @@ namespace NCI.OCPL.Api.BestBets.Indexer
 {
     public class Program
     {
-        /// <summary>
-        /// This class will actually handle the real work of the program.
-        /// Encapsulating this to make a more logical separation without having
-        /// to actually create another file...
-        /// </summary>
-        private class Worker {
-
-            /// <summary>
-            /// Creates a new instance of "the program"
-            /// </summary>
-            public Worker()
-            {
-            }
-
-
-        }
 
         public Program()
         {

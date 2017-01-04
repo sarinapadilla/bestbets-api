@@ -70,10 +70,12 @@ rm -rf $TMPDIR
 
 
 # Create and push SDK image
-#docker build --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/bestbets-api:sdk -f src/NCI.OCPL.Api.BestBets/Dockerfile/Dockerfile.SDK .
+export IMG_ID=$(docker build --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/bestbets-api:sdk -f src/NCI.OCPL.Api.BestBets/Dockerfile/Dockerfile.SDK .)
+docker tag $IMG_ID nciwebcomm/bestbets-api:sdk-${VERSION_NUMBER}
 
 # Create and push Release image
-#docker build --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/bestbets-api:release -f src/NCI.OCPL.Api.BestBets/Dockerfile/Dockerfile.Release .
+export IMG_ID=$(docker build --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/bestbets-api:release -f src/NCI.OCPL.Api.BestBets/Dockerfile/Dockerfile.Release .)
+docker tag $IMG_ID nciwebcomm/bestbets-api:release-${VERSION_NUMBER}
 
 
 
@@ -106,9 +108,9 @@ rm -rf $TMPDIR
 
 
 # Create SDK Docker image
-#docker build --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/bestbets-indexer:sdk -f src/NCI.OCPL.Api.BestBets.Indexer/Dockerfile/Dockerfile.SDK .
+export IMG_ID=$(docker build --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/bestbets-indexer:sdk -f src/NCI.OCPL.Api.BestBets.Indexer/Dockerfile/Dockerfile.SDK .)
+docker tag $IMG_ID nciwebcomm/bestbets-indexer:sdk-${VERSION_NUMBER}
 
 # Create Release Docker image
-#docker build --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/bestbets-indexer:release -f src/NCI.OCPL.Api.BestBets.Indexer/Dockerfile/Dockerfile.Release .
-
-
+export IMG_ID=$(docker build --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/bestbets-indexer:release -f src/NCI.OCPL.Api.BestBets.Indexer/Dockerfile/Dockerfile.Release .)
+docker tag $IMG_ID nciwebcomm/bestbets-indexer:release-${VERSION_NUMBER}

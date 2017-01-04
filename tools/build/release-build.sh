@@ -98,8 +98,8 @@ cd $PROJECT_HOME
 # echo "Creating release '${VERSION_NUMBER}' in github"
 # github-release release --user ${GH_ORGANIZATION_NAME} --repo ${GH_REPO_NAME} --tag ${VERSION_NUMBER} --name "${VERSION_NUMBER}"
 
-echo "Uploading BestBets Indexer artifacts into github"
-github-release upload --user ${GH_ORGANIZATION_NAME} --repo ${GH_REPO_NAME} --tag ${VERSION_NUMBER} --name "${PROJECT_NAME}-Indexer-${VERSION_NUMBER}.zip" --file $TMPDIR/proj$
+echo "Uploading BestBets Indexer artifacts to github"
+github-release upload --user ${GH_ORGANIZATION_NAME} --repo ${GH_REPO_NAME} --tag ${VERSION_NUMBER} --name "${PROJECT_NAME}-Indexer-${VERSION_NUMBER}.zip" --file $TMPDIR/project-release.zip
 
 # Clean up
 rm -rf $TMPDIR

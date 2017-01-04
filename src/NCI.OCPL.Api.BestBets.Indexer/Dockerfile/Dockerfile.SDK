@@ -5,12 +5,9 @@
 
 FROM nciwebcomm/dotnet-docker:sdk
 
-COPY . /app
-
-WORKDIR /app
-
-RUN ["dotnet", "restore"]
-
-RUN ["dotnet", "build"]
-
-CMD echo "This Dockerfile is a placeholder"
+ARG version_number
+RUN curl -SL "https://github.com/NCIOCPL/bestbets-api/releases/download/$version_number/bestbets-indexer-$version_number.zip"  --output bestbets-indexer.zip \
+    && mkdir -p /usr/share/release \
+    && unzip bestbets-indexer.zip  -d /usr/share/release
+WORKDIR /usr/share/release
+ENTRYPOINT ["dotnet", "NCI.OCPL.Api.BestBets.Indexer.dll"]

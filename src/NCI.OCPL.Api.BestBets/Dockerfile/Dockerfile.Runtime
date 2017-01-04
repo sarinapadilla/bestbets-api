@@ -4,14 +4,11 @@
 
 FROM nciwebcomm/dotnet-docker:runtime
 
-COPY . /app
-
-WORKDIR /app
-
-RUN ["dotnet", "restore"]
-
-RUN ["dotnet", "build"]
-
-EXPOSE 5000/tcp
-
-CMD ["dotnet", "run", "--server.urls", "http://*:5000"]
+ARG version_number
+RUN curl -SL "https://github.com/NCIOCPL/bestbets-api/releases/download/$version_number/bestbets-api-$version_number.zip"  --output bestbets-api.zip \
+    && mkdir -p /usr/share/release \
+    && unzip bestbets-api.zip  -d /usr/share/release
+ENV ASPNETCORE_URLS http://*:5006
+EXPOSE 5006
+WORKDIR /usr/share/release
+ENTRYPOINT ["dotnet", "NCI.OCPL.Api.BestBets.dll"]

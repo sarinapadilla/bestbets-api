@@ -105,10 +105,10 @@ github-release upload --user ${GH_ORGANIZATION_NAME} --repo ${GH_REPO_NAME} --ta
 rm -rf $TMPDIR
 
 
-# Create and push SDK image
+# Create SDK Docker image
 #docker build --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/bestbets-indexer:sdk -f src/NCI.OCPL.Api.BestBets.Indexer/Dockerfile/Dockerfile.SDK .
 
-# Create and push Release image
+# Create Release Docker image
 #docker build --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/bestbets-indexer:release -f src/NCI.OCPL.Api.BestBets.Indexer/Dockerfile/Dockerfile.Release .
 
 

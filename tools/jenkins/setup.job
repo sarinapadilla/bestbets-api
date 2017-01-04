@@ -61,7 +61,7 @@ job("${folderName}/_lower/${releaseBuild}") {
         github(sourceRepository)
     }
     steps {
-        shell("./tools/build/${releaseBuild}.sh ${sourcePath} ${testPath}" + ' $RELEASE_TOKEN')
+        shell("./tools/build/${releaseBuild}.sh \$RELEASE_TOKEN")
     }
 }
 

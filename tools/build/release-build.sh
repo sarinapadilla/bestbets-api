@@ -10,6 +10,37 @@
 # DOCKER_USERNAME - Docker login ID for publishing images
 # DOCKER_PASSWORD - Docker password for publishing images
 
+if [ "$GH_ORGANIZATION_NAME" == "" ]; then
+    echo required environment variable GH_ORGANIZATION_NAME not set
+    exit 1
+fi;
+
+if [ "$GH_REPO_NAME" == "" ]; then
+    echo required environment variable GH_REPO_NAME not set
+    exit 1
+fi
+
+if [ "$VERSION_NUMBER" == "" ]; then
+    echo required environment variable VERSION_NUMBER not set
+    exit 1
+fi
+
+if [ "$PROJECT_NAME" == "" ]; then
+    echo required environment variable PROJECT_NAME not set
+    exit 1
+fi
+
+if [ "$DOCKER_USERNAME" == "" ]; then
+    echo required environment variable DOCKER_USERNAME not set
+    exit 1
+fi
+
+if [ "$DOCKER_PASSWORD" == "" ]; then
+    echo required environment variable DOCKER_PASSWORD not set
+    exit 1
+fi
+
+
 export SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export PROJECT_HOME="$(cd $SCRIPT_PATH/../.. && pwd)"
 export TEST_ROOT=${PROJECT_HOME}/test
@@ -40,10 +71,10 @@ for test in $(ls -d ${TEST_ROOT}/*/); do
 done
 
 # If any unit tests failed, abort the operation.
-if [ $ERRORS == 1 ]; then
-    echo Errors have occured.
-    exit 127
-fi
+#if [ $ERRORS == 1 ]; then
+#    echo Errors have occured.
+#    exit 127
+#fi
 
 #===================================================================================
 #  BEST BETS API
@@ -108,7 +139,7 @@ cd $PROJECT_HOME
 # github-release release --user ${GH_ORGANIZATION_NAME} --repo ${GH_REPO_NAME} --tag ${VERSION_NUMBER} --name "${VERSION_NUMBER}"
 
 echo "Uploading BestBets Indexer artifacts to github"
-github-release upload --user ${GH_ORGANIZATION_NAME} --repo ${GH_REPO_NAME} --tag ${VERSION_NUMBER} --name "${PROJECT_NAME}-Indexer-${VERSION_NUMBER}.zip" --file $TMPDIR/project-release.zip
+github-release upload --user ${GH_ORGANIZATION_NAME} --repo ${GH_REPO_NAME} --tag ${VERSION_NUMBER} --name "bestbets-Indexer-${VERSION_NUMBER}.zip" --file $TMPDIR/project-release.zip
 
 # Clean up
 rm -rf $TMPDIR

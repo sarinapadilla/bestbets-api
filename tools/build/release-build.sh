@@ -153,7 +153,7 @@ eval $SCRIPT_PATH/publish-docker-image.sh nciwebcomm/bestbets-indexer sdk
 eval $SCRIPT_PATH/publish-docker-image.sh nciwebcomm/bestbets-indexer sdk-${VERSION_NUMBER}
 
 # Create Release Docker image
-export IMG_ID=$(docker build -q --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/bestbets-indexer:runtime -f src/NCI.OCPL.Api.BestBets.Indexer/Dockerfile/Dockerfile.Release .)
+export IMG_ID=$(docker build -q --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/bestbets-indexer:runtime -f src/NCI.OCPL.Api.BestBets.Indexer/Dockerfile/Dockerfile.Runtime .)
 docker tag $IMG_ID nciwebcomm/bestbets-indexer:runtime-${VERSION_NUMBER}
 eval $SCRIPT_PATH/publish-docker-image.sh nciwebcomm/bestbets-indexer runtime
 eval $SCRIPT_PATH/publish-docker-image.sh nciwebcomm/bestbets-indexer runtime-${VERSION_NUMBER}

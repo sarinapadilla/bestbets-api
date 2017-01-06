@@ -104,13 +104,13 @@ rm -rf $TMPDIR
 docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
 
 # Create and push SDK image
-export IMG_ID=$(docker build --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/bestbets-api:sdk -f src/NCI.OCPL.Api.BestBets/Dockerfile/Dockerfile.SDK .)
+export IMG_ID=$(docker build -q --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/bestbets-api:sdk -f src/NCI.OCPL.Api.BestBets/Dockerfile/Dockerfile.SDK .)
 docker tag $IMG_ID nciwebcomm/bestbets-api:sdk-${VERSION_NUMBER}
 eval $SCRIPT_PATH/publish-docker-image.sh nciwebcomm/bestbets-api sdk
 eval $SCRIPT_PATH/publish-docker-image.sh nciwebcomm/bestbets-api sdk-${VERSION_NUMBER}
 
 # Create and push Release image
-export IMG_ID=$(docker build --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/bestbets-api:runtime -f src/NCI.OCPL.Api.BestBets/Dockerfile/Dockerfile.Release .)
+export IMG_ID=$(docker build -q --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/bestbets-api:runtime -f src/NCI.OCPL.Api.BestBets/Dockerfile/Dockerfile.Runtime .)
 docker tag $IMG_ID nciwebcomm/bestbets-api:runtime-${VERSION_NUMBER}
 eval $SCRIPT_PATH/publish-docker-image.sh nciwebcomm/bestbets-api runtime
 eval $SCRIPT_PATH/publish-docker-image.sh nciwebcomm/bestbets-api runtime-${VERSION_NUMBER}
@@ -147,13 +147,13 @@ rm -rf $TMPDIR
 docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
 
 # Create SDK Docker image
-export IMG_ID=$(docker build --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/bestbets-indexer:sdk -f src/NCI.OCPL.Api.BestBets.Indexer/Dockerfile/Dockerfile.SDK .)
+export IMG_ID=$(docker build -q --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/bestbets-indexer:sdk -f src/NCI.OCPL.Api.BestBets.Indexer/Dockerfile/Dockerfile.SDK .)
 docker tag $IMG_ID nciwebcomm/bestbets-indexer:sdk-${VERSION_NUMBER}
 eval $SCRIPT_PATH/publish-docker-image.sh nciwebcomm/bestbets-indexer sdk
 eval $SCRIPT_PATH/publish-docker-image.sh nciwebcomm/bestbets-indexer sdk-${VERSION_NUMBER}
 
 # Create Release Docker image
-export IMG_ID=$(docker build --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/bestbets-indexer:runtime -f src/NCI.OCPL.Api.BestBets.Indexer/Dockerfile/Dockerfile.Release .)
+export IMG_ID=$(docker build -q --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/bestbets-indexer:runtime -f src/NCI.OCPL.Api.BestBets.Indexer/Dockerfile/Dockerfile.Release .)
 docker tag $IMG_ID nciwebcomm/bestbets-indexer:runtime-${VERSION_NUMBER}
 eval $SCRIPT_PATH/publish-docker-image.sh nciwebcomm/bestbets-indexer runtime
 eval $SCRIPT_PATH/publish-docker-image.sh nciwebcomm/bestbets-indexer runtime-${VERSION_NUMBER}

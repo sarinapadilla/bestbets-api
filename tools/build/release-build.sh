@@ -71,10 +71,10 @@ for test in $(ls -d ${TEST_ROOT}/*/); do
 done
 
 # If any unit tests failed, abort the operation.
-#if [ $ERRORS == 1 ]; then
-#    echo Errors have occured.
-#    exit 127
-#fi
+if [ $ERRORS == 1 ]; then
+    echo Errors have occured.
+    exit 127
+fi
 
 #===================================================================================
 #  BEST BETS API

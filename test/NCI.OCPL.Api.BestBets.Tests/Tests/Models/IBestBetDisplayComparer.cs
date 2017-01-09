@@ -35,14 +35,14 @@ namespace NCI.OCPL.Api.BestBets.Tests
 
         /// <summary>
         /// Since we don't care about newlines for purposes of these tests, NormalizeString()
-        /// allows removes leading and trailing whitspace and replaces the carriage return and newline
-        /// combination ("\r\n") with a single newline ("\n").
+        /// removes leading and trailing whitspace along with carriage return (\r) and newline (\n)
+        /// characters
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
         private string NormalizeString(string text)
         {
-            return text?.Trim().Replace("\r\n", "\n");
+            return text?.Trim().Replace("\r", String.Empty).Replace("\n", String.Empty);
         }
 
         public int GetHashCode(IBestBetDisplay obj)

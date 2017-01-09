@@ -20,7 +20,7 @@ namespace NCI.OCPL.Api.BestBets.Tests.CategoryTestData
 <!-- Image -->
 <!-- End Image -->
 <div class=""title-and-desc title desc container""><a class=""title"" href=""https://cancerresearchideas.cancer.gov"">Cancer Research Ideas</a><!-- start description -->
-<div class=""description""><p class=""body"">An online platform for cancer researchers to submit their best scientific ideas for bringing about a decade’s worth of advances in 5 years, making more therapies available to more patients, and spurring progress in cancer prevention, treatment, and care. </p></div><!-- end description --></div><!-- end title & desc container -->
+<div class=""description""><p class=""body"">An online platform for cancer researchers to submit their best scientific ideas for bringing about a decade's worth of advances in 5 years, making more therapies available to more patients, and spurring progress in cancer prevention, treatment, and care. </p></div><!-- end description --></div><!-- end title & desc container -->
 </li></ul>
 </div>
 "

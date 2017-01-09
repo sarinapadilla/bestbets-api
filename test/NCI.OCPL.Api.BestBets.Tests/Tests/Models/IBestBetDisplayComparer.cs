@@ -42,7 +42,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
         /// <returns></returns>
         private string NormalizeString(string text)
         {
-            return text?.Trim().Replace("\r", String.Empty).Replace("\n", String.Empty);
+            return text?.Trim().Replace("\r", null).Replace("\n", null);
         }
 
         public int GetHashCode(IBestBetDisplay obj)

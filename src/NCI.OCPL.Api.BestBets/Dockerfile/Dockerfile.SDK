@@ -5,15 +5,31 @@
 
 FROM nciwebcomm/dotnet-docker:sdk
 ARG version_number
-RUN yum -y install shadow-utils && \
-groupadd -r containeruser && \
-useradd -r  -g containeruser -d /home/containeruser -ms /sbin/nologin -c "Docker container user" containeruser && \
-chown -R containeruser:containeruser /home/containeruser
-USER containeruser
+
+# Create containeruser ID.
+RUN yum -y update \
+    && yum -y install shadow-utils \
+    && groupadd -r containeruser \
+    && useradd -r  -g containeruser -d /home/containeruser -ms /sbin/nologin -c "Docker container user" containeruser \
+    && chown -R containeruser:containeruser /home/containeruser
+
+
+# Install Best Bets Indexer
+RUN curl -SL "https://github.com/NCIOCPL/bestbets-api/releases/download/$version_number/bestbets-indexer-$version_number.zip"  --output /home/containeruser/bestbets-indexer.zip \
+    && mkdir -p /home/containeruser/indexer \
+    && unzip /home/containeruser/bestbets-indexer.zip  -d /home/containeruser/indexer
+
+
+# Install BestBets API
 RUN curl -SL "https://github.com/NCIOCPL/bestbets-api/releases/download/$version_number/bestbets-api-$version_number.zip"  --output /home/containeruser/bestbets-api.zip \
-    && mkdir -p   /home/containeruser/release \
-    && unzip /home/containeruser/bestbets-api.zip  -d /home/containeruser/release
+    && mkdir -p   /home/containeruser/api \
+    && unzip /home/containeruser/bestbets-api.zip  -d /home/containeruser/api
 ENV ASPNETCORE_URLS http://*:5006
 EXPOSE 5006
-WORKDIR /home/containeruser/release
+
+# Run the API as the container's default action.
+WORKDIR /home/containeruser/api
 ENTRYPOINT ["dotnet", "NCI.OCPL.Api.BestBets.dll"]
+
+
+USER containeruser

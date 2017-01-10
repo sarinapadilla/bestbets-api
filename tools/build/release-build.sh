@@ -81,26 +81,55 @@ fi
 #===================================================================================
 
 # Publish API to temporary location and create archives for uploading to GitHub
-TMPDIR=`mktemp -d` || exit 1
-dotnet publish src/NCI.OCPL.Api.BestBets/ -o $TMPDIR
+API_TMPDIR=`mktemp -d` || exit 1
+dotnet publish src/NCI.OCPL.Api.BestBets/ -o $API_TMPDIR
 
 # Creating the archive in the publishing folder prevents the parent directory being included
 # in the archive.
 echo "Creating release archive"
-cd $TMPDIR
+cd $API_TMPDIR
 zip -r project-release.zip .
 cd $PROJECT_HOME
 
-## Create GitHub release with build artifacts.
+
+
+
+
+#===================================================================================
+#  BEST BETS INDEXER
+#===================================================================================
+
+# Publish API to temporary location and create archives for uploading to GitHub
+INDEXER_TMPDIR=`mktemp -d` || exit 1
+dotnet publish src/NCI.OCPL.Api.BestBets.Indexer/ -o $INDEXER_TMPDIR
+
+# Creating the archive in the publishing folder prevents the parent directory being included
+# in the archive.
+echo "Creating release archive"
+cd $INDEXER_TMPDIR
+zip -r project-release.zip .
+cd $PROJECT_HOME
+
+
+
+#===================================================================================
+#  Create GitHub release with build artifacts.
+#===================================================================================
 echo "Creating release '${VERSION_NUMBER}' in github"
 github-release release --user ${GH_ORGANIZATION_NAME} --repo ${GH_REPO_NAME} --tag ${VERSION_NUMBER} --name "${VERSION_NUMBER}"
 
 echo "Uploading BestBets API artifacts into github"
-github-release upload --user ${GH_ORGANIZATION_NAME} --repo ${GH_REPO_NAME} --tag ${VERSION_NUMBER} --name "${PROJECT_NAME}-${VERSION_NUMBER}.zip" --file $TMPDIR/project-release.zip
+github-release upload --user ${GH_ORGANIZATION_NAME} --repo ${GH_REPO_NAME} --tag ${VERSION_NUMBER} --name "${PROJECT_NAME}-${VERSION_NUMBER}.zip" --file $API_TMPDIR/project-release.zip
 
-# Clean up
-rm -rf $TMPDIR
+echo "Uploading BestBets Indexer artifacts to github"
+github-release upload --user ${GH_ORGANIZATION_NAME} --repo ${GH_REPO_NAME} --tag ${VERSION_NUMBER} --name "bestbets-Indexer-${VERSION_NUMBER}.zip" --file $INDEXER_TMPDIR/project-release.zip
 
+
+
+
+#===================================================================================
+#  Create and publish Docker images
+#===================================================================================
 docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
 
 # Create and push SDK image
@@ -117,43 +146,7 @@ eval $SCRIPT_PATH/publish-docker-image.sh nciwebcomm/bestbets-api runtime-${VERS
 
 
 
-
-
-#===================================================================================
-#  BEST BETS INDEXER
-#===================================================================================
-
-# Publish API to temporary location and create archives for uploading to GitHub
-TMPDIR=`mktemp -d` || exit 1
-dotnet publish src/NCI.OCPL.Api.BestBets.Indexer/ -o $TMPDIR
-
-# Creating the archive in the publishing folder prevents the parent directory being included
-# in the archive.
-echo "Creating release archive"
-cd $TMPDIR
-zip -r project-release.zip .
-cd $PROJECT_HOME
-
-## Create GitHub release with build artifacts.
-# echo "Creating release '${VERSION_NUMBER}' in github"
-# github-release release --user ${GH_ORGANIZATION_NAME} --repo ${GH_REPO_NAME} --tag ${VERSION_NUMBER} --name "${VERSION_NUMBER}"
-
-echo "Uploading BestBets Indexer artifacts to github"
-github-release upload --user ${GH_ORGANIZATION_NAME} --repo ${GH_REPO_NAME} --tag ${VERSION_NUMBER} --name "bestbets-Indexer-${VERSION_NUMBER}.zip" --file $TMPDIR/project-release.zip
-
 # Clean up
-rm -rf $TMPDIR
+rm -rf $API_TMPDIR
+rm -rf $INDEXER_TMPDIR
 
-docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-
-# Create SDK Docker image
-export IMG_ID=$(docker build -q --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/bestbets-indexer:sdk -f src/NCI.OCPL.Api.BestBets.Indexer/Dockerfile/Dockerfile.SDK .)
-docker tag $IMG_ID nciwebcomm/bestbets-indexer:sdk-${VERSION_NUMBER}
-eval $SCRIPT_PATH/publish-docker-image.sh nciwebcomm/bestbets-indexer sdk
-eval $SCRIPT_PATH/publish-docker-image.sh nciwebcomm/bestbets-indexer sdk-${VERSION_NUMBER}
-
-# Create Release Docker image
-export IMG_ID=$(docker build -q --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/bestbets-indexer:runtime -f src/NCI.OCPL.Api.BestBets.Indexer/Dockerfile/Dockerfile.Runtime .)
-docker tag $IMG_ID nciwebcomm/bestbets-indexer:runtime-${VERSION_NUMBER}
-eval $SCRIPT_PATH/publish-docker-image.sh nciwebcomm/bestbets-indexer runtime
-eval $SCRIPT_PATH/publish-docker-image.sh nciwebcomm/bestbets-indexer runtime-${VERSION_NUMBER}

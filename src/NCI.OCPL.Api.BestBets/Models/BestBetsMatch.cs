@@ -25,7 +25,7 @@ namespace NCI.OCPL.Api.BestBets
         /// <summary>
         /// Gets or sets the synonym that was matched
         /// </summary>
-        [String(Name = "Synonym")]
+        [String(Name = "synonym")]
         public string Synonym {get; set;}
 
         /// <summary>

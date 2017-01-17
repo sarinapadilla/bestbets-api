@@ -9,36 +9,22 @@
 # PROJECT_NAME - Project name
 # DOCKER_USERNAME - Docker login ID for publishing images
 # DOCKER_PASSWORD - Docker password for publishing images
+# GITHUB_TOKEN - Github access token for creating releases and uploading build artifacts.
 
-if [ "$GH_ORGANIZATION_NAME" == "" ]; then
-    echo required environment variable GH_ORGANIZATION_NAME not set
-    exit 1
-fi;
 
-if [ "$GH_REPO_NAME" == "" ]; then
-    echo required environment variable GH_REPO_NAME not set
-    exit 1
-fi
+if [ "$GH_ORGANIZATION_NAME" == "" ]; then echo GH_ORGANIZATION_NAME not set; exit 1; fi
 
-if [ "$VERSION_NUMBER" == "" ]; then
-    echo required environment variable VERSION_NUMBER not set
-    exit 1
-fi
+if [ "$GH_REPO_NAME" == "" ]; then echo GH_REPO_NAME not set; exit 1; fi
 
-if [ "$PROJECT_NAME" == "" ]; then
-    echo required environment variable PROJECT_NAME not set
-    exit 1
-fi
+if [ "$VERSION_NUMBER" == "" ]; then echo VERSION_NUMBER not set; exit 1; fi
 
-if [ "$DOCKER_USERNAME" == "" ]; then
-    echo required environment variable DOCKER_USERNAME not set
-    exit 1
-fi
+if [ "$PROJECT_NAME" == "" ]; then echo PROJECT_NAME not set; exit 1; fi
 
-if [ "$DOCKER_PASSWORD" == "" ]; then
-    echo required environment variable DOCKER_PASSWORD not set
-    exit 1
-fi
+if [ "$DOCKER_USERNAME" == "" ]; then echo DOCKER_USERNAME not set; exit 1; fi
+
+if [ "$DOCKER_PASSWORD" == "" ]; then echo DOCKER_PASSWORD not set; exit 1; fi
+
+if [ "$GITHUB_TOKEN" == "" ]; then echo GITHUB_TOKEN not set; exit 1; fi
 
 
 export SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -49,7 +35,6 @@ export CURDIR=`pwd`
 
 echo Creating Release Build.
 
-export GITHUB_TOKEN=$1  # Make GitHub security token available to release tool.
 
 
 # Go to the project home foldder and restore packages
@@ -117,12 +102,16 @@ cd $PROJECT_HOME
 #===================================================================================
 echo "Creating release '${VERSION_NUMBER}' in github"
 github-release release --user ${GH_ORGANIZATION_NAME} --repo ${GH_REPO_NAME} --tag ${VERSION_NUMBER} --name "${VERSION_NUMBER}"
+if [ $? != 0 ]; then echo Exiting with errors; exit 1; fi
+
 
 echo "Uploading BestBets API artifacts into github"
 github-release upload --user ${GH_ORGANIZATION_NAME} --repo ${GH_REPO_NAME} --tag ${VERSION_NUMBER} --name "${PROJECT_NAME}-${VERSION_NUMBER}.zip" --file $API_TMPDIR/project-release.zip
+if [ $? != 0 ]; then echo Exiting with errors; exit 1; fi
 
 echo "Uploading BestBets Indexer artifacts to github"
 github-release upload --user ${GH_ORGANIZATION_NAME} --repo ${GH_REPO_NAME} --tag ${VERSION_NUMBER} --name "bestbets-Indexer-${VERSION_NUMBER}.zip" --file $INDEXER_TMPDIR/project-release.zip
+if [ $? != 0 ]; then echo Exiting with errors; exit 1; fi
 
 
 

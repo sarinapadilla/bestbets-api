@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 using Elasticsearch.Net;
 using Nest;
@@ -18,15 +19,20 @@ namespace NCI.OCPL.Api.BestBets.Services
     {
         private IElasticClient _elasticClient;
         private ITokenAnalyzerService _tokenAnalyzer;
+        private CGBBIndexOptions _bestbetsConfig;
         private readonly ILogger<ESBestBetsMatchService> _logger;
 
         /// <summary>
         /// Creates a new instance of a ESBestBetsMatchService
         /// </summary>        
-        public ESBestBetsMatchService(IElasticClient client, ITokenAnalyzerService tokenAnalyzer, ILogger<ESBestBetsMatchService> logger) //Needs someway to get an IElasticClient 
+        public ESBestBetsMatchService(IElasticClient client,
+            ITokenAnalyzerService tokenAnalyzer,
+            IOptions<CGBBIndexOptions> config,
+            ILogger<ESBestBetsMatchService> logger) //Needs someway to get an IElasticClient 
         {
             _elasticClient = client;
             _tokenAnalyzer = tokenAnalyzer;
+            _bestbetsConfig = config.Value;
             _logger = logger;
         }
 
@@ -130,8 +136,7 @@ namespace NCI.OCPL.Api.BestBets.Services
             {
                 var response = _elasticClient.SearchTemplate<BestBetsMatch>(sd => {
                     sd = sd
-                    //TODO: Configure alias and not hardcode
-                    .Index("bestbets")
+                    .Index(_bestbetsConfig.AliasName)
                     .Type("synonyms")
                     .File(templateFileName)
                     .Params(pd =>
@@ -151,7 +156,7 @@ namespace NCI.OCPL.Api.BestBets.Services
                 //Test if response is valid
                 if (!response.IsValid)
                 {
-                    _logger.LogError("Elasticsearch Response is Not Valid.  Term '{0}'", cleanedTerm);
+                    _logger.LogError("Elasticsearch Response is Not Valid. Term '{0}'", cleanedTerm);
                     throw new APIErrorException(500, "Errors Occurred.");
                 }
 

@@ -22,7 +22,7 @@ using System.Text;
 
 namespace NCI.OCPL.Api.BestBets.Tests
 {
-    public class ESTokenAnalyzerServiceTests
+    public class ESTokenAnalyzerServiceTests : TestServiceBase
     {
 
         public static IEnumerable<object[]> GetTokenCountData => new[] {
@@ -77,7 +77,9 @@ namespace NCI.OCPL.Api.BestBets.Tests
             var connectionSettings = new ConnectionSettings(pool, conn);
             IElasticClient client = new ElasticClient(connectionSettings);
 
-            ESTokenAnalyzerService service = new ESTokenAnalyzerService(client, new NullLogger<ESTokenAnalyzerService>());
+            IOptions<CGBBIndexOptions> config = GetMockConfig();
+
+            ESTokenAnalyzerService service = new ESTokenAnalyzerService(client, config, new NullLogger<ESTokenAnalyzerService>());
             int actualCount = service.GetTokenCount(searchTerm);
 
             Assert.Equal(expectedCount, actualCount);

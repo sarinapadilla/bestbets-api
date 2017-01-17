@@ -17,7 +17,7 @@ using Microsoft.Extensions.Logging.Testing;
 
 namespace NCI.OCPL.Api.BestBets.Tests
 {
-    public class ESBestBetsMatchServiceTests
+    public class ESBestBetsMatchServiceTests : TestServiceBase
     {
 
 
@@ -97,7 +97,9 @@ namespace NCI.OCPL.Api.BestBets.Tests
             var connectionSettings = new ConnectionSettings(pool, connection);
             IElasticClient client = new ElasticClient(connectionSettings);
 
-            return new ESTokenAnalyzerService(client, new NullLogger<ESTokenAnalyzerService>());
+            IOptions<CGBBIndexOptions> config = GetMockConfig();
+
+            return new ESTokenAnalyzerService(client, config, new NullLogger<ESTokenAnalyzerService>());
         }
 
         private ESBestBetsMatchService GetMatchService(ESTokenAnalyzerService tokenService, IConnection connection)
@@ -109,10 +111,10 @@ namespace NCI.OCPL.Api.BestBets.Tests
             var connectionSettings = new ConnectionSettings(pool, connection);
             IElasticClient client = new ElasticClient(connectionSettings);
 
-            return new ESBestBetsMatchService(client, tokenService, new NullLogger<ESBestBetsMatchService>());
+            IOptions<CGBBIndexOptions> config = GetMockConfig();
+
+            return new ESBestBetsMatchService(client, tokenService, config, new NullLogger<ESBestBetsMatchService>());
         }
-
-
 
     }
 }

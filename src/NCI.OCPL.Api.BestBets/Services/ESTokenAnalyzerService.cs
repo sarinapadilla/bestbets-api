@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 using Elasticsearch.Net;
 using Nest;
@@ -19,14 +20,18 @@ namespace NCI.OCPL.Api.BestBets.Services
     public class ESTokenAnalyzerService : ITokenAnalyzerService
     {
         private IElasticClient _elasticClient;
+        private CGBBIndexOptions _bestbetsConfig;
         private readonly ILogger<ESTokenAnalyzerService> _logger;
 
         /// <summary>
         /// Creates a new instance of a ESBestBetsMatchService
         /// </summary>        
-        public ESTokenAnalyzerService(IElasticClient client, ILogger<ESTokenAnalyzerService> logger) //Needs someway to get an IElasticClient 
+        public ESTokenAnalyzerService(IElasticClient client,
+                        IOptions<CGBBIndexOptions> bestbetsConfig,
+                        ILogger<ESTokenAnalyzerService> logger) //Needs someway to get an IElasticClient 
         {
             _elasticClient = client;
+            _bestbetsConfig = bestbetsConfig.Value;
             _logger = logger;
         }
 
@@ -40,7 +45,7 @@ namespace NCI.OCPL.Api.BestBets.Services
             var analyzeResponse = this._elasticClient.Analyze(
                 a => a
                 //TODO: Make alias a configuration option
-                .Index("bestbets")
+                .Index(_bestbetsConfig.AliasName)
                 .Analyzer("nostem")
                 .Text(term)
             );

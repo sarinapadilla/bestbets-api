@@ -41,8 +41,9 @@ namespace NCI.OCPL.Api.BestBets
             //Turn on the OptionsManager that supports IOptions
             services.AddOptions();
 
-            //Add the mapping for the BestBets Display Service Configuration
+            //Add Configuration mappings.
             services.Configure<CGBestBetsDisplayServiceOptions>(Configuration.GetSection("CGBestBetsDisplayService"));
+            services.Configure<CGBBIndexOptions>(Configuration.GetSection("CGBestBetsIndex"));
 
             //Add HttpClient singleton, which is used by the display service.
             services.AddSingleton<HttpClient, HttpClient>();

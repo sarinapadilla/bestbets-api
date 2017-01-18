@@ -1,6 +1,12 @@
 # Configuration 
 # Best Bets Indexer
 
+Run the Bets Indexer by running the `bestbets.indexer.sh` script.
+* The `bestbets.indexer.sh` script optionally takes the name of a configuration file as an argument.
+* If the configuration file argument is omitted, `bestbets.indexer.configuration.default` is loaded from the
+    directory where `bestbets.indexer.sh` is located.
+* If the file `bestbets.indexer.STOP` exists in the script's directory, then the indexer will not be executed.
+
 The Best Bets Indexer is configured by supplying values in bestbets.indexer.config.  All values are required.
 
 container_name=bestbetsindexer

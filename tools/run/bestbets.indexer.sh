@@ -1,10 +1,21 @@
 #!/bin/sh
-if [ -e "bestbets.indexer.disabled" ]; then echo "Best bets indexer disabled. Exiting."; exit 0; fi
-
 export SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+# Is indexing enabled?
+if [ -f "${SCRIPT_PATH}/bestbets.indexer.STOP" ]; then echo "Best bets indexer disabled. Exiting."; exit 0; fi
+
+# Determine what configuration file to use.
+if [ -n "$1" ]; then
+    configuration=$1
+else
+    configuration="${SCRIPT_PATH}/bestbets.indexer.config.default"
+fi
+if [ ! -f $configuration ]; then
+    echo "Configuration file '${configuration}' not found"
+fi
+
+
 # Read configuration
-export configuration="$SCRIPT_PATH/bestbets.indexer.config"
 export configData=`cat $configuration`
 while IFS='=' read -r name value || [ -n "$name" ]
 do

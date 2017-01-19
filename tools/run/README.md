@@ -1,4 +1,23 @@
-# Starting and Stopping Best Bets
+# Managing Best Bets Containers
+
+The Best Bets start up scripts each take a single parameter consisting of the name of a configuration
+file. One of the values in the configuration files is the container name to use for that particular
+instance. This allows multiple containers to run from a single image.
+
+For example:
+```bash
+bestbets.api.sh bestbets.api.config.live
+bestbets.api.sh bestbets.api.config.preview
+```
+
+## Stopping containers
+
+`halt-container.sh` is provided as a convenience to stop and unload a container in a single command.  The usage
+is `halt-container.sh <container_name>`
+
+```bash
+./halt-container.sh bestbets-api-live
+```
 
 ## Best Bets API
 

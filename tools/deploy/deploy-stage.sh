@@ -1,25 +1,63 @@
 #!/bin/sh
 # Deploy to staging
 
+export SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+export RUN_SCRIPTS="../run"
+export RUN_LOCATION="bestbets-run"
+
+# Determine what configuration file to use.
+configuration="${SCRIPT_PATH}/deploy-stage.config"
+
+if [ ! -f $configuration ]; then
+    echo "Configuration file '${configuration}' not found"
+fi
+
+
 #   Need to import:
-#       - a list of servers 
-#       - name of the indexer server
 #       - Version number to run
 #       - SSH credentials
-#
-#   Steps
-#
-#    Suspend cron on Indexer server (For images having an indexer)
-#       SSH to designated server, create STOP file(s)
-#
-#    Wait for any running tasks to complete (Look for the container with the indexer)
-#
-#    Per server
-#
+
+# Read configuration
+export configData=`cat $configuration`
+while IFS='=' read -r name value || [ -n "$name" ]
+do
+    if [ $name = "indexer_server" ];then export indexer_server="$value"; fi
+    if [ $name = "server_list" ];then export server_list="$value"; fi
+done <<< "$configData"
+
+IFS=', ' read -r -a server_list <<< "$server_list"
+
+# Check for required config values
+if [ -z "$indexer_server" ]; then echo "indexer_server not set, aborting."; exit 1; fi
+if [ -z "$server_list" ]; then echo "server_list not set, aborting."; exit 1; fi
+
+
+# Deploy support script collection.
+for server in "${server_list[@]}"
+do
+    ssh ${server} mkdir -p bestbets-run
+    scp ${RUN_SCRIPTS}/* ${server}:bestbets-run
+done
+
+##################################################################
+#   Suspend cron on Indexer server (For images having an indexer)
+##################################################################
+ssh ${indexer_server} ${RUN_LOCATION}/stop-indexers.sh
+
+##################################################################
+#   Per server steps.
+##################################################################
+for server in "${server_list[@]}"
+do
+
+
 #        Deploy configuration (Write a persistent something or other telling the system which tag it's going to use)
-#        Stop existing API container
-#           Use tools/run/halt-container.sh
-#
+
+    # Stop existing API container
+    ssh ${server} ${RUN_LOCATION}/stop-api.sh
+
+
+
 #        Pull image for new version (pull version-specific tag)
 #            When we run the image, possibly run the indexer first.
 #               tools/run/bestbets-indexer.sh bestbets.indexer.config.live (or .preview)
@@ -33,7 +71,9 @@
 #                Continue on next server.
 #            Error:
 #                Roll back to previous image
-#
+
+done
+
 #    After all servers are updated, report that deployment has completed.
 #
 #    Run indexer(?) (Command line switch?)

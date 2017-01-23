@@ -35,14 +35,14 @@ if [ -z "$server_list" ]; then echo "server_list not set, aborting."; exit 1; fi
 # Deploy support script collection.
 for server in "${server_list[@]}"
 do
-    ssh ${server} mkdir -p bestbets-run
-    scp ${RUN_SCRIPTS}/* ${server}:bestbets-run
+    ssh ${USER}@${server} mkdir -p bestbets-run
+    scp ${RUN_SCRIPTS}/* ${USER}@${server}:bestbets-run
 done
 
 ##################################################################
 #   Suspend cron on Indexer server (For images having an indexer)
 ##################################################################
-ssh ${indexer_server} ${RUN_LOCATION}/stop-indexers.sh
+ssh ${USER}@${indexer_server} ${RUN_LOCATION}/stop-indexers.sh
 
 ##################################################################
 #   Per server steps.
@@ -54,7 +54,7 @@ do
 #        Deploy configuration (Write a persistent something or other telling the system which tag it's going to use)
 
     # Stop existing API container
-    ssh ${server} ${RUN_LOCATION}/stop-api.sh
+    ssh ${USER}@${server} ${RUN_LOCATION}/stop-api.sh
 
 
 

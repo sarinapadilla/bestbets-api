@@ -1,5 +1,7 @@
 # Managing Best Bets Containers
 
+**Scripts in this directory should be deployed together and on the path for the resource account responsbile for running the system.**
+
 The Best Bets start up scripts each take a single parameter consisting of the name of a configuration
 file. One of the values in the configuration files is the container name to use for that particular
 instance. This allows multiple containers to run from a single image.

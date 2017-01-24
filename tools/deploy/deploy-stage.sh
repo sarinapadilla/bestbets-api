@@ -68,10 +68,9 @@ do
     imageName="nciwebcomm/bestbets-api:runtime-${release_version}"
     ssh -q ${server} bestbets-run/pull-image.sh $imageName $DOCKER_USER $DOCKER_PASS
 
-#        Pull image for new version (pull version-specific tag)
-#            When we run the image, possibly run the indexer first.
-#               tools/run/bestbets-indexer.sh bestbets.indexer.config.live (or .preview)
-#            This is something we'd want when changing the schema, probably involves introducing a new alias at the same time (said new alias would have no data until the indexer runs)
+#   When we run the image, possibly run the indexer first.
+#       tools/run/bestbets-indexer.sh bestbets.indexer.config.live (or .preview)
+#   This is something we'd want when changing the schema, probably involves introducing a new alias at the same time (said new alias would have no data until the indexer runs)
 #
 #        Start API via tools/run/bestbets-api.sh bestbets.api.config.live (or .preview)
 #

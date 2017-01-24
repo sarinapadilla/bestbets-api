@@ -12,14 +12,26 @@ bestbets.api.sh bestbets.api.config.live
 bestbets.api.sh bestbets.api.config.preview
 ```
 
-## Stopping containers
+## Scripts
 
-`halt-container.sh` is provided as a convenience to stop and unload a container in a single command.  The usage
-is `halt-container.sh <container_name>`
+* **bestbets-api.sh -** Launches an instance of the BestBets API. (See Best Bets API section below for details.)  
+    ```./bestbets-api.sh bestbets-api-config.live```
+* **bestbets-indexer.sh -** Launches an instance of the BestBets indexer.
+    (See Best Bets Indexer section below for details.)  
+    ```./bestbets-indexer.sh bestbets-indexer-config.live```
+* **halt-container.sh -** Halts the named container and removes it from memory.  
+    ```./halt-container.sh bestbets-api-live```
+* **pull-image.sh -** Pulls the named image from the Docker repository. Requires
+    Docker login credentials.  
+    ```./pull-image.sh nciwebcomm/bestbets-api:release <USERID> <PASSWORD>```
+* **resume-indexers.sh -** Allows the BestBet indexers to resume running on schedule.  
+    ```./resume-indexers.sh```
+* **stop-api.sh -** Stops all instances of the API from running (Currently a hard-coded list).  
+    ```./stop-api.sh```
+* **stop-indexers.sh -** Prevents any new scheduled instances of the Best Bets indexer from starting.
+    Does not return until all currently running instances have completed.  
+    ```./stop-indexers.sh```
 
-```bash
-./halt-container.sh bestbets-api-live
-```
 
 ## Best Bets API
 
@@ -30,7 +42,7 @@ Run the Bets API by running the `bestbets.api.sh` script.
 
 The Best Bets API uses these configuration values.  All values are required.
 
-container_name=bestbets-api
+* **container_name -** The name to assign to the container.
 * **currentTag -** The indexer version number to run. (**NOTE:** If the image for the configured version is not present,
     the run script will fail. This is by design. Only the deployment script should be used to deploy new image versions.)
 * **elasticsearch\_user -** An Elasticsearch userid with access to create and modify indices.

@@ -1,3 +1,4 @@
+# Sample Best Bets Indexer instance configuration file.
 container_name=bestbets-indexer
 currentTag=0.1.22
 elasticsearch_user=ELASTICSEARCH_USERID

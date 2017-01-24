@@ -24,14 +24,17 @@ do
     if [ "$name" = "indexer_server" ];then export indexer_server="$value"; fi
     if [ "$name" = "server_list" ];then export server_list="$value"; fi
     if [ "$name" = "release_version" ];then export release_version="$value"; fi
+    if [ "$name" = "api_instance_list" ];then export api_instance_list="$value"; fi
 done <<< "$configData"
 
 IFS=', ' read -r -a server_list <<< "$server_list"
+IFS=', ' read -r -a api_instance_list <<< "$api_instance_list"
 
 # Check for required config values
 if [ -z "$indexer_server" ]; then echo "indexer_server not set, aborting."; exit 1; fi
 if [ -z "$server_list" ]; then echo "server_list not set, aborting."; exit 1; fi
 if [ -z "$release_version" ]; then echo "release_version not set, aborting."; exit 1; fi
+if [ -z "$api_instance_list" ]; then echo "api_instance_list not set, aborting."; exit 1; fi
 
 # Check for required environment variables
 if [ -z "$DOCKER_USER" ]; then echo "DOCKER_USER not set, aborting."; exit 1; fi
@@ -42,8 +45,8 @@ if [ -z "$DOCKER_PASS" ]; then echo "DOCKER_PASS not set, aborting."; exit 1; fi
 for server in "${server_list[@]}"
 do
     echo "Deploying run scripts to ${server}"
-    ssh -q ${server} mkdir -p bestbets-run
-    scp -q ${RUN_SCRIPTS}/* ${server}:bestbets-run
+    ssh -q ${server} mkdir -p ${RUN_LOCATION}
+    scp -q ${RUN_SCRIPTS}/* ${server}:${RUN_LOCATION}
 done
 
 ##################################################################
@@ -66,30 +69,35 @@ do
 
     # Pull image for new version (pull version-specific tag)
     imageName="nciwebcomm/bestbets-api:runtime-${release_version}"
-    ssh -q ${server} bestbets-run/pull-image.sh $imageName $DOCKER_USER $DOCKER_PASS
+    ssh -q ${server} ${RUN_LOCATION}/pull-image.sh $imageName $DOCKER_USER $DOCKER_PASS
 
-#   When we run the image, possibly run the indexer first.
-#       tools/run/bestbets-indexer.sh bestbets.indexer.config.live (or .preview)
-#   This is something we'd want when changing the schema, probably involves introducing a new alias at the same time (said new alias would have no data until the indexer runs)
-#
-#        Start API via tools/run/bestbets-api.sh bestbets.api.config.live (or .preview)
-#
-#        Test API availability
-#            If all is well,
-#                Remove old image
-#                Continue on next server.
-#            Error:
-#                Roll back to previous image
+    # When we run the image, possibly run the indexer first.
+    #   tools/run/bestbets-indexer.sh bestbets.indexer.config.live (or .preview)
+    # This is something we'd want when changing the schema, probably involves introducing a new alias at the same time (said new alias would have no data until the indexer runs)
+
+    # Start API via tools/run/bestbets-api.sh bestbets.api.config.live (or .preview)
+    for instance in "${api_instance_list[@]}"
+    do
+        echo "Starting $instance API instance"
+        ssh -q ${server} ${RUN_LOCATION}/bestbets-api.sh ${RUN_LOCATION}/bestbets-api-config.${instance}
+    done
+
+    # Test API availability
+    #   If all is well,
+    #       Remove old image
+    #       Continue on next server.
+    #   Error:
+    #       Roll back to previous image
 
 done
 
-#    After all servers are updated, report that deployment has completed.
-#
-#    Run indexer(?) (Command line switch?)
-#
+# Report that deployment has completed.
+
+# Run indexer(?) (Command line switch?)
+
 
 ##################################################################
-#   Resume Indexer
+#   Allow scheduled indexing to resume
 ##################################################################
 echo "Resuming indexers on ${indexer_server}"
 ssh -q ${indexer_server} ${RUN_LOCATION}/resume-indexers.sh

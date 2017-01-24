@@ -2,9 +2,6 @@
 export SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export BASE_API_IMAGE="nciwebcomm/bestbets-api:runtime"
 
-# Is indexing enabled?
-if [ -f "${SCRIPT_PATH}/bestbets.indexer.STOP" ]; then echo "Best bets indexer disabled. Exiting."; exit 0; fi
-
 # Determine what configuration file to use.
 if [ -n "$1" ]; then
     configuration=$1
@@ -13,6 +10,7 @@ else
 fi
 if [ ! -f $configuration ]; then
     echo "Configuration file '${configuration}' not found"
+    exit 1
 fi
 
 
@@ -20,12 +18,12 @@ fi
 export configData=`cat $configuration`
 while IFS='=' read -r name value || [ -n "$name" ]
 do
-    if [ $name = "container_name" ];then export container_name="$value"; fi
-    if [ $name = "currentTag" ];then export currentTag="$value"; fi
-    if [ $name = "elasticsearch_user" ];then export elasticsearch_user="$value"; fi
-    if [ $name = "elasticsearch_password" ];then export elasticsearch_password="$value"; fi
-    if [ $name = "elasticsearch_servers" ];then export elasticsearch_servers="$value"; fi
-    if [ $name = "displayservice_host" ];then export displayservice_host="$value"; fi
+    if [ "$name" = "container_name" ];then export container_name="$value"; fi
+    if [ "$name" = "currentTag" ];then export currentTag="$value"; fi
+    if [ "$name" = "elasticsearch_user" ];then export elasticsearch_user="$value"; fi
+    if [ "$name" = "elasticsearch_password" ];then export elasticsearch_password="$value"; fi
+    if [ "$name" = "elasticsearch_servers" ];then export elasticsearch_servers="$value"; fi
+    if [ "$name" = "displayservice_host" ];then export displayservice_host="$value"; fi
 done <<< "$configData"
 
 # Check for required config values

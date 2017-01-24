@@ -21,8 +21,8 @@ fi
 export configData=`cat $configuration`
 while IFS='=' read -r name value || [ -n "$name" ]
 do
-    if [ $name = "indexer_server" ];then export indexer_server="$value"; fi
-    if [ $name = "server_list" ];then export server_list="$value"; fi
+    if [ "$name" = "indexer_server" ];then export indexer_server="$value"; fi
+    if [ "$name" = "server_list" ];then export server_list="$value"; fi
 done <<< "$configData"
 
 IFS=', ' read -r -a server_list <<< "$server_list"
@@ -40,7 +40,7 @@ do
 done
 
 ##################################################################
-#   Suspend cron on Indexer server (For images having an indexer)
+#   Suspend Indexer
 ##################################################################
 ssh ${indexer_server} ${RUN_LOCATION}/stop-indexers.sh
 
@@ -56,7 +56,8 @@ do
     # Stop existing API container
     ssh ${server} ${RUN_LOCATION}/stop-api.sh
 
-
+echo "Updating ${server} ..."
+sleep 30
 
 #        Pull image for new version (pull version-specific tag)
 #            When we run the image, possibly run the indexer first.
@@ -78,5 +79,11 @@ done
 #
 #    Run indexer(?) (Command line switch?)
 #
+
+##################################################################
+#   Resume Indexer
+##################################################################
+ssh ${indexer_server} ${RUN_LOCATION}/resume-indexers.sh
+
 #    Resume cron
 #       SSH to designated server, remove STOP file(s)

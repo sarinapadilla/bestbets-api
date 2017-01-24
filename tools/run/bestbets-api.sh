@@ -1,6 +1,6 @@
 #!/bin/sh
 export SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-export BASE_INDEXER_IMAGE="nciwebcomm/bestbets-api:runtime"
+export BASE_API_IMAGE="nciwebcomm/bestbets-api:runtime"
 
 # Is indexing enabled?
 if [ -f "${SCRIPT_PATH}/bestbets.indexer.STOP" ]; then echo "Best bets indexer disabled. Exiting."; exit 0; fi
@@ -37,7 +37,7 @@ if [ -z "$elasticsearch_servers" ]; then echo "elasticsearch_servers not set, ab
 if [ -z "$displayservice_host" ]; then echo "displayservice_host not set, aborting."; exit 1; fi
 
 # Does the image exist?
-export imageName="${BASE_INDEXER_IMAGE}-${currentTag}"
+export imageName="${BASE_API_IMAGE}-${currentTag}"
 export imageID=$(docker images -q $imageName)
 if [ -z "$imageID" ]; then
     echo "Image $imageName not available. Aborting."

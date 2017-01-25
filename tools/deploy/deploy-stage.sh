@@ -82,12 +82,21 @@ do
         ssh -q ${server} ${RUN_LOCATION}/bestbets-api.sh ${RUN_LOCATION}/bestbets-api-config.${instance}
     done
 
-    # Test API availability
-    #   If all is well,
-    #       Remove old image
-    #       Continue on next server.
-    #   Error:
-    #       Roll back to previous image
+    # Test API availability by retrieving a Best Bet with at least one result.
+    testdata=$(curl -f --silent --write-out 'RESULT_CODE:%{http_code}' -XGET http://localhost:5006/bestbets/en/treatment)
+    statusCode=${testdata:${#testdata}-3}
+    testdata=${testdata:${#testdata}-15}
+    dataLength=${#testdata}
+
+    # Check for statusCode other than 200 or short testdata.
+    if [ "$statusCode" != "200" && dataLength > 100 ]; then
+        # All is well,
+        #   Remove old image
+        #   Continue on next server.
+    else
+        # Error:
+        #   Roll back to previous image
+    fi
 
 done
 

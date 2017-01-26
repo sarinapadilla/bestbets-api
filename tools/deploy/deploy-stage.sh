@@ -83,19 +83,28 @@ do
     done
 
     # Test API availability by retrieving a Best Bet with at least one result.
-    testdata=$(curl -f --silent --write-out 'RESULT_CODE:%{http_code}' -XGET http://localhost:5006/bestbets/en/treatment)
-    statusCode=${testdata:${#testdata}-3}
-    testdata=${testdata:${#testdata}-15}
+    sleep 10 # Wait for the API to finish spinning up before querying.
+    testdata=$(curl -f --silent --write-out 'RESULT_CODE:%{http_code}' -XGET http://${server}:5006/bestbets/en/treatment)
+
+    statusCode=${testdata:${#testdata}-3}  # Get HTTP Status from end of output.
+    testdata=${testdata:0:${#testdata}-15} # Trim the HTTP Status from output
     dataLength=${#testdata}
 
     # Check for statusCode other than 200 or short testdata.
-    if [ "$statusCode" != "200" && dataLength > 100 ]; then
+    if [ "$statusCode" = "200" -a $dataLength -gt 100 -a ${testdata:0:1} = '[' ]; then
+        echo "Successfully deployed to ${server}"
         # All is well,
         #   Remove old image
         #   Continue on next server.
     else
+        echo "Failed deploying to ${server}"
+        [ "$statusCode" != 200 ] && echo "HTTP status: ${statusCode}"
+        [ $dataLength -lt 101 ] && echo "Short data length (${dataLength})"
+        [ ${testdata:0:1} = '[' ] && echo "Incorrect starting character, expected '[', got '${testdata:0:1}'."
+        echo "TestData '${testdata}'"
         # Error:
         #   Roll back to previous image
+        exit 1
     fi
 
 done

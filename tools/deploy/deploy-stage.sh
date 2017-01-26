@@ -44,7 +44,7 @@ if [ -z "$DOCKER_PASS" ]; then echo "DOCKER_PASS not set, aborting."; exit 1; fi
 # Deploy support script collection.
 for server in "${server_list[@]}"
 do
-    echo "Deploying run scripts to ${server}"
+    echo "Copying run scripts to ${server}"
     ssh -q ${server} mkdir -p ${RUN_LOCATION}
     scp -q ${RUN_SCRIPTS}/* ${server}:${RUN_LOCATION}
 done
@@ -63,6 +63,9 @@ do
 
 
 #        Deploy configuration (Write a persistent something or other telling the system which tag it's going to use)
+
+    # Find out what images are already deployed for eventual cleanup.
+    oldImageList=$(ssh -q $server ${RUN_LOCATION}/get-image-tag.sh nciwebcomm/bestbets-api)
 
     # Stop existing API container
     ssh -q ${server} ${RUN_LOCATION}/stop-api.sh

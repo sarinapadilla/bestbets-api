@@ -4,6 +4,10 @@
 export SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export RUN_SCRIPTS="../run"
 export RUN_LOCATION="bestbets-run"
+export OLD_RUN_LOCATION="${RUN_LOCATION}-"`date +%Y%m%d-%H%M`
+
+echo $RUN_LOCATION
+echo $OLD_RUN_LOCATION
 
 # Determine what configuration file to use.
 configuration="${SCRIPT_PATH}/deploy-stage.config"
@@ -45,6 +49,8 @@ if [ -z "$DOCKER_PASS" ]; then echo "DOCKER_PASS not set, aborting."; exit 1; fi
 for server in "${server_list[@]}"
 do
     echo "Copying run scripts to ${server}"
+    ssh -q ${server} [ -e ${RUN_LOCATION} ] && cp ${RUN_LOCATION} ${OLD_RUN_LOCATION} # Backup existing files.
+exit 0
     ssh -q ${server} mkdir -p ${RUN_LOCATION}
     scp -q ${RUN_SCRIPTS}/* ${server}:${RUN_LOCATION}
 done

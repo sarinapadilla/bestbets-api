@@ -73,6 +73,15 @@ job("${folderName}/_lower/${releaseBuild}") {
 }
 
 job("${folderName}/_upper/${releaseToStage}") {
+    wrappers {
+        credentialsBinding {
+            usernamePassword('DOCKER_USERNAME', 'DOCKER_PASSWORD', DOCKER_USER_KEY)
+        }
+        //environmentVariables {
+        //    envs(
+        //    )
+        //}
+    }
     label('!master') // Run anywhere except the master
     scm {
         github(sourceRepository)
@@ -83,6 +92,15 @@ job("${folderName}/_upper/${releaseToStage}") {
 }
 
 job("${folderName}/_upper/${releaseToProd}") {
+    wrappers {
+        credentialsBinding {
+            usernamePassword('DOCKER_USERNAME', 'DOCKER_PASSWORD', DOCKER_USER_KEY)
+        }
+        //environmentVariables {
+        //    envs(
+        //    )
+        //}
+    }
     label('!master') // Run anywhere except the master
     scm {
         github(sourceRepository)

@@ -54,6 +54,7 @@ namespace NCI.OCPL.Api.BestBets.Indexer
 
             services.Configure<CGBestBetsDisplayServiceOptions>(Configuration.GetSection("CGBestBetsDisplayService"));
             services.Configure<ESBBIndexerServiceOptions>(Configuration.GetSection("ESBBIndexerService"));
+            services.Configure<CGBBIndexOptions>(Configuration.GetSection("CGBestBetsIndex"));
             services.Configure<ElasticSearchOptions>(Configuration.GetSection("Elasticsearch"));
             services.Configure<PublishedContentListingServiceOptions>(Configuration.GetSection("CDEPubContentListingService"));
 

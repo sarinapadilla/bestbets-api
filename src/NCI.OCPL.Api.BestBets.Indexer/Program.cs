@@ -53,10 +53,14 @@ namespace NCI.OCPL.Api.BestBets.Indexer
             services.AddOptions();
 
             services.Configure<CGBestBetsDisplayServiceOptions>(Configuration.GetSection("CGBestBetsDisplayService"));
-            services.Configure<ESBBIndexerServiceOptions>(Configuration.GetSection("ESBBIndexerService"));
-            services.Configure<CGBBIndexOptions>(Configuration.GetSection("CGBestBetsIndex"));
             services.Configure<ElasticSearchOptions>(Configuration.GetSection("Elasticsearch"));
             services.Configure<PublishedContentListingServiceOptions>(Configuration.GetSection("CDEPubContentListingService"));
+
+            // This is not a typo. ESBBIndexerServiceOptions is a superset of CGBBIndexOptions.
+            // CGBBIndexOptions loads only the portion of the settings it needs.
+            services.Configure<ESBBIndexerServiceOptions>(Configuration.GetSection("ESBBIndexerService"));
+            services.Configure<CGBBIndexOptions>(Configuration.GetSection("ESBBIndexerService"));
+
 
             services.AddSingleton<ConfiguredElasticClientFactory, ConfiguredElasticClientFactory>();
             services.AddTransient<IElasticClient>(p => p.GetRequiredService<ConfiguredElasticClientFactory>().GetInstance());

@@ -5,11 +5,10 @@ using System.Threading.Tasks;
 
 namespace NCI.OCPL.Api.BestBets.Indexer.Services
 {
-    public class ESBBIndexerServiceOptions
+    public class ESBBIndexerServiceOptions :
+        CGBBIndexOptions
     {
-        /// <summary>
-        /// Gets and sets the alias name for the BestBets collection.
-        /// </summary>
-        public string AliasName { get; set; } 
+        // Wraps CGBBIndexOptions so we only need a single configuaration
+        // unit for their overlapping data.
     }
 }

@@ -3,9 +3,8 @@
 
 export SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# Block new indexer instances from launching.
-# Assumes that this script lives in the same folder as the ones which run the indexers.
-touch "${SCRIPT_PATH}/bestbets.indexer.STOP"
+# Stop new indexer instances from launching.
+crontab -r
 
 
 # Wait for existing indexer instances to finish.

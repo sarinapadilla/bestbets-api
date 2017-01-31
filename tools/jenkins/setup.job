@@ -77,10 +77,27 @@ job("${folderName}/_upper/${releaseToStage}") {
         credentialsBinding {
             usernamePassword('DOCKER_USERNAME', 'DOCKER_PASSWORD', DOCKER_USER_KEY)
         }
-        //environmentVariables {
-        //    envs(
-        //    )
-        //}
+        environmentVariables {
+            envs(
+                ELASTICSEARCH_LIVE_ALIAS : "bestbets",
+                ELASTICSEARCH_PREVIEW_ALIAS : "bestbetspreview",
+                BESTBETS_HOST_LIVE : "https://www.cancer.gov/",
+                BESTBETS_HOST_PREVIEW : "https://preview.cancer.gov/",
+
+                // Userids and passwords need to move to the credentialsBinding section
+                INDEXER_SERVER : "",
+                SERVER_LIST : "",
+                RELEASE_VERSION : "",
+                DOCKER_USER : "",
+                DOCKER_PASS : "",
+                ELASTICSEARCH_SERVERS : "",
+                ELASTICSEARCH_INDEX_USER : "",
+                ELASTICSEARCH_INDEX_PASSWORD : "",
+                ELASTICSEARCH_SEARCH_USER : "",
+                ELASTICSEARCH_SEARCH_PASSWORD : ""
+
+            )
+        }
     }
     label('!master') // Run anywhere except the master
     scm {

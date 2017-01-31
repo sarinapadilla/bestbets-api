@@ -6,43 +6,19 @@ export RUN_SCRIPTS="../run"
 export RUN_LOCATION="bestbets-run"
 export OLD_RUN_LOCATION="${RUN_LOCATION}-"`date +%Y%m%d-%H%M`
 
-echo $RUN_LOCATION
-echo $OLD_RUN_LOCATION
 
-# Determine what configuration file to use.
-configuration="${SCRIPT_PATH}/deploy-stage.config"
-
-if [ ! -f $configuration ]; then
-    echo "Configuration file '${configuration}' not found"
-fi
-
-
-#   Need to import:
-#       - Version number to run
-#       - SSH credentials
-
-# Read configuration
-export configData=`cat $configuration`
-while IFS='=' read -r name value || [ -n "$name" ]
-do
-    if [ "$name" = "indexer_server" ];then export indexer_server="$value"; fi
-    if [ "$name" = "server_list" ];then export server_list="$value"; fi
-    if [ "$name" = "release_version" ];then export release_version="$value"; fi
-    if [ "$name" = "api_instance_list" ];then export api_instance_list="$value"; fi
-done <<< "$configData"
-
-IFS=', ' read -r -a server_list <<< "$server_list"
-IFS=', ' read -r -a api_instance_list <<< "$api_instance_list"
-
-# Check for required config values
-if [ -z "$indexer_server" ]; then echo "indexer_server not set, aborting."; exit 1; fi
-if [ -z "$server_list" ]; then echo "server_list not set, aborting."; exit 1; fi
-if [ -z "$release_version" ]; then echo "release_version not set, aborting."; exit 1; fi
-if [ -z "$api_instance_list" ]; then echo "api_instance_list not set, aborting."; exit 1; fi
 
 # Check for required environment variables
+if [ -z "$INDEXER_SERVER" ]; then echo "INDEXER_SERVER not set, aborting."; exit 1; fi
+if [ -z "$SERVER_LIST" ]; then echo "SERVER_LIST not set, aborting."; exit 1; fi
+if [ -z "$RELEASE_VERSION" ]; then echo "RELEASE_VERSION not set, aborting."; exit 1; fi
+if [ -z "$API_INSTANCE_LIST" ]; then echo "API_INSTANCE_LIST not set, aborting."; exit 1; fi
 if [ -z "$DOCKER_USER" ]; then echo "DOCKER_USER not set, aborting."; exit 1; fi
 if [ -z "$DOCKER_PASS" ]; then echo "DOCKER_PASS not set, aborting."; exit 1; fi
+
+
+IFS=', ' read -r -a server_list <<< "$SERVER_LIST"
+IFS=', ' read -r -a api_instance_list <<< "$API_INSTANCE_LIST"
 
 
 # Deploy support script collection.
@@ -50,7 +26,6 @@ for server in "${server_list[@]}"
 do
     echo "Copying run scripts to ${server}"
     ssh -q ${server} [ -e ${RUN_LOCATION} ] && cp ${RUN_LOCATION} ${OLD_RUN_LOCATION} # Backup existing files.
-exit 0
     ssh -q ${server} mkdir -p ${RUN_LOCATION}
     scp -q ${RUN_SCRIPTS}/* ${server}:${RUN_LOCATION}
 done
@@ -58,8 +33,8 @@ done
 ##################################################################
 #   Suspend Indexer
 ##################################################################
-echo "Suspending indexers on ${indexer_server}"
-ssh -q ${indexer_server} ${RUN_LOCATION}/stop-indexers.sh
+echo "Suspending indexers on ${INDEXER_SERVER}"
+ssh -q ${INDEXER_SERVER} ${RUN_LOCATION}/stop-indexers.sh
 
 ##################################################################
 #   Per server steps.
@@ -77,7 +52,7 @@ do
     ssh -q ${server} ${RUN_LOCATION}/stop-api.sh
 
     # Pull image for new version (pull version-specific tag)
-    imageName="nciwebcomm/bestbets-api:runtime-${release_version}"
+    imageName="nciwebcomm/bestbets-api:runtime-${RELEASE_VERSION}"
     ssh -q ${server} ${RUN_LOCATION}/pull-image.sh $imageName $DOCKER_USER $DOCKER_PASS
 
     # When we run the image, possibly run the indexer first.
@@ -100,7 +75,7 @@ do
     dataLength=${#testdata}
 
     # Check for statusCode other than 200 or short testdata.
-    if [ "$statusCode" = "200" -a $dataLength -gt 100 -a ${testdata:0:1} = '[' ]; then
+    if [ "$statusCode" = "200" -a $dataLength -gt 100 -a "${testdata:0:1}" = "[" ]; then
         echo "Successfully deployed to ${server}"
         # All is well,
         #   Remove old image
@@ -126,5 +101,5 @@ done
 ##################################################################
 #   Allow scheduled indexing to resume
 ##################################################################
-echo "Resuming indexers on ${indexer_server}"
-ssh -q ${indexer_server} ${RUN_LOCATION}/resume-indexers.sh
+echo "Resuming indexers on ${INDEXER_SERVER}"
+ssh -q ${INDEXER_SERVER} ${RUN_LOCATION}/resume-indexers.sh

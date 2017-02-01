@@ -95,6 +95,7 @@ job("${folderName}/_upper/${releaseToStage}") {
             )
         }
     }
+    label('master')
     scm {
         github(sourceRepository)
     }
@@ -113,6 +114,7 @@ job("${folderName}/_upper/${releaseToProd}") {
         //    )
         //}
     }
+    label('master')
     scm {
         github(sourceRepository)
     }

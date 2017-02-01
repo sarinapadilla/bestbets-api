@@ -94,6 +94,7 @@ job("${folderName}/_upper/${releaseToStage}") {
                 INDEXER_SERVER : "",
                 SERVER_LIST : "",
                 RELEASE_VERSION : "",
+                SSH_USER : ""
             )
         }
     }

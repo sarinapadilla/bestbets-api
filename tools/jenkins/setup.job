@@ -14,8 +14,10 @@ def testPath = 'test/NCI.OCPL.Api.BestBets.Tests'  // Unit test code path relati
 def GH_REPO_NAME = 'bestbets-api'    // The project's repository name (as used in the URL).
 def GH_ORGANIZATION_NAME = 'NCIOCPL'   // GitHub Organization name (as used in the URL/userid).
 def GH_USER_KEY = 'NCIOCPL-GitHub'    // Jenkins ID of the credential string containing the GitHub userid which creates releases.
-def GH_USER_TOKEN_KEY = 'NCIOCPL-GitHub-Token'    // Jenkins ID of the credential string containing the GitHub access token for creating releases.
-def DOCKER_USER_KEY = 'NCIOCPL-Docker-User'  // Docker ID of the credential containing the login/password for the automation Docker Hub account.
+def GH_USER_TOKEN_KEY = 'NCIOCPL-GitHub-Token'  // Jenkins ID of the credential string containing the GitHub access token for creating releases.
+def DOCKER_USER_KEY = 'NCIOCPL-Docker-User'     // Docker ID of the credential containing the login/password for the automation Docker Hub account.
+def ES_READONLY_KEY = 'NCIOCPL-ES-ReadOnly-User'    // Read-only Elasticsearch login credentials (for search)
+def ES_INDEXER_KEY = 'NCIOCPL-ES-Indexer-User'      // Elasticsearch credentials that can create indices.
 
 def VERSION_NUMBER = '0.1.5'            // Project version number, following semantic versioning.
 def PROJECT_NAME = 'bestbets-api'     // Project name.
@@ -75,7 +77,9 @@ job("${folderName}/_lower/${releaseBuild}") {
 job("${folderName}/_upper/${releaseToStage}") {
     wrappers {
         credentialsBinding {
-            usernamePassword('DOCKER_USERNAME', 'DOCKER_PASSWORD', DOCKER_USER_KEY)
+            usernamePassword('DOCKER_USER', 'DOCKER_PASS', DOCKER_USER_KEY)
+            usernamePassword('ELASTICSEARCH_INDEX_USER', 'ELASTICSEARCH_INDEX_PASSWORD', ES_INDEXER_KEY)
+            usernamePassword('ELASTICSEARCH_SEARCH_USER', 'ELASTICSEARCH_SEARCH_PASSWORD', ES_READONLY_KEY)
         }
         environmentVariables {
             envs(
@@ -84,18 +88,9 @@ job("${folderName}/_upper/${releaseToStage}") {
                 BESTBETS_HOST_LIVE : "https://www.cancer.gov/",
                 BESTBETS_HOST_PREVIEW : "https://preview.cancer.gov/",
 
-                // Userids and passwords need to move to the credentialsBinding section
                 INDEXER_SERVER : "",
                 SERVER_LIST : "",
                 RELEASE_VERSION : "",
-                DOCKER_USER : "",
-                DOCKER_PASS : "",
-                ELASTICSEARCH_SERVERS : "",
-                ELASTICSEARCH_INDEX_USER : "",
-                ELASTICSEARCH_INDEX_PASSWORD : "",
-                ELASTICSEARCH_SEARCH_USER : "",
-                ELASTICSEARCH_SEARCH_PASSWORD : ""
-
             )
         }
     }

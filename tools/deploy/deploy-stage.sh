@@ -51,6 +51,7 @@ if [ -z "$ELASTICSEARCH_LIVE_ALIAS" ]; then echo "ELASTICSEARCH_LIVE_ALIAS not s
 if [ -z "$ELASTICSEARCH_PREVIEW_ALIAS" ]; then echo "ELASTICSEARCH_PREVIEW_ALIAS not set, aborting."; exit 1; fi
 if [ -z "$BESTBETS_HOST_LIVE" ]; then echo "BESTBETS_HOST_LIVE not set, aborting."; exit 1; fi
 if [ -z "$BESTBETS_HOST_PREVIEW" ]; then echo "BESTBETS_HOST_PREVIEW not set, aborting."; exit 1; fi
+if [ -z "$SSH_USER" ]; then echo "SSH_USER not set, aborting."; exit 1; fi
 
 
 IFS=', ' read -r -a server_list <<< "$SERVER_LIST"
@@ -74,6 +75,7 @@ echo "Suspending indexers on ${INDEXER_SERVER}"
 ssh -q ${INDEXER_SERVER} ${RUN_LOCATION}/stop-indexers.sh
 
 
+server_list=()
 ##################################################################
 #   Per server steps.
 ##################################################################
@@ -145,10 +147,9 @@ es_alias["preview"]=$ELASTICSEARCH_PREVIEW_ALIAS
 declare -A bb_host
 bb_host['live']=$BESTBETS_HOST_LIVE
 bb_host['preview']=$BESTBETS_HOST_PREVIEW
+cronfile='' # Holds the contents of the remote crontab file
 for instance in "${api_instance_list[@]}"
 do
-    echo "FF: ${es_alias[$instance]}"
-    echo "F2: ${instance}"
     indexerCommand="docker run --name bestbets-indexer-${instance}  \
         --rm \
         -e CDEPubContentListingService__Host=\"${bb_host[$instance]}\" \
@@ -160,8 +161,12 @@ do
         --entrypoint dotnet \
         nciwebcomm/bestbets-api:runtime-${RELEASE_VERSION} \
         /home/containeruser/indexer/NCI.OCPL.Api.BestBets.Indexer.dll"
-    echo =============================================================
-    echo $indexerCommand
-    echo =============================================================
-    #ssh -q ${INDEXER_SERVER} ${RUN_LOCATION}/resume-indexers.sh
+    cronfile="$cronfile
+$indexerCommand"
 done
+
+ssh -q ${INDEXER_SERVER} "echo \"${cronfile}\" > ${RUN_LOCATION}/cronfile"
+#ssh -q ${INDEXER_SERVER} "echo '${cronfile}' > ${RUN_LOCATION}/cronfile && crontab -r && crontab ${RUN_LOCATION}/cronfile"
+#ssh -q ${INDEXER_SERVER} "${RUN_LOCATION}/resume-indexers.sh"
+
+echo "$cronfile">crontab

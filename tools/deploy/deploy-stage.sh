@@ -9,12 +9,16 @@
 #   $SERVER_LIST - comma separated list of servers to deploy to
 #   $RELEASE_VERSION - Version number to deploy (e.g 0.1.23)
 # 
-#   Credentials for pulling the container image from the central repository.
+# Indexing schedule (cron expressions)
+#   INDEXER_SCHEDULE_LIVE - Schedule for running the live indexer
+#   INDEXER_SCHEDULE_PREVIEW - Schedule for running the preview indexer
+# 
+# Credentials for pulling the container image from the central repository.
 #   (NOTE: This is an NCI internal repository, not Docker Hub)
 #   $DOCKER_USER - Userid for 
 #   $DOCKER_PASS - Password for pulling the container image from the central repository.
 # 
-#   Elastic Search credentials. Assumed to be the same for both live and preview.
+# Elastic Search credentials. Assumed to be the same for both live and preview.
 #   $ELASTICSEARCH_SERVERS - Comma separated list of ES servers.
 #   $ELASTICSEARCH_INDEX_USER - User with ability to create new indnces
 #   $ELASTICSEARCH_INDEX_PASSWORD - Password for index user.
@@ -23,7 +27,7 @@
 #   $ELASTICSEARCH_LIVE_ALIAS - ES Alias to use for the live API/Index
 #   $ELASTICSEARCH_PREVIEW_ALIAS - ES Alias to use for the preview API/Index
 # 
-#   Host for retrieving Best Bets data.
+# Host for retrieving Best Bets data.
 #   BESTBETS_HOST_LIVE
 #   BESTBETS_HOST_PREVIEW
 # 
@@ -51,6 +55,8 @@ if [ -z "$ELASTICSEARCH_LIVE_ALIAS" ]; then echo "ELASTICSEARCH_LIVE_ALIAS not s
 if [ -z "$ELASTICSEARCH_PREVIEW_ALIAS" ]; then echo "ELASTICSEARCH_PREVIEW_ALIAS not set, aborting."; exit 1; fi
 if [ -z "$BESTBETS_HOST_LIVE" ]; then echo "BESTBETS_HOST_LIVE not set, aborting."; exit 1; fi
 if [ -z "$BESTBETS_HOST_PREVIEW" ]; then echo "BESTBETS_HOST_PREVIEW not set, aborting."; exit 1; fi
+if [ -z "$INDEXER_SCHEDULE_LIVE" ]; then echo "INDEXER_SCHEDULE_LIVE not set, aborting."; exit 1; fi
+if [ -z "$INDEXER_SCHEDULE_PREVIEW" ]; then echo "INDEXER_SCHEDULE_PREVIEW not set, aborting."; exit 1; fi
 if [ -z "$SSH_USER" ]; then echo "SSH_USER not set, aborting."; exit 1; fi
 
 
@@ -147,6 +153,9 @@ es_alias["preview"]=$ELASTICSEARCH_PREVIEW_ALIAS
 declare -A bb_host
 bb_host['live']=$BESTBETS_HOST_LIVE
 bb_host['preview']=$BESTBETS_HOST_PREVIEW
+declare -A indexSchedule
+indexSchedule['live']=$INDEXER_SCHEDULE_LIVE
+indexSchedule['preview']=$INDEXER_SCHEDULE_PREVIEW
 cronfile='' # Holds the contents of the remote crontab file
 for instance in "${api_instance_list[@]}"
 do
@@ -161,12 +170,13 @@ do
         --entrypoint dotnet \
         nciwebcomm/bestbets-api:runtime-${RELEASE_VERSION} \
         /home/containeruser/indexer/NCI.OCPL.Api.BestBets.Indexer.dll"
-    cronfile="$cronfile
-$indexerCommand"
+    cronfile="${indexSchedule[$instance]} $indexerCommand
+$cronfile"
 done
 
-ssh -q ${INDEXER_SERVER} "echo \"${cronfile}\" > ${RUN_LOCATION}/cronfile"
-#ssh -q ${INDEXER_SERVER} "echo '${cronfile}' > ${RUN_LOCATION}/cronfile && crontab -r && crontab ${RUN_LOCATION}/cronfile"
+#ssh -q ${INDEXER_SERVER} "echo \"${cronfile}\" > ${RUN_LOCATION}/cronfile"
+# NOTE: Existing jobs are removed as part of shutting down the indexers
+ssh -q ${INDEXER_SERVER} "echo '${cronfile}' > ${RUN_LOCATION}/cronfile && crontab ${RUN_LOCATION}/cronfile"
 #ssh -q ${INDEXER_SERVER} "${RUN_LOCATION}/resume-indexers.sh"
 
-echo "$cronfile">crontab
+#echo "$cronfile">crontab

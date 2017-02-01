@@ -87,6 +87,8 @@ job("${folderName}/_upper/${releaseToStage}") {
                 ELASTICSEARCH_PREVIEW_ALIAS : "bestbetspreview",
                 BESTBETS_HOST_LIVE : "https://www.cancer.gov/",
                 BESTBETS_HOST_PREVIEW : "https://preview.cancer.gov/",
+                INDEXER_SCHEDULE_LIVE : "# 0 12 * * *",
+                INDEXER_SCHEDULE_PREVIEW : "# 0 12 * * *",
 
                 ELASTICSEARCH_SERVERS : "",
                 INDEXER_SERVER : "",

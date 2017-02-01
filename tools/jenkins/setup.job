@@ -39,7 +39,7 @@ job("${folderName}/_lower/${devBuild}") {
             scmpoll_spec("H 7-19 * * 1-5")
         }
     }
-    label('!master') // Run anywhere except the master
+    label('docker && linux && netcore-1.0.1') // Require Linux, Docker and .Net Coroe
     scm {
         github(sourceRepository)
     }
@@ -65,7 +65,7 @@ job("${folderName}/_lower/${releaseBuild}") {
             )
         }
     }
-    label('!master') // Run anywhere except the master
+    label('docker && linux && netcore-1.0.1') // Require Linux, Docker and .Net Coroe
     scm {
         github(sourceRepository)
     }
@@ -88,18 +88,18 @@ job("${folderName}/_upper/${releaseToStage}") {
                 BESTBETS_HOST_LIVE : "https://www.cancer.gov/",
                 BESTBETS_HOST_PREVIEW : "https://preview.cancer.gov/",
 
+                ELASTICSEARCH_SERVERS : "",
                 INDEXER_SERVER : "",
                 SERVER_LIST : "",
                 RELEASE_VERSION : "",
             )
         }
     }
-    label('!master') // Run anywhere except the master
     scm {
         github(sourceRepository)
     }
     steps {
-        shell("./tools/build/${releaseToStage}.sh ${sourcePath} ${testPath}")
+        shell("./tools/deploy/deploy-stage.sh ${sourcePath} ${testPath}")
     }
 }
 
@@ -113,7 +113,6 @@ job("${folderName}/_upper/${releaseToProd}") {
         //    )
         //}
     }
-    label('!master') // Run anywhere except the master
     scm {
         github(sourceRepository)
     }

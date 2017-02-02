@@ -133,9 +133,3 @@ docker tag $IMG_ID nciwebcomm/bestbets-api:runtime-${VERSION_NUMBER}
 eval $SCRIPT_PATH/publish-docker-image.sh nciwebcomm/bestbets-api runtime
 eval $SCRIPT_PATH/publish-docker-image.sh nciwebcomm/bestbets-api runtime-${VERSION_NUMBER}
 
-
-
-# Clean up
-rm -rf $API_TMPDIR
-rm -rf $INDEXER_TMPDIR
-

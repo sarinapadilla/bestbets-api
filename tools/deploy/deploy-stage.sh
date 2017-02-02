@@ -5,9 +5,10 @@
 # 
 # Required environment variables
 # 
-#   $INDEXER_SERVER - Contains the name of the server where the indexers run.
-#   $SERVER_LIST - comma separated list of servers to deploy to
-#   $RELEASE_VERSION - Version number to deploy (e.g 0.1.23)
+#   INDEXER_SERVER - Contains the name of the server where the indexers run.
+#   SERVER_LIST - comma separated list of servers to deploy to
+#   RELEASE_VERSION - Version number to deploy (e.g 0.1.23)
+#   SSH_USER - User id for SSH to deployment server
 # 
 # Indexing schedule (cron expressions)
 #   INDEXER_SCHEDULE_LIVE - Schedule for running the live indexer
@@ -15,17 +16,17 @@
 # 
 # Credentials for pulling the container image from the central repository.
 #   (NOTE: This is an NCI internal repository, not Docker Hub)
-#   $DOCKER_USER - Userid for 
-#   $DOCKER_PASS - Password for pulling the container image from the central repository.
+#   DOCKER_USER - Userid for 
+#   DOCKER_PASS - Password for pulling the container image from the central repository.
 # 
 # Elastic Search credentials. Assumed to be the same for both live and preview.
-#   $ELASTICSEARCH_SERVERS - Comma separated list of ES servers.
-#   $ELASTICSEARCH_INDEX_USER - User with ability to create new indnces
-#   $ELASTICSEARCH_INDEX_PASSWORD - Password for index user.
-#   $ELASTICSEARCH_SEARCH_USER - User with read-only access
-#   $ELASTICSEARCH_SEARCH_PASSWORD - Password for search user.
-#   $ELASTICSEARCH_LIVE_ALIAS - ES Alias to use for the live API/Index
-#   $ELASTICSEARCH_PREVIEW_ALIAS - ES Alias to use for the preview API/Index
+#   ELASTICSEARCH_SERVERS - Comma separated list of ES servers.
+#   ELASTICSEARCH_INDEX_USER - User with ability to create new indnces
+#   ELASTICSEARCH_INDEX_PASSWORD - Password for index user.
+#   ELASTICSEARCH_SEARCH_USER - User with read-only access
+#   ELASTICSEARCH_SEARCH_PASSWORD - Password for search user.
+#   ELASTICSEARCH_LIVE_ALIAS - ES Alias to use for the live API/Index
+#   ELASTICSEARCH_PREVIEW_ALIAS - ES Alias to use for the preview API/Index
 # 
 # Host for retrieving Best Bets data.
 #   BESTBETS_HOST_LIVE
@@ -69,16 +70,16 @@ api_instance_list=("live" "preview")
 for server in "${server_list[@]}"
 do
     echo "Copying run scripts to ${server}"
-    ssh -q ${server} "[ -e ${RUN_LOCATION} ] && mv ${RUN_LOCATION} ${OLD_RUN_LOCATION}" # Backup existing files.
-    ssh -q ${server} mkdir -p ${RUN_LOCATION}
-    scp -q ${RUN_SCRIPTS}/* ${server}:${RUN_LOCATION}
+    ssh -q ${SSH_USER}@${server} "[ -e ${RUN_LOCATION} ] && mv ${RUN_LOCATION} ${OLD_RUN_LOCATION}" # Backup existing files.
+    ssh -q ${SSH_USER}@${server} mkdir -p ${RUN_LOCATION}
+    scp -q ${RUN_SCRIPTS}/* ${SSH_USER}@${server}:${RUN_LOCATION}
 done
 
 ##################################################################
 #   Suspend Indexer
 ##################################################################
 echo "Suspending indexers on ${INDEXER_SERVER}"
-ssh -q ${INDEXER_SERVER} ${RUN_LOCATION}/stop-indexers.sh
+ssh -q ${SSH_USER}@${INDEXER_SERVER} ${RUN_LOCATION}/stop-indexers.sh
 
 
 server_list=()
@@ -92,14 +93,14 @@ do
 #        Deploy configuration (Write a persistent something or other telling the system which tag it's going to use)
 
     # Find out what images are already deployed for eventual cleanup.
-    oldImageList=$(ssh -q $server ${RUN_LOCATION}/get-image-tag.sh nciwebcomm/bestbets-api)
+    oldImageList=$(ssh -q ${SSH_USER}@${server} ${RUN_LOCATION}/get-image-tag.sh nciwebcomm/bestbets-api)
 
     # Stop existing API container
-    ssh -q ${server} ${RUN_LOCATION}/stop-api.sh
+    ssh -q ${SSH_USER}@${server} ${RUN_LOCATION}/stop-api.sh
 
     # Pull image for new version (pull version-specific tag)
     imageName="nciwebcomm/bestbets-api:runtime-${RELEASE_VERSION}"
-    ssh -q ${server} ${RUN_LOCATION}/pull-image.sh $imageName $DOCKER_USER $DOCKER_PASS
+    ssh -q ${SSH_USER}@${server} ${RUN_LOCATION}/pull-image.sh $imageName $DOCKER_USER $DOCKER_PASS
 
     # When we run the image, possibly run the indexer first.
     #   tools/run/bestbets-indexer.sh bestbets.indexer.config.live (or .preview)
@@ -109,7 +110,7 @@ do
     for instance in "${api_instance_list[@]}"
     do
         echo "Starting $instance API instance"
-        ssh -q ${server} ${RUN_LOCATION}/bestbets-api.sh ${RUN_LOCATION}/bestbets-api-config.${instance}
+        ssh -q ${SSH_USER}@${server} ${RUN_LOCATION}/bestbets-api.sh ${RUN_LOCATION}/bestbets-api-config.${instance}
     done
 
     # Test API availability by retrieving a Best Bet with at least one result.
@@ -176,6 +177,6 @@ done
 
 #ssh -q ${INDEXER_SERVER} "echo \"${cronfile}\" > ${RUN_LOCATION}/cronfile"
 # NOTE: Existing jobs are removed as part of shutting down the indexers
-echo "${cronfile}" | ssh -q ${INDEXER_SERVER} "cat > ${RUN_LOCATION}/cronfile && crontab ${RUN_LOCATION}/cronfile"
+echo "${cronfile}" | ssh -q ${SSH_USER}@${INDEXER_SERVER} "cat > ${RUN_LOCATION}/cronfile && crontab ${RUN_LOCATION}/cronfile"
 #ssh -q ${INDEXER_SERVER} "${RUN_LOCATION}/resume-indexers.sh"
 

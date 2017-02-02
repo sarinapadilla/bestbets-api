@@ -18,6 +18,7 @@ def GH_USER_TOKEN_KEY = 'NCIOCPL-GitHub-Token'  // Jenkins ID of the credential 
 def DOCKER_USER_KEY = 'NCIOCPL-Docker-User'     // Docker ID of the credential containing the login/password for the automation Docker Hub account.
 def ES_READONLY_KEY = 'NCIOCPL-ES-ReadOnly-User'    // Read-only Elasticsearch login credentials (for search)
 def ES_INDEXER_KEY = 'NCIOCPL-ES-Indexer-User'      // Elasticsearch credentials that can create indices.
+def SSH_USER_KEY = 'NCIOCPL-Deployment-User'    // Jenkins ID of the text secret containing the name of deployment SSH user account.
 
 def VERSION_NUMBER = '0.1.5'            // Project version number, following semantic versioning.
 def PROJECT_NAME = 'bestbets-api'     // Project name.
@@ -80,6 +81,7 @@ job("${folderName}/_upper/${releaseToStage}") {
             usernamePassword('DOCKER_USER', 'DOCKER_PASS', DOCKER_USER_KEY)
             usernamePassword('ELASTICSEARCH_INDEX_USER', 'ELASTICSEARCH_INDEX_PASSWORD', ES_INDEXER_KEY)
             usernamePassword('ELASTICSEARCH_SEARCH_USER', 'ELASTICSEARCH_SEARCH_PASSWORD', ES_READONLY_KEY)
+            string('SSH_USER', SSH_USER_KEY)
         }
         environmentVariables {
             envs(

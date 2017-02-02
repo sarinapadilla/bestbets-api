@@ -36,7 +36,7 @@
 
 
 export SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-export RUN_SCRIPTS="../run"
+export RUN_SCRIPTS="$( cd "${SCRIPT_PATH}" && cd "../run" && pwd )"
 export RUN_LOCATION="bestbets-run"
 export OLD_RUN_LOCATION="${RUN_LOCATION}-"`date +%Y%m%d-%H%M`
 

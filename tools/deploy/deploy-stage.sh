@@ -175,7 +175,6 @@ do
 $cronfile"
 done
 
-#ssh -q ${INDEXER_SERVER} "echo \"${cronfile}\" > ${RUN_LOCATION}/cronfile"
 # NOTE: Existing jobs are removed as part of shutting down the indexers
 echo "${cronfile}" | ssh -q ${SSH_USER}@${INDEXER_SERVER} "cat > ${RUN_LOCATION}/cronfile && crontab ${RUN_LOCATION}/cronfile"
 #ssh -q ${INDEXER_SERVER} "${RUN_LOCATION}/resume-indexers.sh"

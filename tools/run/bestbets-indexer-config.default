@@ -1,8 +1,0 @@
-# Sample Best Bets Indexer instance configuration file.
-container_name=bestbets-indexer
-currentTag=0.1.22
-elasticsearch_user=ELASTICSEARCH_USERID
-elasticsearch_password=ELASTICSEARCH_PASSWORD
-elasticsearch_servers=https://localhost/
-listingservice_host=https://www.cancer.gov/
-displayservice_host=https://www.cancer.gov/

@@ -1,9 +1,11 @@
 #!/bin/sh
-# Stops indexers from running. When this script exists, no indexers are running.
+# Stops indexers from running. When this script exists, no indexers are running
+# and the crontab file has been removed.
 
 export SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Stop new indexer instances from launching.
+# Note: The user running this script must be included in cron.allow
 crontab -r
 
 

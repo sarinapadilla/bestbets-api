@@ -4,7 +4,7 @@
 export SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Stop new indexer instances from launching.
-crontab -r
+sudo crontab -r
 
 
 # Wait for existing indexer instances to finish.

@@ -53,6 +53,7 @@ namespace NCI.OCPL.Api.BestBets.Services
             if (!analyzeResponse.IsValid)
             {
                 _logger.LogError("Elasticsearch Response for GetTokenCount is Not Valid.  Term '{0}'", term);
+                _logger.LogError("Returned debug info: {0}.", analyzeResponse.DebugInformation);
                 throw new APIErrorException(500, "Errors Occurred.");
             }
 

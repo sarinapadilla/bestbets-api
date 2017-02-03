@@ -28,7 +28,7 @@ namespace NCI.OCPL.Api.BestBets.Services
         public ESBestBetsMatchService(IElasticClient client,
             ITokenAnalyzerService tokenAnalyzer,
             IOptions<CGBBIndexOptions> config,
-            ILogger<ESBestBetsMatchService> logger) //Needs someway to get an IElasticClient 
+            ILogger<ESBestBetsMatchService> logger)
         {
             _elasticClient = client;
             _tokenAnalyzer = tokenAnalyzer;
@@ -157,6 +157,7 @@ namespace NCI.OCPL.Api.BestBets.Services
                 if (!response.IsValid)
                 {
                     _logger.LogError("Elasticsearch Response is Not Valid. Term '{0}'", cleanedTerm);
+                    _logger.LogError("Returned debug info: {0}.", response.DebugInformation);
                     throw new APIErrorException(500, "Errors Occurred.");
                 }
 

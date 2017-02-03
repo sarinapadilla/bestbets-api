@@ -143,7 +143,7 @@ do
 && ./${scriptName}"
 
     done
-exit 0
+
 #    # Test API availability by retrieving a Best Bet with at least one result.
 #    sleep 10 # Wait for the API to finish spinning up before querying.
 #    testdata=$(curl -f --silent --write-out 'RESULT_CODE:%{http_code}' -XGET http://${server}:5006/bestbets/en/treatment)
@@ -208,5 +208,4 @@ done
 
 # NOTE: Existing jobs are removed as part of shutting down the indexers
 echo "${cronfile}" | ssh -q ${SSH_USER}@${INDEXER_SERVER} "cat > ${RUN_LOCATION}/cronfile && crontab ${RUN_LOCATION}/cronfile"
-#ssh -q ${INDEXER_SERVER} "${RUN_LOCATION}/resume-indexers.sh"
 

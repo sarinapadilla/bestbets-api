@@ -139,9 +139,9 @@ do
         # Create and launch script for running the API
         scriptName="${RUN_LOCATION}/bestbets-api-${instance}.sh"
         echo "${apiCommand}" | ssh -q ${SSH_USER}@${server} "cat > $scriptName \
-&& chmod u+x $scriptName "
+&& chmod u+x $scriptName \
+&& ./{scriptName}"
 
-#        ssh -q ${SSH_USER}@${server} ${RUN_LOCATION}/bestbets-api.sh ${RUN_LOCATION}/bestbets-api-config.${instance}
     done
 exit 0
 #    # Test API availability by retrieving a Best Bet with at least one result.

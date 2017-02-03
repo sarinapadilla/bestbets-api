@@ -140,7 +140,7 @@ do
         scriptName="${RUN_LOCATION}/bestbets-api-${instance}.sh"
         echo "${apiCommand}" | ssh -q ${SSH_USER}@${server} "cat > $scriptName \
 && chmod u+x $scriptName \
-&& ./{scriptName}"
+&& ./${scriptName}"
 
     done
 exit 0

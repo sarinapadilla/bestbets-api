@@ -181,6 +181,8 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Services
 
             if (!response.IsValid)
             {
+                _logger.LogError("Error Optimizing index, '{0}'.", indexName);
+                _logger.LogError("Returned debug info: {0}.", response.DebugInformation);
                 throw new Exception("Error Optimizing index, " + indexName, response.OriginalException);
             }
 

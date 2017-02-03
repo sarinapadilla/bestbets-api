@@ -122,20 +122,14 @@ if [ $? != 0 ]; then echo Exiting with errors; exit 1; fi
 docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
 
 # Create and push SDK image
-export IMG_ID=$(docker build -q --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/bestbets-api:sdk -f src/NCI.OCPL.Api.BestBets/Dockerfile/Dockerfile.SDK .)
+export IMG_ID=$(docker build -q --no-cache --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/bestbets-api:sdk -f src/NCI.OCPL.Api.BestBets/Dockerfile/Dockerfile.SDK .)
 docker tag $IMG_ID nciwebcomm/bestbets-api:sdk-${VERSION_NUMBER}
 eval $SCRIPT_PATH/publish-docker-image.sh nciwebcomm/bestbets-api sdk
 eval $SCRIPT_PATH/publish-docker-image.sh nciwebcomm/bestbets-api sdk-${VERSION_NUMBER}
 
 # Create and push Release image
-export IMG_ID=$(docker build -q --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/bestbets-api:runtime -f src/NCI.OCPL.Api.BestBets/Dockerfile/Dockerfile.Runtime .)
+export IMG_ID=$(docker build -q --no-cache --build-arg version_number=${VERSION_NUMBER} -t nciwebcomm/bestbets-api:runtime -f src/NCI.OCPL.Api.BestBets/Dockerfile/Dockerfile.Runtime .)
 docker tag $IMG_ID nciwebcomm/bestbets-api:runtime-${VERSION_NUMBER}
 eval $SCRIPT_PATH/publish-docker-image.sh nciwebcomm/bestbets-api runtime
 eval $SCRIPT_PATH/publish-docker-image.sh nciwebcomm/bestbets-api runtime-${VERSION_NUMBER}
-
-
-
-# Clean up
-rm -rf $API_TMPDIR
-rm -rf $INDEXER_TMPDIR
 

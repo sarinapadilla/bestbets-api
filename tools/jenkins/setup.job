@@ -89,8 +89,10 @@ job("${folderName}/_upper/${releaseToStage}") {
                 ELASTICSEARCH_PREVIEW_ALIAS : "bestbetspreview",
                 BESTBETS_HOST_LIVE : "https://www.cancer.gov/",
                 BESTBETS_HOST_PREVIEW : "https://preview.cancer.gov/",
-                INDEXER_SCHEDULE_LIVE : "# 0 12 * * *",
-                INDEXER_SCHEDULE_PREVIEW : "# 0 12 * * *",
+                INDEXER_SCHEDULE_LIVE : "10 1-21/5 * * *",
+                INDEXER_SCHEDULE_PREVIEW : "15,45 7-17 * * * ",
+                LIVE_API_HOST_PORT : 5006,
+                PREVIEW_API_HOST_PORT : 5007,
 
                 ELASTICSEARCH_SERVERS : "",
                 INDEXER_SERVER : "",

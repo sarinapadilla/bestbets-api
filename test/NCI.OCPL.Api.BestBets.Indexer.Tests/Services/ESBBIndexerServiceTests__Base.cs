@@ -11,6 +11,7 @@ using NCI.OCPL.Utils.Testing;
 using NCI.OCPL.Api.BestBets.Indexer.Services;
 using Microsoft.Extensions.Options;
 using NCI.OCPL.Api.BestBets.Tests.Util;
+using Microsoft.Extensions.Logging.Testing;
 
 namespace NCI.OCPL.Api.BestBets.Indexer.Tests
 {
@@ -48,7 +49,8 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Tests
 
             ESBBIndexerService service = new ESBBIndexerService(
                 client,
-                options.Object
+                options.Object,
+                new NullLogger<ESBBIndexerService>()
             );
 
             return service;

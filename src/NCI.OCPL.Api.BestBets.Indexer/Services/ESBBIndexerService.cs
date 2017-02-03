@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Nest;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+
 using MoreLinq; //Adds .Batch used for indexing terms
 
 namespace NCI.OCPL.Api.BestBets.Indexer.Services
@@ -13,6 +15,7 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Services
     {
         private readonly IElasticClient _client;
         private readonly ESBBIndexerServiceOptions _config;
+        private readonly ILogger<ESBBIndexerService> _logger;
 
 
         /// <summary>
@@ -20,10 +23,13 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Services
         /// </summary>
         /// <param name="client"></param>
         /// <param name="config"></param>
-        public ESBBIndexerService(IElasticClient client, IOptions<ESBBIndexerServiceOptions> config)
+        public ESBBIndexerService(IElasticClient client,
+            IOptions<ESBBIndexerServiceOptions> config,
+            ILogger<ESBBIndexerService> logger)
         {
             this._client = client;
             this._config = config.Value;
+            this._logger = logger;
         }
 
 
@@ -45,7 +51,11 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Services
             var response = _client.CreateIndex(indexName);
 
             if (!response.IsValid)
+            {
+                _logger.LogError("Elasticsearch Response is Not Valid creating timestamped index '{0}'.", indexName);
+                _logger.LogError("Returned debug info: {0}.", response.DebugInformation);
                 throw new Exception("Error creating Time Stamped Index, " + indexName);
+            }
 
             return indexName;
         }

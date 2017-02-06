@@ -186,13 +186,15 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Services
                 throw new Exception("Error Optimizing index, " + indexName, response.OriginalException);
             }
 
-            //An expected response has 1 shard that was successful.
+            // An expected response has at least one shard and none that failed.
             if (
-                response.Shards.Total != 1 
-                || response.Shards.Successful != 1 
+                response.Shards.Total < 1 
+                || response.Shards.Successful != response.Shards.Total
                 || response.Shards.Failed != 0
             )
             {
+                _logger.LogError("Shard count: Total: {0}, Successful : {1}, Failed {2}",
+                    response.Shards.Total, response.Shards.Successful, response.Shards.Failed);
                 throw new Exception("Error Optimizing index," + indexName + " optimize finished unexpected response");
             }
 

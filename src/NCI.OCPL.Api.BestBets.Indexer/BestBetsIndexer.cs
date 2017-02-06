@@ -65,6 +65,7 @@ namespace NCI.OCPL.Api.BestBets.Indexer
             }
             catch (Exception ex)
             {
+                _logger.LogError("Error while indexing. '{0}'", ex.Message);
                 throw new Exception("We should really have a logger for this error.", ex);
             }
         }

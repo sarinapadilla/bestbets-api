@@ -36,4 +36,4 @@ USER containeruser
 
 # Test API availability by retrieving a Best Bet with at least one result.
 # If successful, exit with a zero status, otherwise exit with status of one.
-HEALTHCHECK --interval=1s CMD curl -f --silent -XGET http://localhost:5006/bestbets/en/treatment > /dev/null && exit 0 || exit 1
+HEALTHCHECK --interval=1m CMD curl -f --silent -XGET http://localhost:5006/bestbets/en/treatment > /dev/null && exit 0 || exit 1

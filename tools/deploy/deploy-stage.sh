@@ -20,6 +20,7 @@
 #   (NOTE: This is an NCI internal repository, not Docker Hub)
 #   DOCKER_USER - Userid for 
 #   DOCKER_PASS - Password for pulling the container image from the central repository.
+#   DOCKER_REGISTRY - Hostname of the NCI Docker registry.
 # 
 # Elastic Search credentials. Assumed to be the same for both live and preview.
 #   ELASTICSEARCH_SERVERS - Comma separated list of ES servers.
@@ -51,6 +52,7 @@ if [ -z "$LIVE_API_HOST_PORT" ]; then echo "LIVE_API_HOST_PORT not set, aborting
 if [ -z "$PREVIEW_API_HOST_PORT" ]; then echo "PREVIEW_API_HOST_PORT not set, aborting."; exit 1; fi
 if [ -z "$DOCKER_USER" ]; then echo "DOCKER_USER not set, aborting."; exit 1; fi
 if [ -z "$DOCKER_PASS" ]; then echo "DOCKER_PASS not set, aborting."; exit 1; fi
+if [ -z "$DOCKER_REGISTRY" ]; then echo "DOCKER_REGISTRY not set, aborting."; exit 1; fi
 if [ -z "$ELASTICSEARCH_SERVERS" ]; then echo "ELASTICSEARCH_SERVERS not set, aborting."; exit 1; fi
 if [ -z "$ELASTICSEARCH_INDEX_USER" ]; then echo "ELASTICSEARCH_INDEX_USER not set, aborting."; exit 1; fi
 if [ -z "$ELASTICSEARCH_INDEX_PASSWORD" ]; then echo "ELASTICSEARCH_INDEX_PASSWORD not set, aborting."; exit 1; fi
@@ -64,6 +66,8 @@ if [ -z "$INDEXER_SCHEDULE_LIVE" ]; then echo "INDEXER_SCHEDULE_LIVE not set, ab
 if [ -z "$INDEXER_SCHEDULE_PREVIEW" ]; then echo "INDEXER_SCHEDULE_PREVIEW not set, aborting."; exit 1; fi
 if [ -z "$SSH_USER" ]; then echo "SSH_USER not set, aborting."; exit 1; fi
 
+
+export IMAGE_NAME="${DOCKER_REGISTRY}/ocpl/bestbets-api"
 
 IFS=', ' read -r -a server_list <<< "$SERVER_LIST"
 
@@ -108,13 +112,13 @@ for server in "${server_list[@]}"
 do
 
     # Find out what images are already deployed for eventual cleanup.
-    oldImageList=$(ssh -q ${SSH_USER}@${server} ${RUN_LOCATION}/get-image-tag.sh nciwebcomm/bestbets-api)
+    oldImageList=$(ssh -q ${SSH_USER}@${server} ${RUN_LOCATION}/get-image-tag.sh ${IMAGE_NAME})
 
     # Stop existing API container
     ssh -q ${SSH_USER}@${server} ${RUN_LOCATION}/stop-api.sh
 
     # Pull image for new version (pull version-specific tag)
-    imageName="nciwebcomm/bestbets-api:runtime-${RELEASE_VERSION}"
+    imageName="${IMAGE_NAME}:runtime-${RELEASE_VERSION}"
     ssh -q ${SSH_USER}@${server} ${RUN_LOCATION}/pull-image.sh $imageName $DOCKER_USER $DOCKER_PASS
 
     # When we run the image, possibly run the indexer first.
@@ -134,7 +138,7 @@ do
             -e Elasticsearch__Userid=\"${ELASTICSEARCH_SEARCH_USER}\" \
             -e Elasticsearch__Password=\"${ELASTICSEARCH_SEARCH_PASSWORD}\" \
             -e CGBestBetsIndex__AliasName=\"${es_alias[$instance]}\" \
-            nciwebcomm/bestbets-api:runtime-${RELEASE_VERSION}"
+            ${imageName}"
 
         # Create and launch script for running the API
         scriptName="${RUN_LOCATION}/bestbets-api-${instance}.sh"
@@ -200,7 +204,7 @@ do
         -e Elasticsearch__Password=\"${ELASTICSEARCH_INDEX_PASSWORD}\" \
         -e ESBBIndexerService__AliasName=\"${es_alias[$instance]}\" \
         --entrypoint dotnet \
-        nciwebcomm/bestbets-api:runtime-${RELEASE_VERSION} \
+        ${imageName} \
         /home/containeruser/indexer/NCI.OCPL.Api.BestBets.Indexer.dll"
     cronfile="${indexSchedule[$instance]} $indexerCommand
 $cronfile"

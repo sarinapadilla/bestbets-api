@@ -86,6 +86,7 @@ job("${folderName}/_upper/${releaseToStage}") {
             usernamePassword('DOCKER_USER', 'DOCKER_PASS', DOCKER_USER_KEY)
             usernamePassword('ELASTICSEARCH_INDEX_USER', 'ELASTICSEARCH_INDEX_PASSWORD', ES_INDEXER_KEY)
             usernamePassword('ELASTICSEARCH_SEARCH_USER', 'ELASTICSEARCH_SEARCH_PASSWORD', ES_READONLY_KEY)
+            string('DOCKER_REGISTRY', DOCKER_REGISTRY_KEY)
             string('SSH_USER', SSH_USER_KEY)
         }
         environmentVariables {

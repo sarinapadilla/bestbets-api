@@ -116,15 +116,15 @@ if [ $? != 0 ]; then echo Exiting with errors; exit 1; fi
 #===================================================================================
 #  Create and publish Docker images
 #===================================================================================
-docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD $DOCKER_REGISTRY
 
 # Create and push SDK image
-export IMG_ID=$(docker build -q --no-cache --build-arg version_number=${VERSION_NUMBER} -t ${IMAGE_NAME}:sdk -t ${IMAGE_NAME}:sdk-${VERSION_NUMBER} -f src/NCI.OCPL.Api.BestBets/Dockerfile/Dockerfile.SDK .)
-eval $SCRIPT_PATH/publish-docker-image.sh nciwebcomm/bestbets-api sdk
-eval $SCRIPT_PATH/publish-docker-image.sh nciwebcomm/bestbets-api sdk-${VERSION_NUMBER}
+docker build -q --no-cache --build-arg version_number=${VERSION_NUMBER} -t ${IMAGE_NAME}:sdk -t ${IMAGE_NAME}:sdk-${VERSION_NUMBER} -f src/NCI.OCPL.Api.BestBets/Dockerfile/Dockerfile.SDK .
+eval $SCRIPT_PATH/publish-docker-image.sh ${IMAGE_NAME} sdk
+eval $SCRIPT_PATH/publish-docker-image.sh ${IMAGE_NAME} sdk-${VERSION_NUMBER}
 
 # Create and push Runtime image
-export IMG_ID=$(docker build -q --no-cache --build-arg version_number=${VERSION_NUMBER} -t ${IMAGE_NAME}:runtime -t ${IMAGE_NAME}:runtime-${VERSION_NUMBER} -f src/NCI.OCPL.Api.BestBets/Dockerfile/Dockerfile.Runtime .)
-eval $SCRIPT_PATH/publish-docker-image.sh nciwebcomm/bestbets-api runtime
-eval $SCRIPT_PATH/publish-docker-image.sh nciwebcomm/bestbets-api runtime-${VERSION_NUMBER}
+docker build -q --no-cache --build-arg version_number=${VERSION_NUMBER} -t ${IMAGE_NAME}:runtime -t ${IMAGE_NAME}:runtime-${VERSION_NUMBER} -f src/NCI.OCPL.Api.BestBets/Dockerfile/Dockerfile.Runtime .
+eval $SCRIPT_PATH/publish-docker-image.sh ${IMAGE_NAME} runtime
+eval $SCRIPT_PATH/publish-docker-image.sh ${IMAGE_NAME} runtime-${VERSION_NUMBER}
 

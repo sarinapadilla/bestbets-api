@@ -119,7 +119,7 @@ do
 
     # Pull image for new version (pull version-specific tag)
     imageName="${IMAGE_NAME}:runtime-${RELEASE_VERSION}"
-    ssh -q ${SSH_USER}@${server} ${RUN_LOCATION}/pull-image.sh $imageName $DOCKER_USER $DOCKER_PASS
+    ssh -q ${SSH_USER}@${server} ${RUN_LOCATION}/pull-image.sh $imageName $DOCKER_USER $DOCKER_PASS $DOCKER_REGISTRY
 
     # When we run the image, possibly run the indexer first.
     #   tools/run/bestbets-indexer.sh bestbets.indexer.config.live (or .preview)

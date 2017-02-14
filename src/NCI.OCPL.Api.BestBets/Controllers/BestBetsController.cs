@@ -86,6 +86,13 @@ namespace NCI.OCPL.Api.BestBets.Controllers
             return displayItems.ToArray();
         }
 
+
+        [HttpGet("status")]
+        public string Status()
+        {
+            return "alive!";
+        }
+
         //TODO: Move CleanTerm to a shared class for use by the indexer as well.
 
         /// <summary>

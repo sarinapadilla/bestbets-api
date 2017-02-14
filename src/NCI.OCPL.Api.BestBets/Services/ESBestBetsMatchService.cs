@@ -1,4 +1,4 @@
-
+using System;
 using System.Collections.Generic;
 
 using Microsoft.Extensions.Logging;
@@ -168,6 +168,17 @@ namespace NCI.OCPL.Api.BestBets.Services
                         yield return match;
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// True if CGBestBetsDisplayService is able to retrieve BestBets.
+        /// </summary>
+        public bool IsHealthy
+        {
+            get
+            {
+                throw new NotImplementedException();
             }
         }
     }

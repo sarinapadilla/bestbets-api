@@ -90,6 +90,10 @@ namespace NCI.OCPL.Api.BestBets.Controllers
         [HttpGet("status")]
         public string Status()
         {
+            // TODO: Needs to check for <n> services.
+            // TODO: Throw ApiExceptiono, status 500 if any service is unhealthy.
+            bool isHealthy = _matchService.IsHealthy;
+
             return "alive!";
         }
 

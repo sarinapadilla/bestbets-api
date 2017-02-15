@@ -11,6 +11,7 @@ using Elasticsearch.Net;
 using NCI.OCPL.Utils.Testing;
 
 using NCI.OCPL.Api.BestBets.Services;
+using NCI.OCPL.Api.BestBets.Tests.ESHealthTestData;
 using NCI.OCPL.Api.BestBets.Tests.ESMatchTestData;
 using System;
 using Microsoft.Extensions.Logging.Testing;
@@ -86,6 +87,38 @@ namespace NCI.OCPL.Api.BestBets.Tests
             string[] actualMatches = service.GetMatches(lang, searchTerm);
 
             Assert.Equal(expectedCategories, actualMatches);
+        }
+
+        [Theory]
+        [InlineData("green")]
+        [InlineData("yellow")]
+        public void HealthStatus_Healthy(string datafile)
+        {
+            ESHealthConnection connection = new ESHealthConnection(datafile);
+            ESHealthTokenizerConnection tokenizerConn = new ESHealthTokenizerConnection(datafile);
+
+            ESTokenAnalyzerService tokenService = GetTokenizerService(tokenizerConn);
+            ESBestBetsMatchService service = GetMatchService(tokenService, connection);
+
+            bool isHealthy = service.IsHealthy;
+
+            Assert.True(isHealthy);
+        }
+
+        [Theory]
+        [InlineData("red")]
+        [InlineData("unexpected")]   // i.e. "Unexpected color"
+        public void HealthStatus_Unhealthy(string datafile)
+        {
+            ESHealthConnection connection = new ESHealthConnection(datafile);
+            ESHealthTokenizerConnection tokenizerConn = new ESHealthTokenizerConnection(datafile);
+
+            ESTokenAnalyzerService tokenService = GetTokenizerService(tokenizerConn);
+            ESBestBetsMatchService service = GetMatchService(tokenService, connection);
+
+            bool isHealthy = service.IsHealthy;
+
+            Assert.False(isHealthy);
         }
 
         private ESTokenAnalyzerService GetTokenizerService(IConnection connection)

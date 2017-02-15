@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 using Microsoft.Extensions.Logging;
@@ -178,7 +177,29 @@ namespace NCI.OCPL.Api.BestBets.Services
         {
             get
             {
-                throw new NotImplementedException();
+                // Use the cluster health API to verify that the Best Bets index is functioning.
+                // Maps to https://ncias-d1592-v.nci.nih.gov:9299/_cluster/health/bestbets?pretty (or other server)
+                //
+                // References:
+                // https://www.elastic.co/guide/en/elasticsearch/reference/master/cluster-health.html
+                // https://github.com/elastic/elasticsearch/blob/master/rest-api-spec/src/main/resources/rest-api-spec/api/cluster.health.json#L20
+                IClusterHealthResponse response = _elasticClient.ClusterHealth(hd =>
+                {
+                    hd = hd
+                        .Index(_bestbetsConfig.AliasName);
+
+                    return hd;
+                });
+
+                if(!response.IsValid)
+                {
+                    _logger.LogError("Error checking ElasticSearch health.");
+                    _logger.LogError("Returned debug info: {0}.", response.DebugInformation);
+                    throw new APIErrorException(500, "Errors Occurred.");
+                }
+
+                return (response.Status == "green"
+                    || response.Status == "yellow");
             }
         }
     }

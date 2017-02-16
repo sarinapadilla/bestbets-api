@@ -95,7 +95,9 @@ namespace NCI.OCPL.Api.BestBets.Tests
         public void HealthStatus_Healthy(string datafile)
         {
             ESHealthConnection connection = new ESHealthConnection(datafile);
-            ESHealthTokenizerConnection tokenizerConn = new ESHealthTokenizerConnection(datafile);
+            // The tokenizer doesn't get called during a healthcheck for the match service,
+            // so we don't need to supply a valid data file for the mock tokenizer.
+            ESHealthTokenizerConnection tokenizerConn = new ESHealthTokenizerConnection(null);
 
             ESTokenAnalyzerService tokenService = GetTokenizerService(tokenizerConn);
             ESBestBetsMatchService service = GetMatchService(tokenService, connection);
@@ -111,7 +113,9 @@ namespace NCI.OCPL.Api.BestBets.Tests
         public void HealthStatus_Unhealthy(string datafile)
         {
             ESHealthConnection connection = new ESHealthConnection(datafile);
-            ESHealthTokenizerConnection tokenizerConn = new ESHealthTokenizerConnection(datafile);
+            // The tokenizer doesn't get called during a healthcheck for the match service,
+            // so we don't need to supply a valid data file for the mock tokenizer.
+            ESHealthTokenizerConnection tokenizerConn = new ESHealthTokenizerConnection(null);
 
             ESTokenAnalyzerService tokenService = GetTokenizerService(tokenizerConn);
             ESBestBetsMatchService service = GetMatchService(tokenService, connection);
@@ -119,6 +123,27 @@ namespace NCI.OCPL.Api.BestBets.Tests
             bool isHealthy = service.IsHealthy;
 
             Assert.False(isHealthy);
+        }
+
+        [Theory]
+        [InlineData(404)]
+        [InlineData(500)]
+        public void HealthStatus_Error(int httpStatus)
+        {
+            ESErrorConnection connection = new ESErrorConnection(httpStatus);
+            // The tokenizer doesn't get called during a healthcheck for the match service,
+            // so we don't need to supply a valid data file for the mock tokenizer.
+            ESHealthTokenizerConnection tokenizerConn = new ESHealthTokenizerConnection(null);
+
+            ESTokenAnalyzerService tokenService = GetTokenizerService(tokenizerConn);
+            ESBestBetsMatchService service = GetMatchService(tokenService, connection);
+
+            Assert.Throws<APIErrorException>(
+                ()=> {
+                    bool isHealthy = service.IsHealthy;
+                });
+                 
+
         }
 
         private ESTokenAnalyzerService GetTokenizerService(IConnection connection)

@@ -125,10 +125,15 @@ namespace NCI.OCPL.Api.BestBets.Tests
             Assert.False(isHealthy);
         }
 
+        /// <summary>
+        /// Test for when the ES healthcheck returns a non-200 response code
+        /// (response.IsValid comes back as false).
+        /// </summary>
+        /// <param name="httpStatus"></param>
         [Theory]
         [InlineData(404)]
         [InlineData(500)]
-        public void HealthStatus_Error(int httpStatus)
+        public void HealthStatus_InvalidResponse(int httpStatus)
         {
             ESErrorConnection connection = new ESErrorConnection(httpStatus);
             // The tokenizer doesn't get called during a healthcheck for the match service,
@@ -142,7 +147,6 @@ namespace NCI.OCPL.Api.BestBets.Tests
                 ()=> {
                     bool isHealthy = service.IsHealthy;
                 });
-                 
 
         }
 

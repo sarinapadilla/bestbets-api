@@ -19,6 +19,8 @@ namespace NCI.OCPL.Api.BestBets.Controllers
         private readonly IBestBetsDisplayService _displayService;
         private readonly ILogger<BestBetsController> _logger;
 
+        public const string HEALTHY_STATUS = "alive!";
+
         /// <summary>
         /// Represents a IBestBetDisplay as returned by the get method.
         /// </summary>
@@ -88,13 +90,33 @@ namespace NCI.OCPL.Api.BestBets.Controllers
 
 
         [HttpGet("status")]
-        public string Status()
+        public string GetStatus()
         {
-            // TODO: Needs to check for <n> services.
-            // TODO: Throw ApiExceptiono, status 500 if any service is unhealthy.
-            bool isHealthy = _matchService.IsHealthy;
+            IHealthCheckService[] monitoredServices = new IHealthCheckService[]
+            {
+                _matchService,
+                _displayService
+            };
 
-            return "alive!";
+            // Check for all services so we can log the status of all failures rather than
+            // than just the first one.
+            bool allHealthy = true;
+            foreach (IHealthCheckService service in monitoredServices)
+            {
+                if (!service.IsHealthy)
+                {
+                    allHealthy = false;
+                    _logger.LogError("Service '{0}' not healthy.", service.GetType().Name);
+                }
+            }
+
+            if (!allHealthy)
+            {
+                _logger.LogError("One or more services are not healthy.");
+                throw new APIErrorException(500, "One or more services are not healthy.");
+            }
+
+            return HEALTHY_STATUS;
         }
 
         //TODO: Move CleanTerm to a shared class for use by the indexer as well.

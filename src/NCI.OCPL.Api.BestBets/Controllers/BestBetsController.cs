@@ -89,6 +89,13 @@ namespace NCI.OCPL.Api.BestBets.Controllers
         }
 
 
+        /// <summary>
+        /// Provides an endpoint for checking that the various services which make up the API
+        /// (and thus the API itself) are all in a state where they can return information.
+        /// </summary>
+        /// <returns>The contents of BestBetsController.HEALTHY_STATUS ('alive!') if
+        /// all services are running. If unhealthy services are found, APIErrorException is thrown
+        /// with HTTPStatusCode set to 500.</returns>
         [HttpGet("status")]
         public string GetStatus()
         {

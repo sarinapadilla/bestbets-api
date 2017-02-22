@@ -17,5 +17,11 @@ namespace NCI.OCPL.Api.BestBets
         /// </summary>
         /// <returns></returns>
         public string BBCategoryPathFormatter { get; set; }
+
+        /// <summary>
+        /// Gets and sets the path, relative to Host, to access when verifying connectivity to the
+        /// server where Best Bets display information is retrieved.
+        /// </summary>
+        public string HealthCheckPath { get; set; }
     }
 }

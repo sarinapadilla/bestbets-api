@@ -1,7 +1,10 @@
-using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
+using System.Text;
+
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging.Testing;
 
 using Xunit;
 using Moq;
@@ -11,7 +14,6 @@ using NCI.OCPL.Utils.Testing;
 
 using NCI.OCPL.Api.BestBets.Services;
 using NCI.OCPL.Api.BestBets.Tests.CategoryTestData;
-using Microsoft.Extensions.Logging.Testing;
 
 namespace NCI.OCPL.Api.BestBets.Tests.CGBestBetsDisplayServiceTests
 {
@@ -42,20 +44,13 @@ namespace NCI.OCPL.Api.BestBets.Tests.CGBestBetsDisplayServiceTests
 
             mockHttp
                 .When(string.Format("https://www.cancer.gov/PublishedContent/BestBets/{0}.xml", data.ExpectedData.ID))
-                .Respond(System.Net.HttpStatusCode.OK, content);
+                .Respond(HttpStatusCode.OK, content);
 
             // Setup the mocked Options
-            Mock<IOptions<CGBestBetsDisplayServiceOptions>> bbClientOptions = new Mock<IOptions<CGBestBetsDisplayServiceOptions>>();
-            bbClientOptions
-                .SetupGet(opt => opt.Value)
-                .Returns(new CGBestBetsDisplayServiceOptions(){
-                    Host = "https://www.cancer.gov",
-                    BBCategoryPathFormatter = "/PublishedContent/BestBets/{0}.xml"
-                }
-            );
+            IOptions<CGBestBetsDisplayServiceOptions> bbClientOptions = GetMockOptions();
 
             CGBestBetsDisplayService bbClient = new CGBestBetsDisplayService(new HttpClient(mockHttp),
-                bbClientOptions.Object,
+                bbClientOptions,
                 NullLogger<CGBestBetsDisplayService>.Instance);
 
             IBestBetDisplay actDisplay = bbClient.GetBestBetForDisplay(data.ExpectedData.ID);
@@ -78,6 +73,85 @@ namespace NCI.OCPL.Api.BestBets.Tests.CGBestBetsDisplayServiceTests
         {
         }
 
+        /// <summary>
+        /// Test that CGBestBetsDisplayService.IsHealthy responds correctly when the 
+        /// health check URL returns an OK (HTTP 200) status.
+        /// </summary>
+        [Fact]
+        public void HealthStatus_Healthy()
+        {
+            //Setup a mock HTTP handler
+            var mockHttp = new MockHttpMessageHandler();
+
+            // We don't care about the content for this test, just the return code
+            ByteArrayContent content = new ByteArrayContent(Encoding.Unicode.GetBytes("<pretend_content />"));
+            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("text/xml");
+
+            mockHttp
+                .When("https://www.cancer.gov/")
+                .Respond(HttpStatusCode.OK, content);
+
+            // Setup the mocked Options
+            IOptions<CGBestBetsDisplayServiceOptions> bbClientOptions = GetMockOptions();
+
+            CGBestBetsDisplayService bbClient = new CGBestBetsDisplayService(new HttpClient(mockHttp),
+                bbClientOptions,
+                NullLogger<CGBestBetsDisplayService>.Instance);
+
+            bool isHealthy = bbClient.IsHealthy;
+
+            Assert.True(isHealthy);
+        }
+
+        /// <summary>
+        /// Test that CGBestBetsDisplayService.IsHealthy responds correctly when the 
+        /// health check URL returns an HTTP error code.
+        /// </summary>
+        [Theory]
+        [InlineData(HttpStatusCode.BadRequest)]
+        [InlineData(HttpStatusCode.NotFound)]
+        [InlineData(HttpStatusCode.InternalServerError)]
+        public void HealthStatus_Unhealthy(HttpStatusCode statusCode)
+        {
+            //Setup a mock HTTP handler
+            var mockHttp = new MockHttpMessageHandler();
+
+            // We don't care about the content for this test, just the return code
+            ByteArrayContent content = new ByteArrayContent(Encoding.Unicode.GetBytes("<pretend_content />"));
+            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("text/xml");
+
+            mockHttp
+                .When("https://www.cancer.gov/")
+                .Respond(statusCode, content);
+
+            // Setup the mocked Options
+            IOptions<CGBestBetsDisplayServiceOptions> bbClientOptions = GetMockOptions();
+
+            CGBestBetsDisplayService bbClient = new CGBestBetsDisplayService(new HttpClient(mockHttp),
+                bbClientOptions,
+                NullLogger<CGBestBetsDisplayService>.Instance);
+
+            bool isHealthy = bbClient.IsHealthy;
+
+            Assert.False(isHealthy);
+        }
+
+
+        private IOptions<CGBestBetsDisplayServiceOptions> GetMockOptions()
+        {
+            Mock<IOptions<CGBestBetsDisplayServiceOptions>> bbClientOptions = new Mock<IOptions<CGBestBetsDisplayServiceOptions>>();
+            bbClientOptions
+                .SetupGet(opt => opt.Value)
+                .Returns(new CGBestBetsDisplayServiceOptions()
+                {
+                    Host = "https://www.cancer.gov",
+                    BBCategoryPathFormatter = "/PublishedContent/BestBets/{0}.xml",
+                    HealthCheckPath = "/"
+                }
+            );
+
+            return bbClientOptions.Object;
+        }
     }
 
 }

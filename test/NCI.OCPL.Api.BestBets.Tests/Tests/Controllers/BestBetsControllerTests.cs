@@ -19,6 +19,7 @@ using NCI.OCPL.Utils.Testing;
 using NCI.OCPL.Api.BestBets;
 using NCI.OCPL.Api.BestBets.Controllers;
 using NCI.OCPL.Api.BestBets.Tests.CategoryTestData;
+using NCI.OCPL.Api.BestBets.Tests.ESHealthTestData;
 
 namespace NCI.OCPL.Api.BestBets.Tests
 {
@@ -121,5 +122,54 @@ namespace NCI.OCPL.Api.BestBets.Tests
             Assert.Equal(actualItems, new IBestBetDisplay[] { data.ExpectedData }, new IBestBetDisplayComparer());
         }
 
+        /// <summary>
+        /// Verify that Status always returns successfully when the services it depends
+        /// on are healthy.
+        /// </summary>
+        [Fact]
+        public void IsHealthy_Healthy()
+        {
+            IBestBetsDisplayService displayService = new HealthyBestBetsDisplayService();
+            IBestBetsMatchService matchService = new HealthyBestBetsMatchService();
+
+            // Create instance of controller
+            BestBetsController controller = new BestBetsController(
+                matchService,
+                displayService,
+                NullLogger<BestBetsController>.Instance
+                );
+
+            Assert.Equal(BestBetsController.HEALTHY_STATUS, controller.GetStatus(), ignoreCase: true);
+        }
+
+        /// <summary>
+        /// Combinations of one or more unhealthy services which are supposed to result in
+        /// BestBetsController.GetStatus() reporting an error condition.
+        /// </summary>
+        public static IEnumerable<object[]> UnhealthyServiceCombinations => new[]
+        {
+            new object[] { new UnhealthyBestBetsDisplayService(), new UnhealthyBestBetsMatchService() },
+            new object[] { new HealthyBestBetsDisplayService(), new UnhealthyBestBetsMatchService() },
+            new object[] { new UnhealthyBestBetsDisplayService(), new HealthyBestBetsMatchService() }
+        };
+
+        /// <summary>
+        /// Verify that Status fails for the various combinations of unhealthy services.
+        /// </summary>
+        [Theory, MemberData("UnhealthyServiceCombinations")]
+        public void IsHealthy_Unhealthy(IBestBetsDisplayService displayService, IBestBetsMatchService matchService)
+        {
+            BestBetsController controller = new BestBetsController(
+                matchService,
+                displayService,
+                NullLogger<BestBetsController>.Instance
+                );
+
+            // If any of the services are unhealthy, verify that GetStatus() throws APIErrorException
+            // with a status of 500.
+            APIErrorException ex = Assert.Throws<APIErrorException>(() => controller.GetStatus());
+
+            Assert.Equal(500, ex.HttpStatusCode);
+        }
     }
 }

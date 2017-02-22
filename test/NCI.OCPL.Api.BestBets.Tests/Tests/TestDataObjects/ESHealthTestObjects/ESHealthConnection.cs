@@ -36,7 +36,7 @@ namespace NCI.OCPL.Api.BestBets.Tests.ESHealthTestData
             //Add Handlers            
             this.RegisterRequestHandlerForType<Nest.ClusterHealthResponse>((req, res) =>
             {
-                // Health check is a GET request (e.g. https://ncias-d1592-v.nci.nih.gov:9299/_cluster/health/bestbets?pretty)
+                // Health check is a GET request (e.g. https://localhost:9299/_cluster/health/bestbets?pretty)
                 // so we don't need to do anything special, just load the data file.
                 //Get the file name for this round
                 res.Stream = TestingTools.GetTestFileAsStream(GetTestFileName());

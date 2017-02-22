@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Xml;
 using System.Xml.Serialization;
@@ -85,7 +85,25 @@ namespace NCI.OCPL.Api.BestBets.Services
         {
             get
             {
-                throw new NotImplementedException();
+                UriBuilder requestUrl = new UriBuilder(_options.Host);
+                requestUrl.Path = _options.HealthCheckPath;
+
+                HttpResponseMessage message = _client.GetAsync(requestUrl.Uri).Result;
+
+                bool isHealthy;
+                if(message.IsSuccessStatusCode && message.StatusCode == HttpStatusCode.OK)
+                {
+                    isHealthy = true;
+                }
+                else
+                {
+                    isHealthy = false;
+
+                    _logger.LogError("Unable to fetch URL '{0}'.", requestUrl.Uri.ToString());
+                    _logger.LogError("Status {0}, {1}", message.StatusCode, message.ReasonPhrase);
+                }
+
+                return isHealthy;
             }
         }
     }

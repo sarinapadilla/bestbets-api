@@ -33,7 +33,8 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Services
             var connectionPool = new SniffingConnectionPool(uris);
 
             //Return a new instance of an ElasticClient with our settings
-            ConnectionSettings settings = new ConnectionSettings(connectionPool);
+            ConnectionSettings settings = new ConnectionSettings(connectionPool)
+                .MaximumRetries(_config.MaximumRetries);
 
             //Let's only try and use credentials if the username is set.
             if (!string.IsNullOrWhiteSpace(username))

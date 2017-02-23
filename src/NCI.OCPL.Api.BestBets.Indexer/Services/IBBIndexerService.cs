@@ -46,8 +46,9 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Services
         /// This will remove any 
         /// </summary>
         /// <param name="removeBefore"></param>
-        /// <returns>A bool indicating success</returns>
-        bool DeleteOldIndices(DateTime olderThan);
+        /// <param name="minIndices">The minimum number of indices to keep regardless of date.</param>
+        /// <returns>A list of the deleted indices</returns>
+        string[] DeleteOldIndices(DateTime olderThan, int minIndices);
 
     }
 }

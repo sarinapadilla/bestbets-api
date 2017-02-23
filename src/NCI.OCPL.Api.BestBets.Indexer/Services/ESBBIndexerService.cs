@@ -60,10 +60,107 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Services
             return indexName;
         }
 
-        public bool DeleteOldIndices(DateTime olderThan)
+        /// <summary>
+        /// This will remove any indices older than a given date
+        /// </summary>
+        /// <param name="olderThan">The date</param>
+        /// <param name="minIndices">The minimum number of indices to keep regardless of date.</param>
+        /// <returns>An array of indices that were deleted.</returns>
+        public string[] DeleteOldIndices(DateTime olderThan, int minIndices)
         {
-            throw new NotImplementedException();
+
+            Tuple<string[], string[]> indices = GetIndices(olderThan);
+            string[] oldIndices = indices.Item1;
+            string[] newIndices = indices.Item2;
+
+            if (oldIndices.Length > 0)
+            {
+                //There are old candidates, but will we have minIndices left when finished.
+                int diff = minIndices - newIndices.Length;
+                if (diff > 0)
+                {
+                    //Skip past the old items.  P.S. If oldIndices is less than diff, then 
+                    //Skip will return empty array.  yay!!
+                    oldIndices = oldIndices.Skip(diff).ToArray();
+                }
+
+
+                if (oldIndices.Length > 0)
+                {
+                    var indicesToDelete = from index in oldIndices
+                                          select new IndexName()
+                                          {
+                                              Name = index
+                                          };
+
+                    var response = _client.DeleteIndex(Indices.Index(indicesToDelete));
+
+                    if (!response.IsValid)
+                    {
+                        _logger.LogError("Elasticsearch Response is Not Valid deleting indices '{0}'.", oldIndices);
+                        _logger.LogError("Returned debug info: {0}.", response.DebugInformation);
+                        throw new Exception(String.Format("Error deleting Indices, {0}", oldIndices));
+                    }
+                }
+            }
+
+            return oldIndices;
         }
+
+        /// <summary>
+        /// This will find all indices older than a given date
+        /// </summary>
+        /// <param name="olderThan">The date</param>
+        /// <returns>Two arrays indices, the first older than the date, the second newer than the date.</returns>
+        private Tuple<string[], string[]> GetIndices(DateTime olderThan)
+        {
+            var response = _client.GetIndexSettings(gis => gis
+                   .Index(this._config.AliasName + "*")
+                   .FlatSettings(true)
+                   .Name(new Names(new string[] { "index.creation_date" }))
+            );
+
+            if (!response.IsValid)
+            {
+                _logger.LogError("Elasticsearch Response is not Valid when checking old indices for alias '{};", this._config.AliasName);
+                _logger.LogError("Returned debug info: {0}.", response.DebugInformation);
+                throw new Exception("Error Getting Index Settings, " + this._config.AliasName);
+            }
+
+            //The ElasticSearch index creation_date is the number of milliseconds since
+            //the Unix Epoch (1/1/1970)
+            double unixTime = olderThan.Subtract(
+                new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
+
+            if (response.Indices != null)
+            {
+                //Sort the Indices
+                var sortedIndices = from indexKey in response.Indices.Keys                                    
+                                    select new
+                                    {
+                                        IndexName = indexKey,
+                                        CreateDate = double.Parse((string)response.Indices[indexKey].Settings["index.creation_date"])
+                                    } into tmpIndex
+                                    orderby tmpIndex.CreateDate descending
+                                    select tmpIndex;
+
+                //Pull old Indices
+                var oldIndices = from index in sortedIndices
+                                 where index.CreateDate < unixTime
+                                 select index.IndexName;
+
+                //Pull newer Indices
+                var newIndices = from index in sortedIndices
+                                 where index.CreateDate >= unixTime
+                                 select index.IndexName;                                                 
+
+                return Tuple.Create(oldIndices.ToArray(), newIndices.ToArray());
+
+            }
+
+            return Tuple.Create(new string[] { }, new string[] { });
+        }
+
 
         public int IndexBestBetsMatches(string indexName, IEnumerable<BestBetsMatch> matches, int batchSize = 1000)
         {

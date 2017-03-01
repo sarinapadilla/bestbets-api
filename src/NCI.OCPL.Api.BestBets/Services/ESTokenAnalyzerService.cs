@@ -42,13 +42,33 @@ namespace NCI.OCPL.Api.BestBets.Services
         /// <returns>The number of tokens in the term</returns>
         public int GetTokenCount(string term)
         {
-            var analyzeResponse = this._elasticClient.Analyze(
-                a => a
-                //TODO: Make alias a configuration option
-                .Index(_bestbetsConfig.AliasName)
-                .Analyzer("nostem")
-                .Text(term)
-            );
+            IAnalyzeResponse analyzeResponse;
+
+            try
+            {
+                analyzeResponse = this._elasticClient.Analyze(
+                    a => a
+                    //TODO: Make alias a configuration option
+                    .Index(_bestbetsConfig.AliasName)
+                    .Analyzer("nostem")
+                    .Text(term)
+                );
+            }
+            catch(UnexpectedElasticsearchClientException ex)
+            {
+                _logger.LogError("Error analyzing token count for term '{0}'. Reason: '{1}'. DebugInformation: {2}",
+                    term, ex.FailureReason, ex.DebugInformation);
+                _logger.LogError("Trying again", ex);
+
+                // Try again.
+                analyzeResponse = this._elasticClient.Analyze(
+                    a => a
+                    //TODO: Make alias a configuration option
+                    .Index(_bestbetsConfig.AliasName)
+                    .Analyzer("nostem")
+                    .Text(term)
+                );
+            }
 
             if (!analyzeResponse.IsValid)
             {

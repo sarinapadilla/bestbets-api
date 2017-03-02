@@ -48,7 +48,6 @@ namespace NCI.OCPL.Api.BestBets.Services
             {
                 analyzeResponse = this._elasticClient.Analyze(
                     a => a
-                    //TODO: Make alias a configuration option
                     .Index(_bestbetsConfig.AliasName)
                     .Analyzer("nostem")
                     .Text(term)
@@ -57,13 +56,12 @@ namespace NCI.OCPL.Api.BestBets.Services
             catch(UnexpectedElasticsearchClientException ex)
             {
                 _logger.LogError("Error analyzing token count for term '{0}'. Reason: '{1}'. DebugInformation: {2}",
-                    term, ex.FailureReason, ex.DebugInformation);
-                _logger.LogError("Trying again", ex);
+                    term, ex.FailureReason, ex.DebugInformation, ex);
+                _logger.LogInformation("Trying again for term '{0}", term);
 
                 // Try again.
                 analyzeResponse = this._elasticClient.Analyze(
                     a => a
-                    //TODO: Make alias a configuration option
                     .Index(_bestbetsConfig.AliasName)
                     .Analyzer("nostem")
                     .Text(term)

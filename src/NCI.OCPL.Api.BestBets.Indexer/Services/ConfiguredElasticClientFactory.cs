@@ -35,6 +35,9 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Services
             //Return a new instance of an ElasticClient with our settings
             ConnectionSettings settings = new ConnectionSettings(connectionPool);
 
+            //Try and use keep alives to stop running out of sockets during index process.
+            settings.EnableTcpKeepAlive(TimeSpan.FromMilliseconds(2000), TimeSpan.FromMilliseconds(2000));
+
             //Let's only try and use credentials if the username is set.
             if (!string.IsNullOrWhiteSpace(username))
             {

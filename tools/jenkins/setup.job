@@ -8,9 +8,6 @@
 
 def folderName  = 'best-bets-api'    // Jenkins folder where the jbos will be placed.
 
-def sourcePath = 'src/NCI.OCPL.Api.BestBets'       // Source code path relative to the working directory
-def testPath = 'test/NCI.OCPL.Api.BestBets.Tests'  // Unit test code path relative to the working directory  
-
 def GH_REPO_NAME = 'bestbets-api'    // The project's repository name (as used in the URL).
 def GH_ORGANIZATION_NAME = 'NCIOCPL'   // GitHub Organization name (as used in the URL/userid).
 
@@ -24,7 +21,7 @@ def ES_INDEXER_KEY = 'NCIOCPL-ES-Indexer-User'      // Elasticsearch credentials
 def SSH_USER_KEY = 'NCIOCPL-Deployment-User'    // Jenkins ID of the text secret containing the name of deployment SSH user account.
 // End secrets
 
-def VERSION_NUMBER = '0.1.5'            // Project version number, following semantic versioning.
+def VERSION_NUMBER = ''            // Project version number, following semantic versioning.
 def PROJECT_NAME = 'bestbets-api'     // Project name.
 
 def sourceRepository = "$GH_ORGANIZATION_NAME/$GH_REPO_NAME"

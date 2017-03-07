@@ -10,6 +10,6 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Services
         public string Servers { get; set; }
         public string Userid { get; set; }
         public string Password { get; set; }
-
+        public int MaximumRetries { get; set; }
     }
 }

@@ -47,7 +47,7 @@ namespace NCI.OCPL.Api.BestBets.Indexer
                 IPublishedContentListing bestBetsList = _listSvc.GetItemsForPath("BestBets", "/");
 
                 //Index the BB
-                int numBBIndexed = _indexerSvc.IndexBestBetsMatches(indexName, GetBestBetMatchesFromListing(bestBetsList));
+                int numBBIndexed = _indexerSvc.IndexBestBetsMatches(indexName, GetBestBetMatchesFromListing(indexName, bestBetsList));
 
                 //Test the collection?
 
@@ -73,25 +73,35 @@ namespace NCI.OCPL.Api.BestBets.Indexer
         /// <summary>
         /// Gets the best bet matches from a IPublishedContentListing.
         /// </summary>
+        /// <param name="analysisIndex">The index to use for token analysis</param>
         /// <param name="bestBetsList">The best bets list.</param>
         /// <returns>IEnumerator&lt;BestBetsMatch&gt;.</returns>
-        private IEnumerable<BestBetsMatch> GetBestBetMatchesFromListing(IPublishedContentListing bestBetsList)
-        {
-            foreach (IPublishedContentInfo item in bestBetsList.Files)
+        private IEnumerable<BestBetsMatch> GetBestBetMatchesFromListing(string analysisIndex, IPublishedContentListing bestBetsList)
+        {            
+            try
             {
-                //Fetch Item
-                _logger.LogDebug("Fetching Category: {0}", item.FileName);
-                CancerGovBestBet bbCategory = _listSvc.GetPublishedFile<CancerGovBestBet>(item.FullWebPath);
+                this._tokenService.UseIndexName(analysisIndex);
 
-                _logger.LogDebug("Mapping Category: {0}", bbCategory.Name);
-
-                //Do we really need a mapper that does this per category?  
-                BestBetSynonymMapper mapper = new BestBetSynonymMapper(_tokenService, bbCategory);
-
-                foreach (BestBetsMatch match in mapper)
+                foreach (IPublishedContentInfo item in bestBetsList.Files)
                 {
-                    yield return match;
+                    //Fetch Item
+                    _logger.LogDebug("Fetching Category: {0}", item.FileName);
+                    CancerGovBestBet bbCategory = _listSvc.GetPublishedFile<CancerGovBestBet>(item.FullWebPath);
+
+                    _logger.LogDebug("Mapping Category: {0}", bbCategory.Name);
+
+                    //Do we really need a mapper that does this per category?  
+                    BestBetSynonymMapper mapper = new BestBetSynonymMapper(_tokenService, bbCategory);
+
+                    foreach (BestBetsMatch match in mapper)
+                    {
+                        yield return match;
+                    }
                 }
+            }
+            finally
+            {
+                this._tokenService.UseDefaultIndexName();
             }
         }
 

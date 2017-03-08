@@ -165,6 +165,8 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Services
         public int IndexBestBetsMatches(string indexName, IEnumerable<BestBetsMatch> matches, int batchSize = 1000)
         {
 
+            
+
             int totalIndexed = 0;
 
             //Note: IEnumerable<T>.Batch comes from moreLinq.

@@ -22,6 +22,42 @@ namespace NCI.OCPL.Api.BestBets.Services
         private IElasticClient _elasticClient;
         private CGBBIndexOptions _bestbetsConfig;
         private readonly ILogger<ESTokenAnalyzerService> _logger;
+        private string _indexForAnalysis = null;
+
+        /// <summary>
+        /// Gets the index for analysis.
+        /// </summary>
+        /// <value>The index for analysis.</value>
+        public string IndexForAnalysis {
+            get 
+            {
+                //If someone has change the index, use that.
+                return String.IsNullOrWhiteSpace(_indexForAnalysis) ? _bestbetsConfig.AliasName : _indexForAnalysis;
+            }
+        }
+
+        /// <summary>
+        /// Uses the default name of the index. (Which is based on the configuration)
+        /// </summary>
+        public void UseDefaultIndexName()
+        {
+            _indexForAnalysis = null;
+        }
+
+        /// <summary>
+        /// Uses the name of the index.
+        /// </summary>
+        /// <param name="index">The name if the index to use for analysis</param>
+        /// <exception cref="System.ArgumentNullException">Index Name must be set.</exception>
+        public void UseIndexName(string index)
+        {
+            if (string.IsNullOrWhiteSpace(index))
+                throw new ArgumentNullException("Index Name must be set.");
+
+            _indexForAnalysis = index;
+        }
+
+
 
         /// <summary>
         /// Creates a new instance of a ESBestBetsMatchService
@@ -48,7 +84,7 @@ namespace NCI.OCPL.Api.BestBets.Services
             {
                 analyzeResponse = this._elasticClient.Analyze(
                     a => a
-                    .Index(_bestbetsConfig.AliasName)
+                    .Index(IndexForAnalysis)
                     .Analyzer("nostem")
                     .Text(term)
                 );
@@ -62,7 +98,7 @@ namespace NCI.OCPL.Api.BestBets.Services
                 // Try again.
                 analyzeResponse = this._elasticClient.Analyze(
                     a => a
-                    .Index(_bestbetsConfig.AliasName)
+                    .Index(IndexForAnalysis)
                     .Analyzer("nostem")
                     .Text(term)
                 );

@@ -16,7 +16,7 @@
   },
 
   "dependencies": {
-    "Elasticsearch.Net": "2.4.6",
+    "Elasticsearch.Net": "2.5.2",
     "Microsoft.Extensions.Configuration": "1.0.1",
     "Microsoft.Extensions.Configuration.CommandLine": "1.0.0",
     "Microsoft.Extensions.Configuration.EnvironmentVariables": "1.0.0",
@@ -33,7 +33,7 @@
     },
     "morelinq": "2.0.0-beta06",
     "NCI.OCPL.Services.CDE.PublishedContentListing": "1.0.0-*",
-    "NEST": "2.4.6"
+    "NEST": "2.5.2"
   },
 
   "frameworks": {

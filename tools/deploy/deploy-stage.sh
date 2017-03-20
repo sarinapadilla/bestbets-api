@@ -138,6 +138,9 @@ do
             -e Elasticsearch__Userid=\"${ELASTICSEARCH_SEARCH_USER}\" \
             -e Elasticsearch__Password=\"${ELASTICSEARCH_SEARCH_PASSWORD}\" \
             -e CGBestBetsIndex__AliasName=\"${es_alias[$instance]}\" \
+            --log-driver=syslog \
+            --log-opt syslog-address=udp://127.0.0.1:514 \
+            --log-opt tag=bestbetsapi-${es_alias[$instance]} \
             ${imageName}"
 
         # Create and launch script for running the API
@@ -203,6 +206,9 @@ do
         -e Elasticsearch__Userid=\"${ELASTICSEARCH_INDEX_USER}\" \
         -e Elasticsearch__Password=\"${ELASTICSEARCH_INDEX_PASSWORD}\" \
         -e ESBBIndexerService__AliasName=\"${es_alias[$instance]}\" \
+        --log-driver=syslog \
+        --log-opt syslog-address=udp://127.0.0.1:514 \
+        --log-opt tag=bestbetsindexer-${es_alias[$instance]} \
         --entrypoint dotnet \
         ${imageName} \
         /home/containeruser/indexer/NCI.OCPL.Api.BestBets.Indexer.dll"

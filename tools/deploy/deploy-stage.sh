@@ -140,7 +140,7 @@ do
             -e CGBestBetsIndex__AliasName=\"${es_alias[$instance]}\" \
             --log-driver=syslog \
             --log-opt syslog-address=udp://127.0.0.1:514 \
-            --log-opt tag=bestbetsapi-${es_alias[$instance]} \
+            --log-opt tag=bestbetsapi-${instance} \
             ${imageName}"
 
         # Create and launch script for running the API
@@ -208,7 +208,7 @@ do
         -e ESBBIndexerService__AliasName=\"${es_alias[$instance]}\" \
         --log-driver=syslog \
         --log-opt syslog-address=udp://127.0.0.1:514 \
-        --log-opt tag=bestbetsindexer-${es_alias[$instance]} \
+        --log-opt tag=bestbetsindexer-${instance} \
         --entrypoint dotnet \
         ${imageName} \
         /home/containeruser/indexer/NCI.OCPL.Api.BestBets.Indexer.dll"

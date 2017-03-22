@@ -3,7 +3,7 @@
 ## and should *not* be used to create production containers.
 ##
 
-FROM nciwebcomm/dotnet-docker:sdk
+FROM ncidockerhub.nci.nih.gov/ocpl/dotnet-docker:sdk
 ARG version_number
 
 # Create containeruser ID.

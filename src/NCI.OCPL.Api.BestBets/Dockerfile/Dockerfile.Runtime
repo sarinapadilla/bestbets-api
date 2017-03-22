@@ -3,7 +3,7 @@
 ##
 
 
-FROM nciwebcomm/dotnet-docker:runtime
+FROM ncidockerhub.nci.nih.gov/ocpl/dotnet-docker:runtime
 ARG version_number
 
 # Create containeruser ID.

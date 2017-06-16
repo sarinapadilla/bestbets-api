@@ -55,7 +55,7 @@ done
 # If any unit tests failed, abort the operation.
 if [ $ERRORS == 1 ]; then
     echo Errors have occured.
-    exit 127
+    exit 1
 fi
 
 #===================================================================================
@@ -117,14 +117,17 @@ if [ $? != 0 ]; then echo Exiting with errors; exit 1; fi
 #  Create and publish Docker images
 #===================================================================================
 docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD $DOCKER_REGISTRY
+if [ $? -ne 0 ]; then echo "Error logging into '$DOCKER_REGISTRY' as '$DOCKER_USERNAME'."; exit 1; fi
 
 # Create and push SDK image
 docker build -q --no-cache --build-arg version_number=${VERSION_NUMBER} -t ${IMAGE_NAME}:sdk -t ${IMAGE_NAME}:sdk-${VERSION_NUMBER} -f src/NCI.OCPL.Api.BestBets/Dockerfile/Dockerfile.SDK .
+if [ $? -ne 0 ]; then echo "Error building image '${IMAGE_NAME}:sdk-${VERSION_NUMBER}'."; exit 1; fi
 eval $SCRIPT_PATH/publish-docker-image.sh ${IMAGE_NAME} sdk
 eval $SCRIPT_PATH/publish-docker-image.sh ${IMAGE_NAME} sdk-${VERSION_NUMBER}
 
 # Create and push Runtime image
 docker build -q --no-cache --build-arg version_number=${VERSION_NUMBER} -t ${IMAGE_NAME}:runtime -t ${IMAGE_NAME}:runtime-${VERSION_NUMBER} -f src/NCI.OCPL.Api.BestBets/Dockerfile/Dockerfile.Runtime .
+if [ $? -ne 0 ]; then echo "Error building image '${IMAGE_NAME}:runtime-${VERSION_NUMBER}'."; exit 1; fi
 eval $SCRIPT_PATH/publish-docker-image.sh ${IMAGE_NAME} runtime
 eval $SCRIPT_PATH/publish-docker-image.sh ${IMAGE_NAME} runtime-${VERSION_NUMBER}
 

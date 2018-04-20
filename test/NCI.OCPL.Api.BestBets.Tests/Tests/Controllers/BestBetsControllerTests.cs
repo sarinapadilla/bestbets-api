@@ -88,7 +88,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
         }
 
 
-        [Theory, MemberData("XmlDeserializingData")]
+        [Theory, MemberData(nameof(XmlDeserializingData))]
         public void Get_EnglishTerm(string searchTerm, BaseCategoryTestData data) 
         {
             Mock<IBestBetsDisplayService> displayService = new Mock<IBestBetsDisplayService>(); 
@@ -156,7 +156,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
         /// <summary>
         /// Verify that Status fails for the various combinations of unhealthy services.
         /// </summary>
-        [Theory, MemberData("UnhealthyServiceCombinations")]
+        [Theory, MemberData(nameof(UnhealthyServiceCombinations))]
         public void IsHealthy_Unhealthy(IBestBetsDisplayService displayService, IBestBetsMatchService matchService)
         {
             BestBetsController controller = new BestBetsController(

@@ -24,7 +24,7 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Tests
         /// Verify that the correct number of synonmyms is created.
         /// </summary>
         /// <param name="data">The BaseSynonymTestData containing reference data.</param>
-        [Theory, MemberData("MappingData")]
+        [Theory, MemberData(nameof(MappingData))]
         void CorrectNumberOfSynonymsFound(SynonymTestData data)
         {
             // Load test BestBet object
@@ -49,7 +49,7 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Tests
         /// Verify that synonyms are correctly converted into BestBetsMatch objects.
         /// </summary>
         /// <param name="data"></param>
-        [Theory, MemberData("MappingData")]
+        [Theory, MemberData(nameof(MappingData))]
         void SynonymsMappedCorrectly(SynonymTestData data)
         {
             // Load test BestBet object

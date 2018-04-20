@@ -10,13 +10,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Update="appsettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="../NCI.OCPL.Services.CDE.PublishedContentListing/NCI.OCPL.Services.CDE.PublishedContentListing.csproj" />
   </ItemGroup>
 

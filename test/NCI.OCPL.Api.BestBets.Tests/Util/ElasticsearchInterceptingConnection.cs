@@ -134,10 +134,10 @@ namespace NCI.OCPL.Api.BestBets.Tests.Util
             return builder.ToResponse();
         }
 
-        async Task<ElasticsearchResponse<TReturn>> IConnection.RequestAsync<TReturn>(RequestData requestData)
+        async Task<ElasticsearchResponse<TReturn>> IConnection.RequestAsync<TReturn>(RequestData requestData, System.Threading.CancellationToken cancellationToken)
         {
 
-            ResponseBuilder<TReturn> builder = new ResponseBuilder<TReturn>(requestData);
+            ResponseBuilder<TReturn> builder = new ResponseBuilder<TReturn>(requestData, cancellationToken);
 
             this.ProcessRequest<TReturn>(requestData, builder);
 

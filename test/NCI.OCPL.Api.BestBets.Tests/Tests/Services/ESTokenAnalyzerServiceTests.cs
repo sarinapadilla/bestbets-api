@@ -47,7 +47,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
             //TODO: Add crazier tests
         };
 
-        [Theory, MemberData("GetTokenCountData")]
+        [Theory, MemberData(nameof(GetTokenCountData))]
         public void GetTokenCount_Responses(
            string searchTerm,           
            string language,

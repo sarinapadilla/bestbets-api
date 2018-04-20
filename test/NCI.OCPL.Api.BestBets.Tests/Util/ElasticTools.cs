@@ -124,7 +124,7 @@ namespace NCI.OCPL.Utils.Testing
                 bool isEqual =  
                     x.Id == y.Id &&
                     x.File == y.File &&                    
-                    x.Template == y.Template;
+                     x.Inline == y.Inline;
 
                 if (isEqual) 
                 {

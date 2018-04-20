@@ -137,7 +137,7 @@ namespace NCI.OCPL.Api.BestBets.Services
                     sd = sd
                     .Index(_bestbetsConfig.AliasName)
                     .Type("synonyms")
-                    .File(templateFileName)
+                    .Id(templateFileName)
                     .Params(pd =>
                     {
                         //Add params that are always set.
@@ -199,7 +199,7 @@ namespace NCI.OCPL.Api.BestBets.Services
                 }
 
                 return (response.Status == "green"
-                    || response.Status == "yellow");
+                        || response.Status == "yellow");
             }
         }
     }

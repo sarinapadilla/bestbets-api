@@ -30,7 +30,7 @@ namespace NCI.OCPL.Api.BestBets.Tests.CGBestBetsDisplayServiceTests
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        [Theory, MemberData("XmlDeserializingData")]
+        [Theory, MemberData(nameof(XmlDeserializingData))]
         public void GetBestBetForDisplay_DataLoading(BaseCategoryTestData data)
         {
             //Setup a mock handler, which is what HttpClient uses under the hood to fetch

@@ -13,25 +13,25 @@ namespace NCI.OCPL.Api.BestBets
         /// <summary>
         /// Gets or sets the name of the category for this Best Bet Match
         /// </summary>
-        [String(Name = "category")]
+        [Text(Name = "category")]
         public string Category { get; set; }
 
         /// <summary>
         /// Gets or sets the content ID of the category of this match
         /// </summary>
-        [String(Name = "contentid")]
+        [Text(Name = "contentid")]
         public string ContentID {get; set;}
 
         /// <summary>
         /// Gets or sets the synonym that was matched
         /// </summary>
-        [String(Name = "synonym")]
+        [Text(Name = "synonym")]
         public string Synonym {get; set;}
 
         /// <summary>
         /// Gets or sets the two-character language code for this match
         /// </summary>
-        [String(Name = "language")]
+        [Text(Name = "language")]
         public string Language {get; set;}
 
         /// <summary>

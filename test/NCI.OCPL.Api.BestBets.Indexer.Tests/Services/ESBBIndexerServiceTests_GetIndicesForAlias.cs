@@ -79,7 +79,7 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Tests
                         res.Exception = null;
                     });
 
-                    conn.RegisterRequestHandlerForType<Nest.GetAliasesResponse>((req, res) =>
+                    conn.RegisterRequestHandlerForType<GetAliasResponse>((req, res) =>
                     {
                         //Store off Request
                         actualPath = req.Path;
@@ -124,7 +124,7 @@ namespace NCI.OCPL.Api.BestBets.Indexer.Tests
                     });
 
                     //This is the handler for GetAlias calls
-                    conn.RegisterRequestHandlerForType<Nest.GetAliasesResponse>((req, res) =>
+                    conn.RegisterRequestHandlerForType<GetAliasResponse>((req, res) =>
                     {
                         //Store off Request
                         actualPath = req.Path;

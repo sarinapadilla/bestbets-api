@@ -69,7 +69,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
         };
 
 
-        [Theory, MemberData("GetMatchesData")]
+        [Theory, MemberData(nameof(GetMatchesData))]
         public void GetMatches_Normal(
             string searchTerm, 
             string lang, 

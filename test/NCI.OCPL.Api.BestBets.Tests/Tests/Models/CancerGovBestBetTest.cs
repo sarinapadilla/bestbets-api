@@ -21,7 +21,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
             new object[] { new BreastCancerCategoryTestData() }
         };
 
-        [Theory, MemberData("XmlDeserializingData")]
+        [Theory, MemberData(nameof(XmlDeserializingData))]
         public void Can_Deserialize_XML(BaseCategoryTestData data) 
         {
             //Setup the expected object.

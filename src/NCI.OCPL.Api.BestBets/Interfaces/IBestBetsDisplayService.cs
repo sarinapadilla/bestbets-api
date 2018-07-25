@@ -11,17 +11,11 @@ namespace NCI.OCPL.Api.BestBets
     {
 
         /// <summary>
-        /// Asynchronously gets as single Best Bet
-        /// </summary>
-        /// <returns></returns>
-        //Task GetBestBetForDisplayAsync(string categoryID);
-
-        /// <summary>
-        /// Synchronously gets a single Best Bet
+        /// Gets a single Best Bet asynchronously
         /// </summary>
         /// <param name="categoryID">The category ID to retrieve</param>
         /// <returns>A IBestBetDisplay represented by the category</returns>
-        IBestBetDisplay GetBestBetForDisplay(string categoryID);
+        Task<IBestBetDisplay> GetBestBetForDisplay(string categoryID);
 
     }
 

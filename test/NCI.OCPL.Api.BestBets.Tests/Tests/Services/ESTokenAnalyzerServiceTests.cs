@@ -48,7 +48,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
         };
 
         [Theory, MemberData(nameof(GetTokenCountData))]
-        public void GetTokenCount_Responses(
+        public async void GetTokenCount_Responses(
            string searchTerm,           
            string language,
            object[] responseTokens,
@@ -80,11 +80,12 @@ namespace NCI.OCPL.Api.BestBets.Tests
             IOptions<CGBBIndexOptions> config = GetMockConfig();
 
             ESTokenAnalyzerService service = new ESTokenAnalyzerService(client, config, new NullLogger<ESTokenAnalyzerService>());
-            int actualCount = service.GetTokenCount(searchTerm);
+            int actualCount = await service.GetTokenCount(searchTerm);
 
             Assert.Equal(expectedCount, actualCount);
 
         }
 
+        //TODO: Test failure after repeated attempts.
     }
 }

@@ -52,7 +52,7 @@ namespace NCI.OCPL.Api.BestBets.Services
         public void UseIndexName(string index)
         {
             if (string.IsNullOrWhiteSpace(index))
-                throw new ArgumentNullException("Index Name must be set.");
+                throw new ArgumentNullException(nameof(index), "Index Name must be set.");
 
             _indexForAnalysis = index;
         }
@@ -76,13 +76,13 @@ namespace NCI.OCPL.Api.BestBets.Services
         /// </summary>
         /// <param name="term">The term to get token count</param>
         /// <returns>The number of tokens in the term</returns>
-        public int GetTokenCount(string term)
+        public async Task<int> GetTokenCount(string term)
         {
             IAnalyzeResponse analyzeResponse;
 
             try
             {
-                analyzeResponse = this._elasticClient.Analyze(
+                analyzeResponse = await this._elasticClient.AnalyzeAsync(
                     a => a
                     .Index(IndexForAnalysis)
                     .Analyzer("nostem")
@@ -95,8 +95,8 @@ namespace NCI.OCPL.Api.BestBets.Services
                     term, ex.FailureReason, ex.DebugInformation, ex);
                 _logger.LogInformation("Trying again for term '{0}", term);
 
-                // Try again.
-                analyzeResponse = this._elasticClient.Analyze(
+                // Try again. (this is really just for when we run out of sockets)
+                analyzeResponse = await this._elasticClient.AnalyzeAsync(
                     a => a
                     .Index(IndexForAnalysis)
                     .Analyzer("nostem")

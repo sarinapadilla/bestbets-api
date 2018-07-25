@@ -54,7 +54,7 @@ namespace NCI.OCPL.Api.BestBets.Controllers
 
         // GET api/values/5
         [HttpGet("{language}/{term}")]
-        public IBestBetDisplay[] Get(string language, string term)
+        public async Task<IBestBetDisplay[]> Get(string language, string term)
         {
             if (String.IsNullOrWhiteSpace(language))
                 throw new APIErrorException(400, "You must supply a language and search term");
@@ -68,14 +68,16 @@ namespace NCI.OCPL.Api.BestBets.Controllers
             // Step 1. Remove Punctuation
             string cleanedTerm = CleanTerm(term);
 
-            string[] categoryIDs = _matchService.GetMatches(language.ToLower(), cleanedTerm);
+            string[] categoryIDs = await _matchService.GetMatches(language.ToLower(), cleanedTerm);
             
-            List<IBestBetDisplay> displayItems = new List<IBestBetDisplay>();            
+            List<IBestBetDisplay> displayItems = new List<IBestBetDisplay>();
 
-            //Now get categories for ID.
-            foreach (string categoryID in categoryIDs)
-            {
-                IBestBetDisplay item = _displayService.GetBestBetForDisplay(categoryID);
+            var categoryTasks = from categoryID in categoryIDs
+                                select _displayService.GetBestBetForDisplay(categoryID);
+
+            var categoryItems = await Task.WhenAll(categoryTasks);
+
+            foreach (IBestBetDisplay item in categoryItems ) {
                 displayItems.Add(new BestBetAPIGetResult()
                 {
                     ID = item.ID,
@@ -97,7 +99,7 @@ namespace NCI.OCPL.Api.BestBets.Controllers
         /// all services are running. If unhealthy services are found, APIErrorException is thrown
         /// with HTTPStatusCode set to 500.</returns>
         [HttpGet("status")]
-        public string GetStatus()
+        public async Task<string> GetStatus()
         {
             IHealthCheckService[] monitoredServices = new IHealthCheckService[]
             {
@@ -108,12 +110,22 @@ namespace NCI.OCPL.Api.BestBets.Controllers
             // Check for all services so we can log the status of all failures rather than
             // than just the first one.
             bool allHealthy = true;
-            foreach (IHealthCheckService service in monitoredServices)
+
+            //Select an async callback that keeps the name with the service.
+            var healthChecks = monitoredServices.Select(async svc => new
             {
-                if (!service.IsHealthy)
+                Name = svc.GetType().Name,
+                Status = await svc.IsHealthy()
+            });
+
+            var results = await Task.WhenAll(healthChecks);
+
+            foreach (var result in results)
+            {
+                if (!result.Status)
                 {
                     allHealthy = false;
-                    _logger.LogError("Service '{0}' not healthy.", service.GetType().Name);
+                    _logger.LogError("Service '{0}' not healthy.", result.Name);
                 }
             }
 

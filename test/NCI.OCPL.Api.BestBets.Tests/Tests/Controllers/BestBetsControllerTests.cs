@@ -20,6 +20,7 @@ using NCI.OCPL.Api.BestBets;
 using NCI.OCPL.Api.BestBets.Controllers;
 using NCI.OCPL.Api.BestBets.Tests.CategoryTestData;
 using NCI.OCPL.Api.BestBets.Tests.ESHealthTestData;
+using System.Threading.Tasks;
 
 namespace NCI.OCPL.Api.BestBets.Tests
 {
@@ -39,7 +40,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
         };
 
         [Fact]
-        public void Get_Error_LanguageEmpty() 
+        public async void Get_Error_LanguageEmpty() 
         {
             Mock<IBestBetsDisplayService> displayService = new Mock<IBestBetsDisplayService>();
             Mock<IBestBetsMatchService> matchService = new Mock<IBestBetsMatchService>();
@@ -51,12 +52,11 @@ namespace NCI.OCPL.Api.BestBets.Tests
                 NullLogger<BestBetsController>.Instance
             );
 
-            APIErrorException ex = Assert.Throws<APIErrorException>( () => controller.Get(null, null) );
-
+            APIErrorException ex = await Assert.ThrowsAsync<APIErrorException>( () => controller.Get(null, null) );
         }
 
         [Fact]
-        public void Get_Error_LanguageBad() 
+        public async void Get_Error_LanguageBad() 
         {
             Mock<IBestBetsDisplayService> displayService = new Mock<IBestBetsDisplayService>();
             Mock<IBestBetsMatchService> matchService = new Mock<IBestBetsMatchService>();
@@ -68,11 +68,11 @@ namespace NCI.OCPL.Api.BestBets.Tests
                 NullLogger<BestBetsController>.Instance
             );
 
-            APIErrorException ex = Assert.Throws<APIErrorException>(() => controller.Get("Chicken", null));
+            await Assert.ThrowsAsync<APIErrorException>(() => controller.Get("Chicken", null));
         }
 
         [Fact]
-        public void Get_Error_SearchTermBad() 
+        public async void Get_Error_SearchTermBad() 
         {
             Mock<IBestBetsDisplayService> displayService = new Mock<IBestBetsDisplayService>();
             Mock<IBestBetsMatchService> matchService = new Mock<IBestBetsMatchService>();
@@ -84,12 +84,12 @@ namespace NCI.OCPL.Api.BestBets.Tests
                 NullLogger<BestBetsController>.Instance
             );
 
-            APIErrorException ex = Assert.Throws<APIErrorException>( () => controller.Get("en", null) );
+            await Assert.ThrowsAsync<APIErrorException>( () => controller.Get("en", null) );
         }
 
 
         [Theory, MemberData(nameof(XmlDeserializingData))]
-        public void Get_EnglishTerm(string searchTerm, BaseCategoryTestData data) 
+        public async void Get_EnglishTerm(string searchTerm, BaseCategoryTestData data) 
         {
             Mock<IBestBetsDisplayService> displayService = new Mock<IBestBetsDisplayService>(); 
             displayService
@@ -98,7 +98,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
                         It.Is<string>(catID => catID == data.ExpectedData.ID)
                     )
                 )
-                .Returns(TestingTools.DeserializeXML<CancerGovBestBet>(data.TestFilePath));
+                .Returns(Task.FromResult<IBestBetDisplay>(TestingTools.DeserializeXML<CancerGovBestBet>(data.TestFilePath)));
 
             Mock<IBestBetsMatchService> matchService = new Mock<IBestBetsMatchService>();
             matchService
@@ -108,7 +108,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
                         It.Is<string>(term => term == searchTerm)
                     )
                 )
-                .Returns(new string[] { data.ExpectedData.ID });
+                .Returns(Task.FromResult(new string[] { data.ExpectedData.ID }));
             
             // Create instance of controller
             BestBetsController controller = new BestBetsController(                
@@ -117,7 +117,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
                 NullLogger<BestBetsController>.Instance
             );
 
-            IBestBetDisplay[] actualItems = controller.Get("en", searchTerm);
+            IBestBetDisplay[] actualItems = await controller.Get("en", searchTerm);
 
             Assert.Equal(actualItems, new IBestBetDisplay[] { data.ExpectedData }, new IBestBetDisplayComparer());
         }
@@ -127,10 +127,10 @@ namespace NCI.OCPL.Api.BestBets.Tests
         /// on are healthy.
         /// </summary>
         [Fact]
-        public void IsHealthy_Healthy()
+        public async void IsHealthy_Healthy()
         {
-            IBestBetsDisplayService displayService = new HealthyBestBetsDisplayService();
-            IBestBetsMatchService matchService = new HealthyBestBetsMatchService();
+            IBestBetsDisplayService displayService = GetMockedHealthSvc<IBestBetsDisplayService>(true);
+            IBestBetsMatchService matchService = GetMockedHealthSvc<IBestBetsMatchService>(true);
 
             // Create instance of controller
             BestBetsController controller = new BestBetsController(
@@ -139,7 +139,18 @@ namespace NCI.OCPL.Api.BestBets.Tests
                 NullLogger<BestBetsController>.Instance
                 );
 
-            Assert.Equal(BestBetsController.HEALTHY_STATUS, controller.GetStatus(), ignoreCase: true);
+            var actual = await controller.GetStatus(); 
+
+            Assert.Equal(BestBetsController.HEALTHY_STATUS, actual, ignoreCase: true);
+        }
+
+
+        private static T GetMockedHealthSvc<T>( bool status) where T : class, IHealthCheckService {
+            var mock = new Mock<T>();
+            mock.Setup(svc => svc.IsHealthy())
+                .Returns(Task.FromResult(status));
+
+            return mock.Object;
         }
 
         /// <summary>
@@ -148,16 +159,16 @@ namespace NCI.OCPL.Api.BestBets.Tests
         /// </summary>
         public static IEnumerable<object[]> UnhealthyServiceCombinations => new[]
         {
-            new object[] { new UnhealthyBestBetsDisplayService(), new UnhealthyBestBetsMatchService() },
-            new object[] { new HealthyBestBetsDisplayService(), new UnhealthyBestBetsMatchService() },
-            new object[] { new UnhealthyBestBetsDisplayService(), new HealthyBestBetsMatchService() }
+            new object[] { GetMockedHealthSvc<IBestBetsDisplayService>(false), GetMockedHealthSvc<IBestBetsMatchService>(false) },
+            new object[] { GetMockedHealthSvc<IBestBetsDisplayService>(true), GetMockedHealthSvc<IBestBetsMatchService>(false) },
+            new object[] { GetMockedHealthSvc<IBestBetsDisplayService>(false), GetMockedHealthSvc<IBestBetsMatchService>(true) }
         };
 
         /// <summary>
         /// Verify that Status fails for the various combinations of unhealthy services.
         /// </summary>
         [Theory, MemberData(nameof(UnhealthyServiceCombinations))]
-        public void IsHealthy_Unhealthy(IBestBetsDisplayService displayService, IBestBetsMatchService matchService)
+        public async void IsHealthy_Unhealthy(IBestBetsDisplayService displayService, IBestBetsMatchService matchService)
         {
             BestBetsController controller = new BestBetsController(
                 matchService,
@@ -167,7 +178,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
 
             // If any of the services are unhealthy, verify that GetStatus() throws APIErrorException
             // with a status of 500.
-            APIErrorException ex = Assert.Throws<APIErrorException>(() => controller.GetStatus());
+            APIErrorException ex = await Assert.ThrowsAsync<APIErrorException>(() => controller.GetStatus());
 
             Assert.Equal(500, ex.HttpStatusCode);
         }

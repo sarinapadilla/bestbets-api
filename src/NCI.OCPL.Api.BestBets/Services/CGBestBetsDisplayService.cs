@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 
 using NCI.OCPL.Api.BestBets;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace NCI.OCPL.Api.BestBets.Services
 {
@@ -39,11 +40,11 @@ namespace NCI.OCPL.Api.BestBets.Services
         }
 
         /// <summary>
-        /// 
+        /// Gets the best bets category list asynchronously
         /// </summary>
         /// <param name="categoryID"></param>
         /// <returns></returns>
-        public IBestBetDisplay GetBestBetForDisplay(string categoryID)
+        public async Task<IBestBetDisplay> GetBestBetForDisplay(string categoryID)
         {
             string requestUrl = _options.Host;
             requestUrl += _options.BBCategoryPathFormatter;
@@ -60,7 +61,7 @@ namespace NCI.OCPL.Api.BestBets.Services
                     XmlSerializer serializer = new XmlSerializer(typeof(CancerGovBestBet), "cde");
 
                     //Get the content from the response message and return the deserialized object.
-                    using (XmlReader xmlReader = XmlReader.Create(message.Content.ReadAsStreamAsync().Result))
+                    using (XmlReader xmlReader = XmlReader.Create(await message.Content.ReadAsStreamAsync()))
                     {
                         return (IBestBetDisplay)serializer.Deserialize(xmlReader);
                     }
@@ -81,30 +82,27 @@ namespace NCI.OCPL.Api.BestBets.Services
         /// <summary>
         /// True if CGBestBetsDisplayService is able to retrieve BestBets.
         /// </summary>
-        public bool IsHealthy
+        public async Task<bool> IsHealthy()
         {
-            get
+            UriBuilder requestUrl = new UriBuilder(_options.Host);
+            requestUrl.Path = _options.HealthCheckPath;
+
+            HttpResponseMessage message = await _client.GetAsync(requestUrl.Uri);
+
+            bool isHealthy;
+            if(message.IsSuccessStatusCode && message.StatusCode == HttpStatusCode.OK)
             {
-                UriBuilder requestUrl = new UriBuilder(_options.Host);
-                requestUrl.Path = _options.HealthCheckPath;
-
-                HttpResponseMessage message = _client.GetAsync(requestUrl.Uri).Result;
-
-                bool isHealthy;
-                if(message.IsSuccessStatusCode && message.StatusCode == HttpStatusCode.OK)
-                {
-                    isHealthy = true;
-                }
-                else
-                {
-                    isHealthy = false;
-
-                    _logger.LogError("Unable to fetch URL '{0}'.", requestUrl.Uri.ToString());
-                    _logger.LogError("Status {0}, {1}", message.StatusCode, message.ReasonPhrase);
-                }
-
-                return isHealthy;
+                isHealthy = true;
             }
+            else
+            {
+                isHealthy = false;
+
+                _logger.LogError("Unable to fetch URL '{0}'.", requestUrl.Uri.ToString());
+                _logger.LogError("Status {0}, {1}", message.StatusCode, message.ReasonPhrase);
+            }
+
+            return isHealthy;
         }
     }
 }

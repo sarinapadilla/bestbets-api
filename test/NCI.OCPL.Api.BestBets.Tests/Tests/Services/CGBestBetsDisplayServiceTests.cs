@@ -31,7 +31,7 @@ namespace NCI.OCPL.Api.BestBets.Tests.CGBestBetsDisplayServiceTests
         /// <param name="data"></param>
         /// <returns></returns>
         [Theory, MemberData(nameof(XmlDeserializingData))]
-        public void GetBestBetForDisplay_DataLoading(BaseCategoryTestData data)
+        public async void GetBestBetForDisplay_DataLoading(BaseCategoryTestData data)
         {
             //Setup a mock handler, which is what HttpClient uses under the hood to fetch
             //data.
@@ -53,7 +53,7 @@ namespace NCI.OCPL.Api.BestBets.Tests.CGBestBetsDisplayServiceTests
                 bbClientOptions,
                 NullLogger<CGBestBetsDisplayService>.Instance);
 
-            IBestBetDisplay actDisplay = bbClient.GetBestBetForDisplay(data.ExpectedData.ID);
+            IBestBetDisplay actDisplay = await bbClient.GetBestBetForDisplay(data.ExpectedData.ID);
 
             Assert.Equal(data.ExpectedData, actDisplay, new IBestBetDisplayComparer());
         }
@@ -78,7 +78,7 @@ namespace NCI.OCPL.Api.BestBets.Tests.CGBestBetsDisplayServiceTests
         /// health check URL returns an OK (HTTP 200) status.
         /// </summary>
         [Fact]
-        public void HealthStatus_Healthy()
+        public async void HealthStatus_Healthy()
         {
             //Setup a mock HTTP handler
             var mockHttp = new MockHttpMessageHandler();
@@ -98,7 +98,7 @@ namespace NCI.OCPL.Api.BestBets.Tests.CGBestBetsDisplayServiceTests
                 bbClientOptions,
                 NullLogger<CGBestBetsDisplayService>.Instance);
 
-            bool isHealthy = bbClient.IsHealthy;
+            bool isHealthy = await bbClient.IsHealthy();
 
             Assert.True(isHealthy);
         }
@@ -111,7 +111,7 @@ namespace NCI.OCPL.Api.BestBets.Tests.CGBestBetsDisplayServiceTests
         [InlineData(HttpStatusCode.BadRequest)]
         [InlineData(HttpStatusCode.NotFound)]
         [InlineData(HttpStatusCode.InternalServerError)]
-        public void HealthStatus_Unhealthy(HttpStatusCode statusCode)
+        public async void HealthStatus_Unhealthy(HttpStatusCode statusCode)
         {
             //Setup a mock HTTP handler
             var mockHttp = new MockHttpMessageHandler();
@@ -131,7 +131,7 @@ namespace NCI.OCPL.Api.BestBets.Tests.CGBestBetsDisplayServiceTests
                 bbClientOptions,
                 NullLogger<CGBestBetsDisplayService>.Instance);
 
-            bool isHealthy = bbClient.IsHealthy;
+            bool isHealthy = await bbClient.IsHealthy();
 
             Assert.False(isHealthy);
         }

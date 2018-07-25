@@ -17,6 +17,10 @@ using Microsoft.Extensions.Logging;
 using Nest;
 using Elasticsearch.Net;
 
+using NSwag.AspNetCore;
+using NJsonSchema;
+using System.Reflection;
+
 using NCI.OCPL.Api.BestBets.Services;
 
 namespace NCI.OCPL.Api.BestBets
@@ -100,8 +104,22 @@ namespace NCI.OCPL.Api.BestBets
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
+
+            app.UseStaticFiles();
+            // Enable the Swagger UI middleware and the Swagger generator
+            app.UseSwaggerUi3(typeof(Startup).GetTypeInfo().Assembly, settings =>
+            {
+                settings.GeneratorSettings.DefaultPropertyNameHandling = PropertyNameHandling.CamelCase;
+                settings.SwaggerUiRoute = "";
+            });
+
 
             // Allow use from anywhere.
             app.UseCors(builder => builder.AllowAnyOrigin());
@@ -134,6 +152,14 @@ namespace NCI.OCPL.Api.BestBets
                         byte[] contents = Encoding.UTF8.GetBytes(new ErrorMessage(){
                             Message = message
                         }.ToString());
+
+                        // THIS IS A HACK!!
+                        // When the pull request that fixes the timing of setting the CORS header (https://github.com/aspnet/CORS/pull/163) goes through,
+                        // we should remove this and test to see if it works without the hack.
+                        if (context.Request.Headers.ContainsKey("Origin"))
+                        {
+                            context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+                        }
 
                         await context.Response.Body.WriteAsync(contents, 0, contents.Length);
                     }

@@ -70,7 +70,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
 
 
         [Theory, MemberData(nameof(GetMatchesData))]
-        public void GetMatches_Normal(
+        public async void GetMatches_Normal(
             string searchTerm, 
             string lang, 
             ESMatchConnection connection, 
@@ -84,7 +84,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
             ESTokenAnalyzerService tokenService = GetTokenizerService(tokenizerConn);
             ESBestBetsMatchService service = GetMatchService(tokenService, connection);
 
-            string[] actualMatches = service.GetMatches(lang, searchTerm);
+            string[] actualMatches = await service.GetMatches(lang, searchTerm);
 
             Assert.Equal(expectedCategories, actualMatches);
         }
@@ -92,7 +92,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
         [Theory]
         [InlineData("green")]
         [InlineData("yellow")]
-        public void HealthStatus_Healthy(string datafile)
+        public async void HealthStatus_Healthy(string datafile)
         {
             ESHealthConnection connection = new ESHealthConnection(datafile);
             // The tokenizer doesn't get called during a healthcheck for the match service,
@@ -102,7 +102,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
             ESTokenAnalyzerService tokenService = GetTokenizerService(tokenizerConn);
             ESBestBetsMatchService service = GetMatchService(tokenService, connection);
 
-            bool isHealthy = service.IsHealthy;
+            bool isHealthy = await service.IsHealthy();
 
             Assert.True(isHealthy);
         }
@@ -110,7 +110,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
         [Theory]
         [InlineData("red")]
         [InlineData("unexpected")]   // i.e. "Unexpected color"
-        public void HealthStatus_Unhealthy(string datafile)
+        public async void HealthStatus_Unhealthy(string datafile)
         {
             ESHealthConnection connection = new ESHealthConnection(datafile);
             // The tokenizer doesn't get called during a healthcheck for the match service,
@@ -120,7 +120,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
             ESTokenAnalyzerService tokenService = GetTokenizerService(tokenizerConn);
             ESBestBetsMatchService service = GetMatchService(tokenService, connection);
 
-            bool isHealthy = service.IsHealthy;
+            bool isHealthy = await service.IsHealthy();
 
             Assert.False(isHealthy);
         }
@@ -133,7 +133,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
         [Theory]
         [InlineData(404)]
         [InlineData(500)]
-        public void HealthStatus_InvalidResponse(int httpStatus)
+        public async void HealthStatus_InvalidResponse(int httpStatus)
         {
             ESErrorConnection connection = new ESErrorConnection(httpStatus);
             // The tokenizer doesn't get called during a healthcheck for the match service,
@@ -143,10 +143,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
             ESTokenAnalyzerService tokenService = GetTokenizerService(tokenizerConn);
             ESBestBetsMatchService service = GetMatchService(tokenService, connection);
 
-            Assert.Throws<APIErrorException>(
-                ()=> {
-                    bool isHealthy = service.IsHealthy;
-                });
+            await Assert.ThrowsAsync<APIErrorException>( () => service.IsHealthy() );
 
         }
 
@@ -177,6 +174,8 @@ namespace NCI.OCPL.Api.BestBets.Tests
 
             return new ESBestBetsMatchService(client, tokenService, config, new NullLogger<ESBestBetsMatchService>());
         }
+
+
 
     }
 }

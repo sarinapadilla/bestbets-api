@@ -80,7 +80,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
             IOptions<CGBBIndexOptions> config = GetMockConfig();
 
             ESTokenAnalyzerService service = new ESTokenAnalyzerService(client, config, new NullLogger<ESTokenAnalyzerService>());
-            int actualCount = await service.GetTokenCount(searchTerm);
+            int actualCount = await service.GetTokenCount("live", searchTerm);
 
             Assert.Equal(expectedCount, actualCount);
 

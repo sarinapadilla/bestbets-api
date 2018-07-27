@@ -40,6 +40,38 @@ namespace NCI.OCPL.Api.BestBets.Tests
         };
 
         [Fact]
+        public async void Get_Error_CollectionEmpty()
+        {
+            Mock<IBestBetsDisplayService> displayService = new Mock<IBestBetsDisplayService>();
+            Mock<IBestBetsMatchService> matchService = new Mock<IBestBetsMatchService>();
+
+            // Create instance of controller
+            BestBetsController controller = new BestBetsController(
+                matchService.Object,
+                displayService.Object,
+                NullLogger<BestBetsController>.Instance
+            );
+
+            APIErrorException ex = await Assert.ThrowsAsync<APIErrorException>(() => controller.Get(null, null, null));
+        }
+
+        [Fact]
+        public async void Get_Error_CollectionBad()
+        {
+            Mock<IBestBetsDisplayService> displayService = new Mock<IBestBetsDisplayService>();
+            Mock<IBestBetsMatchService> matchService = new Mock<IBestBetsMatchService>();
+
+            // Create instance of controller
+            BestBetsController controller = new BestBetsController(
+                matchService.Object,
+                displayService.Object,
+                NullLogger<BestBetsController>.Instance
+            );
+
+            APIErrorException ex = await Assert.ThrowsAsync<APIErrorException>(() => controller.Get("chicken", null, null));
+        }
+
+        [Fact]
         public async void Get_Error_LanguageEmpty() 
         {
             Mock<IBestBetsDisplayService> displayService = new Mock<IBestBetsDisplayService>();
@@ -52,7 +84,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
                 NullLogger<BestBetsController>.Instance
             );
 
-            APIErrorException ex = await Assert.ThrowsAsync<APIErrorException>( () => controller.Get(null, null) );
+            APIErrorException ex = await Assert.ThrowsAsync<APIErrorException>( () => controller.Get("live", null, null) );
         }
 
         [Fact]
@@ -68,7 +100,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
                 NullLogger<BestBetsController>.Instance
             );
 
-            await Assert.ThrowsAsync<APIErrorException>(() => controller.Get("Chicken", null));
+            await Assert.ThrowsAsync<APIErrorException>(() => controller.Get("live", "Chicken", null));
         }
 
         [Fact]
@@ -84,7 +116,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
                 NullLogger<BestBetsController>.Instance
             );
 
-            await Assert.ThrowsAsync<APIErrorException>( () => controller.Get("en", null) );
+            await Assert.ThrowsAsync<APIErrorException>( () => controller.Get("live", "en", null) );
         }
 
 
@@ -95,6 +127,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
             displayService
                 .Setup(
                     dispSvc => dispSvc.GetBestBetForDisplay(
+                        It.Is<string>(coll => coll == "live"),
                         It.Is<string>(catID => catID == data.ExpectedData.ID)
                     )
                 )
@@ -103,7 +136,8 @@ namespace NCI.OCPL.Api.BestBets.Tests
             Mock<IBestBetsMatchService> matchService = new Mock<IBestBetsMatchService>();
             matchService
                 .Setup(
-                    matchSvc => matchSvc.GetMatches(                        
+                    matchSvc => matchSvc.GetMatches(
+                        It.Is<string>(coll => coll == "live"),
                         It.Is<string>(lang => lang == "en"),
                         It.Is<string>(term => term == searchTerm)
                     )
@@ -117,7 +151,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
                 NullLogger<BestBetsController>.Instance
             );
 
-            IBestBetDisplay[] actualItems = await controller.Get("en", searchTerm);
+            IBestBetDisplay[] actualItems = await controller.Get("live", "en", searchTerm);
 
             Assert.Equal(actualItems, new IBestBetDisplay[] { data.ExpectedData }, new IBestBetDisplayComparer());
         }

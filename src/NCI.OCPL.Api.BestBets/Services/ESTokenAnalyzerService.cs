@@ -22,42 +22,6 @@ namespace NCI.OCPL.Api.BestBets.Services
         private IElasticClient _elasticClient;
         private CGBBIndexOptions _bestbetsConfig;
         private readonly ILogger<ESTokenAnalyzerService> _logger;
-        private string _indexForAnalysis = null;
-
-        /// <summary>
-        /// Gets the index for analysis.
-        /// </summary>
-        /// <value>The index for analysis.</value>
-        public string IndexForAnalysis {
-            get 
-            {
-                //If someone has change the index, use that.
-                return String.IsNullOrWhiteSpace(_indexForAnalysis) ? _bestbetsConfig.AliasName : _indexForAnalysis;
-            }
-        }
-
-        /// <summary>
-        /// Uses the default name of the index. (Which is based on the configuration)
-        /// </summary>
-        public void UseDefaultIndexName()
-        {
-            _indexForAnalysis = null;
-        }
-
-        /// <summary>
-        /// Uses the name of the index.
-        /// </summary>
-        /// <param name="index">The name if the index to use for analysis</param>
-        /// <exception cref="System.ArgumentNullException">Index Name must be set.</exception>
-        public void UseIndexName(string index)
-        {
-            if (string.IsNullOrWhiteSpace(index))
-                throw new ArgumentNullException(nameof(index), "Index Name must be set.");
-
-            _indexForAnalysis = index;
-        }
-
-
 
         /// <summary>
         /// Creates a new instance of a ESBestBetsMatchService
@@ -74,17 +38,21 @@ namespace NCI.OCPL.Api.BestBets.Services
         /// <summary>
         /// Gets a count of the number of tokens as tokenized by elasticsearch
         /// </summary>
+        /// <param name="collection">The search index to use</param>
         /// <param name="term">The term to get token count</param>
         /// <returns>The number of tokens in the term</returns>
-        public async Task<int> GetTokenCount(string term)
+        public async Task<int> GetTokenCount(string collection, string term)
         {
             IAnalyzeResponse analyzeResponse;
+            string indexForAnalysis = (collection == "preview") ?
+                                        _bestbetsConfig.PreviewAliasName :
+                                        _bestbetsConfig.LiveAliasName;
 
             try
-            {
+            {                
                 analyzeResponse = await this._elasticClient.AnalyzeAsync(
                     a => a
-                    .Index(IndexForAnalysis)
+                    .Index(indexForAnalysis)
                     .Analyzer("nostem")
                     .Text(term)
                 );
@@ -98,7 +66,7 @@ namespace NCI.OCPL.Api.BestBets.Services
                 // Try again. (this is really just for when we run out of sockets)
                 analyzeResponse = await this._elasticClient.AnalyzeAsync(
                     a => a
-                    .Index(IndexForAnalysis)
+                    .Index(indexForAnalysis)
                     .Analyzer("nostem")
                     .Text(term)
                 );

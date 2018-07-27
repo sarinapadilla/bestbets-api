@@ -13,9 +13,10 @@ namespace NCI.OCPL.Api.BestBets
         /// <summary>
         /// Gets a single Best Bet asynchronously
         /// </summary>
+        /// <param name="collection">The collection to use. This will be 'live' or 'preview'.</param>
         /// <param name="categoryID">The category ID to retrieve</param>
         /// <returns>A IBestBetDisplay represented by the category</returns>
-        Task<IBestBetDisplay> GetBestBetForDisplay(string categoryID);
+        Task<IBestBetDisplay> GetBestBetForDisplay(string collection, string categoryID);
 
     }
 

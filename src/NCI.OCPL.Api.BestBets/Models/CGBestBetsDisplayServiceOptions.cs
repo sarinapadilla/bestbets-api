@@ -6,10 +6,16 @@ namespace NCI.OCPL.Api.BestBets
     public class CGBestBetsDisplayServiceOptions
     {
         /// <summary>
-        /// This is the host, with protocol, of where to fetch info from.
+        /// This is the host of the preview site, with protocol, of where to fetch info from.
         /// </summary>
         /// <returns></returns>
-        public string Host { get; set; }
+        public string PreviewHost { get; set; }
+
+        /// <summary>
+        /// This is the host of the live site, with protocol, of where to fetch info from.
+        /// </summary>
+        /// <returns></returns>
+        public string LiveHost { get; set; }
 
         /// <summary>
         /// Get and sets the formatter for building a path to a BB category

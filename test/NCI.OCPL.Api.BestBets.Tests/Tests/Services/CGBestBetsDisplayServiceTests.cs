@@ -53,7 +53,7 @@ namespace NCI.OCPL.Api.BestBets.Tests.CGBestBetsDisplayServiceTests
                 bbClientOptions,
                 NullLogger<CGBestBetsDisplayService>.Instance);
 
-            IBestBetDisplay actDisplay = await bbClient.GetBestBetForDisplay(data.ExpectedData.ID);
+            IBestBetDisplay actDisplay = await bbClient.GetBestBetForDisplay("live", data.ExpectedData.ID);
 
             Assert.Equal(data.ExpectedData, actDisplay, new IBestBetDisplayComparer());
         }
@@ -91,6 +91,10 @@ namespace NCI.OCPL.Api.BestBets.Tests.CGBestBetsDisplayServiceTests
                 .When("https://www.cancer.gov/")
                 .Respond(HttpStatusCode.OK, content);
 
+            mockHttp
+                .When("https://preview.cancer.gov/")
+                .Respond(HttpStatusCode.OK, content);
+            
             // Setup the mocked Options
             IOptions<CGBestBetsDisplayServiceOptions> bbClientOptions = GetMockOptions();
 
@@ -144,7 +148,8 @@ namespace NCI.OCPL.Api.BestBets.Tests.CGBestBetsDisplayServiceTests
                 .SetupGet(opt => opt.Value)
                 .Returns(new CGBestBetsDisplayServiceOptions()
                 {
-                    Host = "https://www.cancer.gov",
+                    PreviewHost = "https://preview.cancer.gov",
+                    LiveHost = "https://www.cancer.gov",
                     BBCategoryPathFormatter = "/PublishedContent/BestBets/{0}.xml",
                     HealthCheckPath = "/"
                 }

@@ -40,18 +40,20 @@ namespace NCI.OCPL.Api.BestBets.Services
 
         /// <summary>
         /// Gets a list of the BestBet Category IDs that matched our term asynchronously
-        /// </summary>        
+        /// </summary>
+        /// <param name="collection">The search index to use</param>
         /// <param name="language">The two-character language code to constrain the matches to</param>
         /// <param name="cleanedTerm">A term that have been cleaned of punctuation and special characters</param>
         /// <returns>An array of category ids</returns>
-        public async Task<string[]> GetMatches(string language, string cleanedTerm)
+        public async Task<string[]> GetMatches(string collection, string language, string cleanedTerm)
         {
 
             // Step 2. Get Number of Tokens in the term
-            int numTokens = _tokenAnalyzer.GetTokenCount(cleanedTerm).Result;
+            int numTokens = await _tokenAnalyzer.GetTokenCount(collection, cleanedTerm);
 
             // Step 4. Iterate over the matches    
             IEnumerable<BestBetsMatch> matches = await GetBestBetMatchesAsync(
+                collection,
                 cleanedTerm,
                 language,
                 numTokens
@@ -71,29 +73,60 @@ namespace NCI.OCPL.Api.BestBets.Services
         /// </summary>
         public async Task<bool> IsHealthy()
         {
+            var hostChecks = new Task<bool>[]
+            {
+                this.IsIndexHealthy(_bestbetsConfig.LiveAliasName),
+                this.IsIndexHealthy(_bestbetsConfig.PreviewAliasName),
+            };
+
+            return (await Task.WhenAll(hostChecks))
+                    .Aggregate(
+                        true, 
+                        (res, next) => res && next 
+                    );
+        }
+
+        /// <summary>
+        /// Determines if an index/alias is healthy. 
+        /// </summary>
+        /// <returns>True if it is health, false if it is not or errors occurred.</returns>
+        /// <param name="alias">Alias.</param>
+        private async Task<bool> IsIndexHealthy(string alias) {
             // Use the cluster health API to verify that the Best Bets index is functioning.
             // Maps to https://ncias-d1592-v.nci.nih.gov:9299/_cluster/health/bestbets?pretty (or other server)
             //
             // References:
             // https://www.elastic.co/guide/en/elasticsearch/reference/master/cluster-health.html
             // https://github.com/elastic/elasticsearch/blob/master/rest-api-spec/src/main/resources/rest-api-spec/api/cluster.health.json#L20
-            IClusterHealthResponse response = await _elasticClient.ClusterHealthAsync(hd =>
-            {
-                hd = hd
-                    .Index(_bestbetsConfig.AliasName);
 
-                return hd;
-            });
-
-            if (!response.IsValid)
+            try
             {
-                _logger.LogError("Error checking ElasticSearch health.");
-                _logger.LogError("Returned debug info: {0}.", response.DebugInformation);
-                throw new APIErrorException(500, "Errors Occurred.");
+                IClusterHealthResponse response = await _elasticClient.ClusterHealthAsync(hd => hd.Index(alias));
+
+                if (!response.IsValid)
+                {
+                    _logger.LogError($"Error checking ElasticSearch health for {alias}.");
+                    _logger.LogError($"Returned debug info: {response.DebugInformation}.");
+                }
+                else
+                {
+                    if (response.Status == "green" || response.Status == "yellow")
+                    {
+                        //This is the only condition that will return true
+                        return true;
+                    }
+                    else
+                    {
+                        _logger.LogError($"Alias ${alias} status is not good");
+                    }
+                }
             }
-
-            return (response.Status == "green"
-                    || response.Status == "yellow");
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error checking ElasticSearch health for {alias}.");
+                _logger.LogError($"Exception: {ex.Message}.");
+            }
+            return false;
         }
 
 
@@ -158,11 +191,12 @@ namespace NCI.OCPL.Api.BestBets.Services
         /// Gets a "round" of Best Bet matches asynchronously
         /// </summary>
         /// <returns>The set of matches.</returns>
+        /// <param name="collection">The search index to use</param> 
         /// <param name="cleanedTerm">The search phrase</param>
         /// <param name="searchTokenCount">Search token count.</param>
         /// <param name="lang">Lang.</param>
         /// <param name="matchedTokenCount">Matched token count.</param>
-        private async Task<IEnumerable<BestBetsMatch>> GetSetOfMatchesAsync(string cleanedTerm, int searchTokenCount, string lang, int matchedTokenCount)
+        private async Task<IEnumerable<BestBetsMatch>> GetSetOfMatchesAsync(string collection, string cleanedTerm, int searchTokenCount, string lang, int matchedTokenCount)
         {
             //This is the query
             var matchQuery = new NumericRangeQuery { Field = "tokencount", LessThanOrEqualTo = matchedTokenCount } &&
@@ -182,7 +216,11 @@ namespace NCI.OCPL.Api.BestBets.Services
 
             try
             {
-                var req = new SearchRequest<BestBetsMatch>(this._bestbetsConfig.AliasName)
+                string alias = (collection == "preview") ?
+                    this._bestbetsConfig.PreviewAliasName :
+                    this._bestbetsConfig.LiveAliasName;
+
+                var req = new SearchRequest<BestBetsMatch>(alias)
                 {
                     Query = matchQuery,
                     Size = 10000 //Make sure this more than the number of synonyms
@@ -217,15 +255,16 @@ namespace NCI.OCPL.Api.BestBets.Services
         /// <summary>
         /// Helper function that generates a list of best bet matches to iterate through.
         /// </summary>
+        /// <param name="collection">The search index to use</param> 
         /// <param name="cleanedTerm">The Cleaned Term</param>
         /// <param name="language">The language of the best bets to fetch</param>
         /// <param name="numTokens">The number of tokens an analyzer would break this up into</param>
         /// <returns>IEnumerable<BestBetsMatch> suitable for iterating through</returns>
-        private async Task<IEnumerable<BestBetsMatch>> GetBestBetMatchesAsync(string cleanedTerm, string language, int numTokens)
+        private async Task<IEnumerable<BestBetsMatch>> GetBestBetMatchesAsync(string collection, string cleanedTerm, string language, int numTokens)
         {
             //Pool up all the fetches to be called in one shot
             var tasks = from tokenCount in Enumerable.Range(1, numTokens)
-                        select this.GetSetOfMatchesAsync(cleanedTerm, numTokens, language, tokenCount);
+                        select this.GetSetOfMatchesAsync(collection, cleanedTerm, numTokens, language, tokenCount);
 
             try
             {

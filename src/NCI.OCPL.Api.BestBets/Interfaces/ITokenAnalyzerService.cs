@@ -11,22 +11,12 @@ namespace NCI.OCPL.Api.BestBets
     public interface ITokenAnalyzerService
     {
         /// <summary>
-        /// Uses the name of the index.
-        /// </summary>
-        /// <param name="index">The name if the index to use for analysis</param>
-        void UseIndexName(string index);
-
-        /// <summary>
-        /// Uses the default name of the index. (Which is based on the configuration)
-        /// </summary>
-        void UseDefaultIndexName();
-
-        /// <summary>
         /// Gets a count of the number of tokens as tokenized by search indexer
         /// </summary>
+        /// <param name="collection">The collection to use. This will be 'live' or 'preview'.</param>
         /// <param name="term">The term to get token count</param>
         /// <returns>The number of tokens in the term</returns>
-        Task<int> GetTokenCount(string term);
+        Task<int> GetTokenCount(string collection, string term);
 
 
     }

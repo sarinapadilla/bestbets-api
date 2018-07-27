@@ -51,11 +51,24 @@ namespace NCI.OCPL.Api.BestBets.Controllers
             this._logger = logger;
         }
 
-
+        /// <summary>
+        /// Get the Best Bet Categories specified language and term.
+        /// </summary>
+        /// <returns>The get.</returns>
+        /// <param name="collection">The collection to use. For normal operation use 'live'.</param>
+        /// <param name="language">The language of the results. This should be either 'en' for English or 'es' for Spanish.</param>
+        /// <param name="term">The search term to get categories for.</param>
         // GET api/values/5
-        [HttpGet("{language}/{term}")]
-        public async Task<IBestBetDisplay[]> Get(string language, string term)
+        [HttpGet("{collection}/{language}/{term}")]
+        public async Task<IBestBetDisplay[]> Get(string collection, string language, string term)
         {
+
+            if (String.IsNullOrWhiteSpace(collection))
+                throw new APIErrorException(400, "You must supply a collection, language and search term");
+
+            if (collection.ToLower() != "preview" && collection.ToLower() != "live") 
+                throw new APIErrorException(404, "Unsupported collection. Please try 'live'");
+            
             if (String.IsNullOrWhiteSpace(language))
                 throw new APIErrorException(400, "You must supply a language and search term");
 
@@ -68,12 +81,12 @@ namespace NCI.OCPL.Api.BestBets.Controllers
             // Step 1. Remove Punctuation
             string cleanedTerm = CleanTerm(term);
 
-            string[] categoryIDs = await _matchService.GetMatches(language.ToLower(), cleanedTerm);
+            string[] categoryIDs = await _matchService.GetMatches(collection.ToLower(), language.ToLower(), cleanedTerm);
             
             List<IBestBetDisplay> displayItems = new List<IBestBetDisplay>();
 
             var categoryTasks = from categoryID in categoryIDs
-                                select _displayService.GetBestBetForDisplay(categoryID);
+                                select _displayService.GetBestBetForDisplay(collection.ToLower(), categoryID);
 
             var categoryItems = await Task.WhenAll(categoryTasks);
 

@@ -84,7 +84,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
             ESTokenAnalyzerService tokenService = GetTokenizerService(tokenizerConn);
             ESBestBetsMatchService service = GetMatchService(tokenService, connection);
 
-            string[] actualMatches = await service.GetMatches(lang, searchTerm);
+            string[] actualMatches = await service.GetMatches("live", lang, searchTerm);
 
             Assert.Equal(expectedCategories, actualMatches);
         }
@@ -143,7 +143,8 @@ namespace NCI.OCPL.Api.BestBets.Tests
             ESTokenAnalyzerService tokenService = GetTokenizerService(tokenizerConn);
             ESBestBetsMatchService service = GetMatchService(tokenService, connection);
 
-            await Assert.ThrowsAsync<APIErrorException>( () => service.IsHealthy() );
+            bool res = await service.IsHealthy();
+            Assert.False(res);
 
         }
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Xml;
@@ -42,11 +43,15 @@ namespace NCI.OCPL.Api.BestBets.Services
         /// <summary>
         /// Gets the best bets category list asynchronously
         /// </summary>
+        /// <param name="collection">The collection to use. This will be 'live' or 'preview'.</param>
         /// <param name="categoryID"></param>
         /// <returns></returns>
-        public async Task<IBestBetDisplay> GetBestBetForDisplay(string categoryID)
-        {
-            string requestUrl = _options.Host;
+        public async Task<IBestBetDisplay> GetBestBetForDisplay(string collection, string categoryID)
+        {            
+            string requestUrl = (collection == "preview") ?
+                _options.PreviewHost :
+                _options.LiveHost;
+            
             requestUrl += _options.BBCategoryPathFormatter;
             requestUrl = string.Format(requestUrl, categoryID);
 
@@ -84,25 +89,51 @@ namespace NCI.OCPL.Api.BestBets.Services
         /// </summary>
         public async Task<bool> IsHealthy()
         {
-            UriBuilder requestUrl = new UriBuilder(_options.Host);
+
+            var hostChecks = new Task<bool>[]
+            {
+                this.IsHostHealthy(_options.LiveHost),
+                this.IsHostHealthy(_options.PreviewHost),
+            };
+
+            return (await Task.WhenAll(hostChecks))
+                    .Aggregate(
+                        true, 
+                        (res, next) => res && next 
+                    );            
+        }
+
+        /// <summary>
+        /// Checks if a single host is healthy
+        /// </summary>
+        /// <returns>The host healthy.</returns>
+        private async Task<bool> IsHostHealthy(string host) {
+            
+            UriBuilder requestUrl = new UriBuilder(host);
             requestUrl.Path = _options.HealthCheckPath;
 
-            HttpResponseMessage message = await _client.GetAsync(requestUrl.Uri);
-
-            bool isHealthy;
-            if(message.IsSuccessStatusCode && message.StatusCode == HttpStatusCode.OK)
+            try
             {
-                isHealthy = true;
-            }
-            else
-            {
-                isHealthy = false;
+                HttpResponseMessage message = await _client.GetAsync(requestUrl.Uri);
 
-                _logger.LogError("Unable to fetch URL '{0}'.", requestUrl.Uri.ToString());
-                _logger.LogError("Status {0}, {1}", message.StatusCode, message.ReasonPhrase);
+                if (message.IsSuccessStatusCode && message.StatusCode == HttpStatusCode.OK)
+                {
+                    //This is the only condition that will return true.
+                    return true;
+                }
+                else
+                {
+                    _logger.LogError($"Unable to fetch URL '{requestUrl.Uri.ToString()}'.");
+                    _logger.LogError($"Status {message.StatusCode}, {message.ReasonPhrase}");
+                }
+
+            } catch (Exception ex) {
+                //WE need to swallow the error and just return false.
+                _logger.LogError($"Unable to fetch URL '{requestUrl.Uri.ToString()}'.");
+                _logger.LogError($"Error: {ex.Message}" );
             }
 
-            return isHealthy;
+            return false;
         }
     }
 }

@@ -26,7 +26,8 @@ namespace NCI.OCPL.Api.BestBets.Tests
                 .SetupGet(o => o.Value)
                 .Returns(new CGBBIndexOptions()
                 {
-                    AliasName = "BestBets"
+                    PreviewAliasName = "PreviewBestBets",
+                    LiveAliasName = "BestBets"
                 });
 
             return config.Object;

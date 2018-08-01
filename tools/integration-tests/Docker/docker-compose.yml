@@ -1,0 +1,22 @@
+version: '3'
+services:
+  elasticsearch:
+    build: elasticsearch
+    networks:
+      - overlay
+  cancergov:
+    build: cancergov
+    volumes:
+      - ./htdocs:/usr/local/apache2/htdocs/
+    networks:
+      - overlay
+  bestbets-api:
+    build: bestbets-api
+    networks:
+      - overlay
+  tester:
+    build: tester
+    networks:
+      - overlay
+networks:
+  overlay:

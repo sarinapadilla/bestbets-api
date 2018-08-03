@@ -1,0 +1,24 @@
+{   
+    "pipeline": { 
+        "transformers": [
+            {
+                "module": "./lib/transformers/category-to-match-transformer",
+                "config": {
+                    "eshosts": [ "http://elasticsearch:9200" ],
+                    "settingsPath": "es-mappings/settings.json",
+                    "analyzer": "nostem"
+                }
+            }
+        ],
+        "loader": {
+            "module": "./lib/loaders/elastic-bestbets-loader",
+            "config": {
+               "eshosts": [ "http://elasticsearch:9200" ],
+               "daysToKeep": 10,               
+               "aliasName": "bestbets_v1",
+               "mappingPath": "es-mappings/mappings.json",
+               "settingsPath": "es-mappings/settings.json"
+            }
+        }
+    }
+}

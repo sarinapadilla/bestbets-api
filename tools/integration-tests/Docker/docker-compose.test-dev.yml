@@ -6,12 +6,16 @@ version: '3'
 services:
   elasticsearch:
     build: elasticsearch
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
     networks:
       - overlay
   cancergov:
     image: httpd:2.4-alpine
     volumes:
-      - ./htdocs:/usr/local/apache2/htdocs/
+      - ./cancergov/htdocs:/usr/local/apache2/htdocs/
       - ./cancergov/apache-conf/conf/httpd.conf:/usr/local/apache2/conf/httpd.conf
       - ./cancergov/apache-conf/conf/extra:/usr/local/apache2/conf/extra
       - ./_shared/certs:/etc/apache2/ssl
@@ -26,16 +30,21 @@ services:
       dockerfile: loader/Dockerfile
     networks:
       - overlay
-
-#  bestbets-api:
-#    build: bestbets-api
-#    networks:
-#      - overlay
-#    ports:
-#      - "5000:5000"
-#    depends_on:
-#      - "cancergov"
-#      - "elasticsearch"
+    depends_on: 
+      - elasticsearch
+      - cancergov      
+  bestbets-api:
+    build: 
+      context: ../../../
+      dockerfile: tools/integration-tests/Docker/bestbets-api/Dockerfile
+    networks:
+      - overlay
+    ports:
+      - "5000:5000"
+    depends_on:
+      - "cancergov"
+      - "elasticsearch"
+      - "loader"
 
 networks:
   overlay:

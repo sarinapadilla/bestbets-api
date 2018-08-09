@@ -27,8 +27,12 @@ namespace NCI.OCPL.Api.BestBets
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env)
+        private readonly ILogger<Startup> _logger;        
+
+        public Startup(ILogger<Startup> logger, IHostingEnvironment env)
         {
+            _logger = logger;
+
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
@@ -117,6 +121,10 @@ namespace NCI.OCPL.Api.BestBets
             app.UseSwaggerUi3(typeof(Startup).GetTypeInfo().Assembly, settings =>
             {
                 settings.GeneratorSettings.DefaultPropertyNameHandling = PropertyNameHandling.CamelCase;
+                settings.PostProcess = document => {
+                    document.Host = null;
+                };
+
                 settings.SwaggerUiRoute = "";
             });
 

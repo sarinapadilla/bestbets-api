@@ -109,6 +109,9 @@ _TeamCity*
 # DotCover is a Code Coverage Tool
 *.dotCover
 
+# Coverlet output
+lcov.info
+
 # NCrunch
 _NCrunch_*
 .*crunch*.local.xml
@@ -252,3 +255,4 @@ buildNumber.properties
 .classpath
 .settings
 .DS_Store
+

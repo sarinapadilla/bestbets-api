@@ -9,13 +9,13 @@ function() {
 
   var config = {
     env: env,
-	  apihost: 'http://bestbets-api:5000'
+	  apiHost: 'http://bestbets-api:5000'
   };
 
   if (env == 'local') {
     // customize
     // e.g. config.foo = 'bar';
-    config.apihost = 'http://localhost:5000';
+    config.apiHost = 'http://localhost:5000';
   }
   return config;
 }

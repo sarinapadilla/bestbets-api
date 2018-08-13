@@ -4,6 +4,6 @@ Feature: test bestbets controller health
     * url apiHost
 
   Scenario: test status check
-    Given path 'status'
+    Given path '/BestBets/status'
     When method get
     Then status 200

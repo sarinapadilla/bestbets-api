@@ -1,13 +1,44 @@
 Feature: test bestbets controller get method
 
   Background:
-  * url apihost
+  * url apiHost
 
+  ############################################################
+  ## English Tests
+  ########################################################
   Scenario: get the live english bestbets for Visuals Online
-    Given path 'live', 'en', 'visuals+online'
+    Given path 'BestBets', 'live', 'en', 'visuals+online'
     When method get
     Then status 200
-    
+    And assert response.length == 1
+    And match response[0].name == "Cancer Images"
+    ## Test list items
+
+  ## Test empty live
+
+  Scenario: get the live english bestbets for Visuals Online
+    Given path 'BestBets', 'preview', 'en', 'visuals+online'
+    When method get
+    Then status 200
+    And assert response.length == 1
+    And match response[0].name == "Cancer Images"
+    ## Test list items
+
+  ## Test empty preview, but working live
+
+
+  ############################################################
+  ## Spanish Tests
+  ########################################################
+  Scenario: get the live spanish bestbets for Visuals Online
+    Given path 'BestBets', 'live', 'es', 'imágenes'
+    When method get
+    Then status 200
+    And assert response.length == 2
+    And match response[0].name == "Multimedia" 
+    And match response[0].name == "Fotos de cáncer"
+    ## Test list items
+
 
 #* def first = response[0]
 #

@@ -52,6 +52,7 @@ namespace NCI.OCPL.Api.BestBets
             //Add Configuration mappings.
             services.Configure<CGBestBetsDisplayServiceOptions>(Configuration.GetSection("CGBestBetsDisplayService"));
             services.Configure<CGBBIndexOptions>(Configuration.GetSection("CGBestBetsIndex"));
+            services.Configure<NSwagOptions>(Configuration.GetSection("NSwag"));
 
             //Add HttpClient singleton, which is used by the display service.
             services.AddSingleton<HttpClient, HttpClient>();
@@ -121,11 +122,22 @@ namespace NCI.OCPL.Api.BestBets
             app.UseSwaggerUi3(typeof(Startup).GetTypeInfo().Assembly, settings =>
             {
                 settings.GeneratorSettings.DefaultPropertyNameHandling = PropertyNameHandling.CamelCase;
+
+                if(!string.IsNullOrEmpty(Configuration["NSwag:Title"]))
+                {
+                    settings.GeneratorSettings.Title = Configuration["NSwag:Title"];
+                }
+
+                if (!string.IsNullOrEmpty(Configuration["NSwag:Description"]))
+                {
+                    settings.GeneratorSettings.Description = Configuration["NSwag:Description"];
+                }
+
+                settings.SwaggerUiRoute = "";
                 settings.PostProcess = document => {
                     document.Host = null;
                 };
 
-                settings.SwaggerUiRoute = "";
             });
 
 

@@ -13,7 +13,7 @@ dotnet test test/**
 # (../../lcov is because this will run from the test project...)
 dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=lcov /p:CoverletOutput=../../lcov test/**
 # Publish to publish directory
-dotnet publish -c Release -o ../../publish src/**
+dotnet publish -c Release -o ../../publish src/NCI.OCPL.Api.BestBets
 ```
 
 

@@ -35,8 +35,8 @@ services:
       - cancergov      
   bestbets-api:
     build: 
-      context: ../../../
-      dockerfile: tools/integration-tests/Docker/bestbets-api/Dockerfile
+      context: ../../
+      dockerfile: tools/integration-test-docker/bestbets-api/Dockerfile
     networks:
       - overlay
     ports:

@@ -36,7 +36,7 @@ Feature: test bestbets controller get method
     Then status 200
     And assert response.length == 2
     And match response[0].name == "Multimedia" 
-    And match response[0].name == "Fotos de cáncer"
+    And match response[1].name == "Fotos de cáncer"
     ## Test list items
 
 

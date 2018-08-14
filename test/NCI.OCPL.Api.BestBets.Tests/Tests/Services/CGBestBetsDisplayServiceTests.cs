@@ -22,7 +22,8 @@ namespace NCI.OCPL.Api.BestBets.Tests.CGBestBetsDisplayServiceTests
         
         public static IEnumerable<object[]> XmlDeserializingData => new[] {
             new object[] { new PancoastTumorCategoryTestData() },
-            new object[] { new BreastCancerCategoryTestData() }
+            new object[] { new BreastCancerCategoryTestData() },
+            new object[] { new FotosDeCancerCategoryTestData() }
         };
 
         /// <summary>

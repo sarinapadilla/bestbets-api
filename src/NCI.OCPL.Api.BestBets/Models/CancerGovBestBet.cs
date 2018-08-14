@@ -107,7 +107,7 @@ namespace NCI.OCPL.Api.BestBets
                         break;
                     }
                     case "CategoryName" : {
-                        Name = ReadElementAsTrimmedString(reader);
+                        Name = System.Net.WebUtility.HtmlDecode(ReadElementAsTrimmedString(reader));
                         break;
                     }
                     case "CategoryWeight" : {

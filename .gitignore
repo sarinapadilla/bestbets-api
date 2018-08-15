@@ -256,3 +256,4 @@ buildNumber.properties
 .settings
 .DS_Store
 
+.vscode/

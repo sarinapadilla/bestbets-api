@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using Elasticsearch.Net;
 using Nest;
 
+using NCI.OCPL.Api.Common;
 
 
 namespace NCI.OCPL.Api.BestBets.Services

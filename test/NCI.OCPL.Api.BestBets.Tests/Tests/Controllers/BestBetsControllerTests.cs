@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging.Testing;
 
@@ -14,13 +15,12 @@ using Newtonsoft.Json.Linq;
 using Moq;
 using Xunit;
 
-using NCI.OCPL.Utils.Testing;
-
+using NCI.OCPL.Api.Common;
+using NCI.OCPL.Api.Common.Testing;
 using NCI.OCPL.Api.BestBets;
 using NCI.OCPL.Api.BestBets.Controllers;
 using NCI.OCPL.Api.BestBets.Tests.CategoryTestData;
 using NCI.OCPL.Api.BestBets.Tests.ESHealthTestData;
-using System.Threading.Tasks;
 
 namespace NCI.OCPL.Api.BestBets.Tests
 {

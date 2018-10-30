@@ -1,7 +1,6 @@
-namespace NCI.OCPL.Api.BestBets
+﻿
+namespace NCI.OCPL.Api.Common
 {
-    /// TODO: APIErrorException should only be defined once.
-
     /// <summary>
     /// Represents an Exception Raised by the API to be returned to the consumer
     /// </summary>
@@ -19,7 +18,8 @@ namespace NCI.OCPL.Api.BestBets
         /// </summary>
         /// <param name="httpStatusCode"></param>
         /// <param name="message"></param>
-        public APIErrorException(int httpStatusCode, string message) : base(message) {
+        public APIErrorException(int httpStatusCode, string message) : base(message)
+        {
             HttpStatusCode = httpStatusCode;
         }
     }

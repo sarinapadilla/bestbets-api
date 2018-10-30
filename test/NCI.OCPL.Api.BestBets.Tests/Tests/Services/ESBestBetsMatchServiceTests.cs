@@ -1,20 +1,16 @@
+using System;
 using System.Collections.Generic;
-using System.Net.Http;
-using Microsoft.Extensions.Options;
 
-using Xunit;
-using Moq;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging.Testing;
 
 using Nest;
 using Elasticsearch.Net;
-
-using NCI.OCPL.Utils.Testing;
+using Xunit;
 
 using NCI.OCPL.Api.BestBets.Services;
 using NCI.OCPL.Api.BestBets.Tests.ESHealthTestData;
 using NCI.OCPL.Api.BestBets.Tests.ESMatchTestData;
-using System;
-using Microsoft.Extensions.Logging.Testing;
 
 namespace NCI.OCPL.Api.BestBets.Tests
 {

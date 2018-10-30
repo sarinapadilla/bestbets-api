@@ -3,15 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+
 using Newtonsoft.Json;
 
 using NCI.OCPL.Api.BestBets;
-using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
+using NCI.OCPL.Api.Common;
+
+
 
 namespace NCI.OCPL.Api.BestBets.Services
 {

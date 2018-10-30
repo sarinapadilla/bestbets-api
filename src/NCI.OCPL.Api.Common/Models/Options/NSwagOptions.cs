@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace NCI.OCPL.Api.BestBets
+namespace NCI.OCPL.Api.Common
 {
     /// <summary>
     /// NSwag configuration

@@ -10,7 +10,7 @@ using Xunit;
 using Moq;
 using RichardSzalay.MockHttp;
 
-using NCI.OCPL.Utils.Testing;
+using NCI.OCPL.Api.Common.Testing;
 
 using NCI.OCPL.Api.BestBets.Services;
 using NCI.OCPL.Api.BestBets.Tests.CategoryTestData;

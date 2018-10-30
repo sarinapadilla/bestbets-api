@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 
 using Elasticsearch.Net;
-using System.IO;
-using System.Text;
 using Newtonsoft.Json.Linq;
-using System.Reflection;
 
-namespace NCI.OCPL.Api.BestBets.Tests.Util
+namespace NCI.OCPL.Api.Common.Testing
 {
     public class ElasticsearchInterceptingConnection : IConnection
     {

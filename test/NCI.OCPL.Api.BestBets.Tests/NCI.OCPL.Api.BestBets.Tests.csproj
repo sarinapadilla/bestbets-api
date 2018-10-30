@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../../src/NCI.OCPL.Api.BestBets/NCI.OCPL.Api.BestBets.csproj" />
+    <ProjectReference Include="..\..\src\NCI.OCPL.Api.Common.Testing\NCI.OCPL.Api.Common.Testing.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,4 +30,7 @@
     <PackageReference Include="coverlet.msbuild" Version="1.1.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Tests\Util\" />
+  </ItemGroup>
 </Project>

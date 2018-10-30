@@ -1,18 +1,23 @@
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
 
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace NCI.OCPL.Utils.Testing
+namespace NCI.OCPL.Api.Common.Testing
 {
+    /// <summary>
+    /// Helper tools for loading responses from files and 
+    /// deserializing XML to objects.
+    /// </summary>
     public static class TestingTools
     {
         /// <summary>
         /// Gets a test file from the TestData folder and returns an array of bytes
         /// </summary>
         /// <returns>An array of byte</returns>
-        public static byte[] GetTestFileAsBytes(string testFile) {
+        public static byte[] GetTestFileAsBytes(string testFile)
+        {
 
             //Get the path to the file.
             string path = GetPathToTestFile(testFile);
@@ -28,7 +33,7 @@ namespace NCI.OCPL.Utils.Testing
         /// </summary>
         /// <param name="testFile">The name of the testfile</param>
         /// <returns></returns>
-        public static Stream GetTestFileAsStream(string testFile) 
+        public static Stream GetTestFileAsStream(string testFile)
         {
             //Get the path to the file.
             string path = GetPathToTestFile(testFile);
@@ -36,7 +41,7 @@ namespace NCI.OCPL.Utils.Testing
             //Get the bytes
             Stream contents = File.OpenRead(path);
 
-            return contents;            
+            return contents;
         }
 
         /// <summary>
@@ -45,7 +50,7 @@ namespace NCI.OCPL.Utils.Testing
         /// <param name="testFile">The test XML filename</param>
         /// <remarks>This will not handle any exceptions.</remarks>
         /// <returns>The deserialized object.</returns>
-        public static T DeserializeXML<T>(string testFile) where T : class 
+        public static T DeserializeXML<T>(string testFile) where T : class
         {
             // Get the path to the file.
             string filePath = GetPathToTestFile(testFile);
@@ -68,15 +73,18 @@ namespace NCI.OCPL.Utils.Testing
         /// </summary>
         /// <param name="testFile">The test filename</param>
         /// <returns>The full path to the file.</returns>
-        public static string GetPathToTestFile(string testFile) {
+        public static string GetPathToTestFile(string testFile)
+        {
             // Determine where the output folder is that should be the parent for the TestData
             string assmPath = Path.GetDirectoryName(typeof(TestingTools).GetTypeInfo().Assembly.Location);
-            
+
             // Build a path to the test file
-            string path = Path.Combine(new string[] { assmPath, "TestData", testFile } );
+            string path = Path.Combine(new string[] { assmPath, "TestData", testFile });
 
             return path;
         }
 
     }
+
+
 }

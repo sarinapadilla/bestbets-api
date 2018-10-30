@@ -10,6 +10,8 @@ using Microsoft.Extensions.Logging;
 using Nest;
 using Elasticsearch.Net;
 
+using NCI.OCPL.Api.Common;
+
 namespace NCI.OCPL.Api.BestBets.Controllers
 {
     [Route("[controller]")]

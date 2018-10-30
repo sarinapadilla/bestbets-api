@@ -1,13 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using Elasticsearch.Net;
 using Nest;
-using System.Threading.Tasks;
-using System.Linq;
+
+using NCI.OCPL.Api.Common;
 
 namespace NCI.OCPL.Api.BestBets.Services
 {

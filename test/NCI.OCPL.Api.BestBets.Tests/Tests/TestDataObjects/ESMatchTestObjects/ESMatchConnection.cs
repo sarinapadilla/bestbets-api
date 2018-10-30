@@ -1,13 +1,15 @@
 using System;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 
 using Elasticsearch.Net;
 
-using NCI.OCPL.Utils.Testing;
-using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
+
+using NCI.OCPL.Api.Common.Testing;
 using NCI.OCPL.Api.BestBets.Tests.Util;
 
 namespace NCI.OCPL.Api.BestBets.Tests.ESMatchTestData

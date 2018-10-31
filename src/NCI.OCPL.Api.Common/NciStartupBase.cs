@@ -141,9 +141,8 @@ namespace NCI.OCPL.Api.Common
                 app.UseDeveloperExceptionPage();
             }
 
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
-            //AddFile???
+            //Setup logging
+            ConfigureLogging(app, env, loggerFactory);
 
             app.UseStaticFiles();
 
@@ -241,6 +240,23 @@ namespace NCI.OCPL.Api.Common
         /// </summary>
         /// <param name="services">Services.</param>
         protected abstract void AddAppServices(IServiceCollection services);
+
+        /// <summary>
+        /// Sets up the logging for the application. Currently it includes:
+        /// <ul>
+        ///   <li>Console logging based on Logging configuration</li>
+        ///   <li>Debugging if enabled</li>
+        /// </ul>
+        /// </summary>
+        /// <remarks>You should really call base() if you override this method.</remarks>
+        /// <param name="app">The application</param>
+        /// <param name="env">The hosting environment</param>
+        /// <param name="loggerFactory">The logger factory</param>
+        protected virtual void ConfigureLogging(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory) {
+            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+            loggerFactory.AddDebug();
+            //AddFile???
+        }
 
         /*****************************
          *     Configure methods     *

@@ -19,8 +19,8 @@ using NCI.OCPL.Api.Common;
 using NCI.OCPL.Api.Common.Testing;
 using NCI.OCPL.Api.BestBets;
 using NCI.OCPL.Api.BestBets.Controllers;
-using NCI.OCPL.Api.BestBets.Tests.CategoryTestData;
 using NCI.OCPL.Api.BestBets.Tests.ESHealthTestData;
+using NCI.OCPL.Api.BestBets.Tests.ESDisplayTestData;
 
 namespace NCI.OCPL.Api.BestBets.Tests
 {
@@ -30,13 +30,9 @@ namespace NCI.OCPL.Api.BestBets.Tests
     {
         public static IEnumerable<object[]> XmlDeserializingData => new[] {
             new object[] {
-                "pancoast", 
-                new PancoastTumorCategoryTestData() 
-            }//,
-            //new object[] {
-            //    "breast cancer", 
-            //    new BreastCancerCategoryTestData() 
-            //}
+                "pancoast",
+                new PancoastTumorDisplayTestData()
+            }
         };
 
         [Fact]
@@ -121,17 +117,19 @@ namespace NCI.OCPL.Api.BestBets.Tests
 
 
         [Theory, MemberData(nameof(XmlDeserializingData))]
-        public async void Get_EnglishTerm(string searchTerm, BaseCategoryTestData data) 
+        public async void Get_EnglishTerm(string searchTerm, BaseDisplayTestData displayData) 
         {
+
+
             Mock<IBestBetsDisplayService> displayService = new Mock<IBestBetsDisplayService>(); 
             displayService
                 .Setup(
                     dispSvc => dispSvc.GetBestBetForDisplay(
                         It.Is<string>(coll => coll == "live"),
-                        It.Is<string>(catID => catID == data.ExpectedData.ID)
+                        It.Is<string>(catID => catID == displayData.ExpectedData.ID)
                     )
                 )
-                .Returns(Task.FromResult<IBestBetDisplay>(TestingTools.DeserializeXML<CancerGovBestBet>(data.TestFilePath)));
+                .Returns(Task.FromResult<IBestBetDisplay>(displayData.ExpectedData));
 
             Mock<IBestBetsMatchService> matchService = new Mock<IBestBetsMatchService>();
             matchService
@@ -142,7 +140,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
                         It.Is<string>(term => term == searchTerm)
                     )
                 )
-                .Returns(Task.FromResult(new string[] { data.ExpectedData.ID }));
+                .Returns(Task.FromResult(new string[] { displayData.ExpectedData.ID }));
             
             // Create instance of controller
             BestBetsController controller = new BestBetsController(                
@@ -153,7 +151,7 @@ namespace NCI.OCPL.Api.BestBets.Tests
 
             IBestBetDisplay[] actualItems = await controller.Get("live", "en", searchTerm);
 
-            Assert.Equal(actualItems, new IBestBetDisplay[] { data.ExpectedData }, new IBestBetDisplayComparer());
+            Assert.Equal(actualItems, new IBestBetDisplay[] { displayData.ExpectedData }, new IBestBetDisplayComparer());
         }
 
         /// <summary>

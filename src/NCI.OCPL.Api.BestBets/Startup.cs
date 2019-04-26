@@ -49,7 +49,6 @@ namespace NCI.OCPL.Api.BestBets
         /// <param name="services">Services.</param>
         protected override void AddAdditionalConfigurationMappings(IServiceCollection services)
         {
-            services.Configure<CGBestBetsDisplayServiceOptions>(Configuration.GetSection("CGBestBetsDisplayService"));
             services.Configure<CGBBIndexOptions>(Configuration.GetSection("CGBestBetsIndex"));
 
         }
@@ -61,7 +60,7 @@ namespace NCI.OCPL.Api.BestBets
         protected override void AddAppServices(IServiceCollection services)
         {
             //Add our Display Service
-            services.AddTransient<IBestBetsDisplayService, CGBestBetsDisplayService>();
+            services.AddTransient<IBestBetsDisplayService, ESBestBetsDisplayService>();
 
             //Add in the token analyzer
             services.AddTransient<ITokenAnalyzerService, ESTokenAnalyzerService>();

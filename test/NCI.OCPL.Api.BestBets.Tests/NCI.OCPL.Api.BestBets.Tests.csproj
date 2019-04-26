@@ -10,6 +10,13 @@
 
   <ItemGroup>
     <None Update="xunit.runner.json;TestData\**\*">
+    </None>
+    <None Include="TestData\**\*" CopyToOutputDirectory="PreserveNewest">
+    </None>
+    <None Update="TestData\ESDisplayData\FotosDeCancer.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="TestData\ESDisplayData\PancoastTumor.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -32,5 +39,18 @@
 
   <ItemGroup>
     <Folder Include="Tests\Util\" />
+    <Folder Include="Tests\TestDataObjects\ESDisplayTestObjects\" />
+    <Folder Include="TestData\ESDisplayData\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="TestData\ESMatchData\breastcancer_1.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\ESMatchData\breastcancer_2.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\ESMatchData\breastcancer_analyze.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>

@@ -104,69 +104,6 @@ namespace NCI.OCPL.Api.BestBets.Services
             }
 
             return result;
-        
-        }
-
-        /// <summary>
-        /// True if CGBestBetsDisplayService is able to retrieve BestBets.
-        /// </summary>
-        public async Task<bool> IsHealthy()
-        {
-
-            var hostChecks = new Task<bool>[]
-            {
-                this.IsHostHealthy(_bestbetsConfig.LiveAliasName),
-                this.IsHostHealthy(_bestbetsConfig.PreviewAliasName),
-            };
-
-            return (await Task.WhenAll(hostChecks))
-                    .Aggregate(
-                        true,
-                        (res, next) => res && next
-                    );
-        }
-
-        /// <summary>
-        /// Checks if a single host is healthy
-        /// </summary>
-        /// <returns>The host healthy.</returns>
-        private async Task<bool> IsHostHealthy(string alias)
-        {
-            // Use the cluster health API to verify that the Best Bets index is functioning.
-            // Maps to https://ncias-d1592-v.nci.nih.gov:9299/_cluster/health/bestbets?pretty (or other server)
-            //
-            // References:
-            // https://www.elastic.co/guide/en/elasticsearch/reference/master/cluster-health.html
-            // https://github.com/elastic/elasticsearch/blob/master/rest-api-spec/src/main/resources/rest-api-spec/api/cluster.health.json#L20
-
-            try
-            {
-                IClusterHealthResponse response = await _elasticClient.ClusterHealthAsync(hd => hd.Index(alias));
-
-                if (!response.IsValid)
-                {
-                    _logger.LogError($"Error checking ElasticSearch health for {alias}.");
-                    _logger.LogError($"Returned debug info: {response.DebugInformation}.");
-                }
-                else
-                {
-                    if (response.Status == "green" || response.Status == "yellow")
-                    {
-                        //This is the only condition that will return true
-                        return true;
-                    }
-                    else
-                    {
-                        _logger.LogError($"Alias ${alias} status is not good");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error checking ElasticSearch health for {alias}.");
-                _logger.LogError($"Exception: {ex.Message}.");
-            }
-            return false;
         }
     }
 }

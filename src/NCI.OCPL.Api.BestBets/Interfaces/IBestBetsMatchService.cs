@@ -5,7 +5,7 @@ namespace NCI.OCPL.Api.BestBets
     /// <summary>
     /// Defines an interface to get best bets matches
     /// </summary>
-    public interface IBestBetsMatchService : IHealthCheckService
+    public interface IBestBetsMatchService
     {
         /// <summary>
         /// Gets a list of the BestBet Category IDs that matched our term 

@@ -10,13 +10,6 @@
 
   <ItemGroup>
     <None Update="xunit.runner.json;TestData\**\*">
-    </None>
-    <None Include="TestData\**\*" CopyToOutputDirectory="PreserveNewest">
-    </None>
-    <None Update="TestData\ESDisplayData\FotosDeCancer.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="TestData\ESDisplayData\PancoastTumor.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

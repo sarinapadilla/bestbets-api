@@ -17,7 +17,5 @@ namespace NCI.OCPL.Api.BestBets
         /// <param name="term">The term to get token count</param>
         /// <returns>The number of tokens in the term</returns>
         Task<int> GetTokenCount(string collection, string term);
-
-
     }
 }

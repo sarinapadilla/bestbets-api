@@ -7,7 +7,7 @@ namespace NCI.OCPL.Api.BestBets
     /// <summary>
     /// Interface defines the methods of a service to retrieve the BestBets display (e.g. the list of links)
     /// </summary>
-    public interface IBestBetsDisplayService : IHealthCheckService
+    public interface IBestBetsDisplayService
     {
 
         /// <summary>

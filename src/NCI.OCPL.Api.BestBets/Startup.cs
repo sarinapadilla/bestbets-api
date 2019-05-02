@@ -59,6 +59,9 @@ namespace NCI.OCPL.Api.BestBets
         /// <param name="services">Services.</param>
         protected override void AddAppServices(IServiceCollection services)
         {
+            //Add our Health Service
+            services.AddTransient<IHealthCheckService, ESBestBetsHealthService>();
+
             //Add our Display Service
             services.AddTransient<IBestBetsDisplayService, ESBestBetsDisplayService>();
 
@@ -67,7 +70,6 @@ namespace NCI.OCPL.Api.BestBets
 
             //Add our Match Service
             services.AddTransient<IBestBetsMatchService, ESBestBetsMatchService>();
-
         }
 
         /*****************************

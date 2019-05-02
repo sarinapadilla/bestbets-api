@@ -19,6 +19,7 @@ namespace NCI.OCPL.Api.BestBets.Controllers
     {
         private readonly IBestBetsMatchService _matchService;
         private readonly IBestBetsDisplayService _displayService;
+        private readonly IHealthCheckService _healthService;
         private readonly ILogger<BestBetsController> _logger;
 
         public const string HEALTHY_STATUS = "alive!";
@@ -41,15 +42,18 @@ namespace NCI.OCPL.Api.BestBets.Controllers
         /// </summary>
         /// <param name="matchService">An IBestBetsMatchService for getting matched best bets categories</param>
         /// <param name="displayService">An IBestBetsDisplayService for getting the display HTML for matched categories</param>
+        /// <param name="healthService">An IHealthCheckService for determining whether Elasticsearch can be reached</param>
         /// <param name="logger">A logger</param>
         public BestBetsController(
             IBestBetsMatchService matchService,
             IBestBetsDisplayService displayService,
+            IHealthCheckService healthService,
             ILogger<BestBetsController> logger
         ) 
         {
             this._matchService = matchService;
             this._displayService = displayService;
+            this._healthService = healthService;
             this._logger = logger;
         }
 
@@ -118,18 +122,15 @@ namespace NCI.OCPL.Api.BestBets.Controllers
         {
             IHealthCheckService[] monitoredServices = new IHealthCheckService[]
             {
-                _matchService,
-                _displayService
+                _healthService
             };
-
+            
             // Check for all services so we can log the status of all failures rather than
             // than just the first one.
             bool allHealthy = true;
-
             //Select an async callback that keeps the name with the service.
             var healthChecks = monitoredServices.Select(async svc => new
             {
-                Name = svc.GetType().Name,
                 Status = await svc.IsHealthy()
             });
 
@@ -140,7 +141,7 @@ namespace NCI.OCPL.Api.BestBets.Controllers
                 if (!result.Status)
                 {
                     allHealthy = false;
-                    _logger.LogError("Service '{0}' not healthy.", result.Name);
+                    _logger.LogError("Service not healthy.");
                 }
             }
 

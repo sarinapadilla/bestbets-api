@@ -85,65 +85,6 @@ namespace NCI.OCPL.Api.BestBets.Tests
             Assert.Equal(expectedCategories, actualMatches);
         }
 
-        [Theory]
-        [InlineData("green")]
-        [InlineData("yellow")]
-        public async void HealthStatus_Healthy(string datafile)
-        {
-            ESHealthConnection connection = new ESHealthConnection(datafile);
-            // The tokenizer doesn't get called during a healthcheck for the match service,
-            // so we don't need to supply a valid data file for the mock tokenizer.
-            ESHealthTokenizerConnection tokenizerConn = new ESHealthTokenizerConnection(null);
-
-            ESTokenAnalyzerService tokenService = GetTokenizerService(tokenizerConn);
-            ESBestBetsMatchService service = GetMatchService(tokenService, connection);
-
-            bool isHealthy = await service.IsHealthy();
-
-            Assert.True(isHealthy);
-        }
-
-        [Theory]
-        [InlineData("red")]
-        [InlineData("unexpected")]   // i.e. "Unexpected color"
-        public async void HealthStatus_Unhealthy(string datafile)
-        {
-            ESHealthConnection connection = new ESHealthConnection(datafile);
-            // The tokenizer doesn't get called during a healthcheck for the match service,
-            // so we don't need to supply a valid data file for the mock tokenizer.
-            ESHealthTokenizerConnection tokenizerConn = new ESHealthTokenizerConnection(null);
-
-            ESTokenAnalyzerService tokenService = GetTokenizerService(tokenizerConn);
-            ESBestBetsMatchService service = GetMatchService(tokenService, connection);
-
-            bool isHealthy = await service.IsHealthy();
-
-            Assert.False(isHealthy);
-        }
-
-        /// <summary>
-        /// Test for when the ES healthcheck returns a non-200 response code
-        /// (response.IsValid comes back as false).
-        /// </summary>
-        /// <param name="httpStatus"></param>
-        [Theory]
-        [InlineData(404)]
-        [InlineData(500)]
-        public async void HealthStatus_InvalidResponse(int httpStatus)
-        {
-            ESErrorConnection connection = new ESErrorConnection(httpStatus);
-            // The tokenizer doesn't get called during a healthcheck for the match service,
-            // so we don't need to supply a valid data file for the mock tokenizer.
-            ESHealthTokenizerConnection tokenizerConn = new ESHealthTokenizerConnection(null);
-
-            ESTokenAnalyzerService tokenService = GetTokenizerService(tokenizerConn);
-            ESBestBetsMatchService service = GetMatchService(tokenService, connection);
-
-            bool res = await service.IsHealthy();
-            Assert.False(res);
-
-        }
-
         private ESTokenAnalyzerService GetTokenizerService(IConnection connection)
         {
             //While this has a URI, it does not matter, an InMemoryConnection never requests

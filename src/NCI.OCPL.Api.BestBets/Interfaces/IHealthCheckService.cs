@@ -1,4 +1,6 @@
 ﻿
+using System.Threading.Tasks;
+
 namespace NCI.OCPL.Api.BestBets
 {
     /// <summary>
@@ -10,6 +12,6 @@ namespace NCI.OCPL.Api.BestBets
         /// <summary>
         /// True if a service is able to fulfill requests.
         /// </summary>
-        bool IsHealthy { get; }
+        Task<bool> IsHealthy();
     }
 }

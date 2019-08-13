@@ -1,24 +1,19 @@
-﻿using System.Collections.Generic;
-using System.Net.Http;
-using Microsoft.Extensions.Options;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
 
-using Xunit;
-using Moq;
+using Microsoft.Extensions.Logging.Testing;
+using Microsoft.Extensions.Options;
 
 using Nest;
 using Elasticsearch.Net;
-
-using NCI.OCPL.Utils.Testing;
-
-using NCI.OCPL.Api.BestBets.Services;
-using NCI.OCPL.Api.BestBets.Tests.ESMatchTestData;
-using System;
-using Microsoft.Extensions.Logging.Testing;
-using NCI.OCPL.Api.BestBets.Tests.Util;
 using Newtonsoft.Json.Linq;
-using System.IO;
-using Newtonsoft.Json;
-using System.Text;
+using Xunit;
+
+using NCI.OCPL.Api.Common.Testing;
+using NCI.OCPL.Api.BestBets.Services;
+
 
 namespace NCI.OCPL.Api.BestBets.Tests
 {
@@ -47,8 +42,8 @@ namespace NCI.OCPL.Api.BestBets.Tests
             //TODO: Add crazier tests
         };
 
-        [Theory, MemberData("GetTokenCountData")]
-        public void GetTokenCount_Responses(
+        [Theory, MemberData(nameof(GetTokenCountData))]
+        public async void GetTokenCount_Responses(
            string searchTerm,           
            string language,
            object[] responseTokens,
@@ -80,11 +75,12 @@ namespace NCI.OCPL.Api.BestBets.Tests
             IOptions<CGBBIndexOptions> config = GetMockConfig();
 
             ESTokenAnalyzerService service = new ESTokenAnalyzerService(client, config, new NullLogger<ESTokenAnalyzerService>());
-            int actualCount = service.GetTokenCount(searchTerm);
+            int actualCount = await service.GetTokenCount("live", searchTerm);
 
             Assert.Equal(expectedCount, actualCount);
 
         }
 
+        //TODO: Test failure after repeated attempts.
     }
 }

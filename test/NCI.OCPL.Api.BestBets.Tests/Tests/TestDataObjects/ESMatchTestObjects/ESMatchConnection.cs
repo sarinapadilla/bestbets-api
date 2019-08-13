@@ -1,13 +1,15 @@
 using System;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 
 using Elasticsearch.Net;
 
-using NCI.OCPL.Utils.Testing;
-using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
+
+using NCI.OCPL.Api.Common.Testing;
 using NCI.OCPL.Api.BestBets.Tests.Util;
 
 namespace NCI.OCPL.Api.BestBets.Tests.ESMatchTestData
@@ -41,7 +43,27 @@ namespace NCI.OCPL.Api.BestBets.Tests.ESMatchTestData
                 dynamic postObj = this.GetRequestPost(req);
 
                 //Determine which round we are performing
-                int numTokens = postObj["params"].matchedtokencount;
+                //int numTokens = postObj["params"].matchedtokencount;
+
+                //If this is one item the bool node will be the nested match
+                //if it is both exact and matches, then the bool node will
+                //be a should. This code is tightly matched to the built query
+                //in the implementation
+                int numTokens = -1;
+
+                var boolNode = postObj["query"]["bool"];
+                if (boolNode["should"] != null) {
+                    numTokens = boolNode["should"][0]
+                                        ["bool"]["must"][3]
+                                        ["match"]["synonym"]
+                                        ["minimum_should_match"].ToObject<int>();
+                } else {
+                    numTokens = boolNode["must"][3]
+                                        ["match"]["synonym"]
+                                        ["minimum_should_match"].ToObject<int>();
+                }
+
+
 
                 //Get the file name for this round
                 res.Stream = TestingTools.GetTestFileAsStream(GetTestFileName(numTokens));

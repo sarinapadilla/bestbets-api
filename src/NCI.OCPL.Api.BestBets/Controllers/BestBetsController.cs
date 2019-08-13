@@ -10,6 +10,8 @@ using Microsoft.Extensions.Logging;
 using Nest;
 using Elasticsearch.Net;
 
+using NCI.OCPL.Api.Common;
+
 namespace NCI.OCPL.Api.BestBets.Controllers
 {
     [Route("[controller]")]
@@ -17,6 +19,7 @@ namespace NCI.OCPL.Api.BestBets.Controllers
     {
         private readonly IBestBetsMatchService _matchService;
         private readonly IBestBetsDisplayService _displayService;
+        private readonly IHealthCheckService _healthService;
         private readonly ILogger<BestBetsController> _logger;
 
         public const string HEALTHY_STATUS = "alive!";
@@ -39,23 +42,39 @@ namespace NCI.OCPL.Api.BestBets.Controllers
         /// </summary>
         /// <param name="matchService">An IBestBetsMatchService for getting matched best bets categories</param>
         /// <param name="displayService">An IBestBetsDisplayService for getting the display HTML for matched categories</param>
+        /// <param name="healthService">An IHealthCheckService for determining whether Elasticsearch can be reached</param>
         /// <param name="logger">A logger</param>
         public BestBetsController(
             IBestBetsMatchService matchService,
             IBestBetsDisplayService displayService,
+            IHealthCheckService healthService,
             ILogger<BestBetsController> logger
         ) 
         {
             this._matchService = matchService;
             this._displayService = displayService;
+            this._healthService = healthService;
             this._logger = logger;
         }
 
-
+        /// <summary>
+        /// Get the Best Bet Categories specified language and term.
+        /// </summary>
+        /// <returns>The get.</returns>
+        /// <param name="collection">The collection to use. For normal operation use 'live'.</param>
+        /// <param name="language">The language of the results. This should be either 'en' for English or 'es' for Spanish.</param>
+        /// <param name="term">The search term to get categories for.</param>
         // GET api/values/5
-        [HttpGet("{language}/{term}")]
-        public IBestBetDisplay[] Get(string language, string term)
+        [HttpGet("{collection}/{language}/{term}")]
+        public async Task<IBestBetDisplay[]> Get(string collection, string language, string term)
         {
+
+            if (String.IsNullOrWhiteSpace(collection))
+                throw new APIErrorException(400, "You must supply a collection, language and search term");
+
+            if (collection.ToLower() != "preview" && collection.ToLower() != "live") 
+                throw new APIErrorException(404, "Unsupported collection. Please try 'live'");
+            
             if (String.IsNullOrWhiteSpace(language))
                 throw new APIErrorException(400, "You must supply a language and search term");
 
@@ -68,14 +87,16 @@ namespace NCI.OCPL.Api.BestBets.Controllers
             // Step 1. Remove Punctuation
             string cleanedTerm = CleanTerm(term);
 
-            string[] categoryIDs = _matchService.GetMatches(language.ToLower(), cleanedTerm);
+            string[] categoryIDs = await _matchService.GetMatches(collection.ToLower(), language.ToLower(), cleanedTerm);
             
-            List<IBestBetDisplay> displayItems = new List<IBestBetDisplay>();            
+            List<IBestBetDisplay> displayItems = new List<IBestBetDisplay>();
 
-            //Now get categories for ID.
-            foreach (string categoryID in categoryIDs)
-            {
-                IBestBetDisplay item = _displayService.GetBestBetForDisplay(categoryID);
+            var categoryTasks = from categoryID in categoryIDs
+                                select _displayService.GetBestBetForDisplay(collection.ToLower(), categoryID);
+
+            var categoryItems = await Task.WhenAll(categoryTasks);
+
+            foreach (IBestBetDisplay item in categoryItems ) {
                 displayItems.Add(new BestBetAPIGetResult()
                 {
                     ID = item.ID,
@@ -97,23 +118,30 @@ namespace NCI.OCPL.Api.BestBets.Controllers
         /// all services are running. If unhealthy services are found, APIErrorException is thrown
         /// with HTTPStatusCode set to 500.</returns>
         [HttpGet("status")]
-        public string GetStatus()
+        public async Task<string> GetStatus()
         {
             IHealthCheckService[] monitoredServices = new IHealthCheckService[]
             {
-                _matchService,
-                _displayService
+                _healthService
             };
-
+            
             // Check for all services so we can log the status of all failures rather than
             // than just the first one.
             bool allHealthy = true;
-            foreach (IHealthCheckService service in monitoredServices)
+            //Select an async callback that keeps the name with the service.
+            var healthChecks = monitoredServices.Select(async svc => new
             {
-                if (!service.IsHealthy)
+                Status = await svc.IsHealthy()
+            });
+
+            var results = await Task.WhenAll(healthChecks);
+
+            foreach (var result in results)
+            {
+                if (!result.Status)
                 {
                     allHealthy = false;
-                    _logger.LogError("Service '{0}' not healthy.", service.GetType().Name);
+                    _logger.LogError("Service not healthy.");
                 }
             }
 

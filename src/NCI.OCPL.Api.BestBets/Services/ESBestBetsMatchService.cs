@@ -1,10 +1,15 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using Elasticsearch.Net;
 using Nest;
+
+using NCI.OCPL.Api.Common;
 
 namespace NCI.OCPL.Api.BestBets.Services
 {
@@ -36,19 +41,21 @@ namespace NCI.OCPL.Api.BestBets.Services
         }
 
         /// <summary>
-        /// Gets a list of the BestBet Category IDs that matched our term 
-        /// </summary>        
+        /// Gets a list of the BestBet Category IDs that matched our term asynchronously
+        /// </summary>
+        /// <param name="collection">The search index to use</param>
         /// <param name="language">The two-character language code to constrain the matches to</param>
         /// <param name="cleanedTerm">A term that have been cleaned of punctuation and special characters</param>
         /// <returns>An array of category ids</returns>
-        public string[] GetMatches(string language, string cleanedTerm)
+        public async Task<string[]> GetMatches(string collection, string language, string cleanedTerm)
         {
 
             // Step 2. Get Number of Tokens in the term
-            int numTokens = _tokenAnalyzer.GetTokenCount(cleanedTerm);
+            int numTokens = await _tokenAnalyzer.GetTokenCount(collection, cleanedTerm);
 
             // Step 4. Iterate over the matches    
-            IEnumerable<BestBetsMatch> matches = GetBestBetMatches(
+            IEnumerable<BestBetsMatch> matches = await GetBestBetMatchesAsync(
+                collection,
                 cleanedTerm,
                 language,
                 numTokens
@@ -60,7 +67,6 @@ namespace NCI.OCPL.Api.BestBets.Services
 
             return validCategories;
         }
-
 
         /// <summary>
         /// Process a list of BestBetsMatches and returns an array of category IDs for display. 
@@ -120,37 +126,45 @@ namespace NCI.OCPL.Api.BestBets.Services
         }
 
         /// <summary>
-        /// Helper function that generates a list of best bet matches to iterate through.
+        /// Gets a "round" of Best Bet matches asynchronously
         /// </summary>
-        /// <param name="cleanedTerm">The Cleaned Term</param>
-        /// <param name="isSpanish">Is this term spanish or not</param>
-        /// <param name="numTokens">The number of tokens an analyzer would break this up into</param>
-        /// <returns>IEnumerable<BestBetsMatch> suitable for iterating through</returns>
-        private IEnumerable<BestBetsMatch> GetBestBetMatches(string cleanedTerm, string language, int numTokens)
+        /// <returns>The set of matches.</returns>
+        /// <param name="collection">The search index to use</param> 
+        /// <param name="cleanedTerm">The search phrase</param>
+        /// <param name="searchTokenCount">Search token count.</param>
+        /// <param name="lang">Lang.</param>
+        /// <param name="matchedTokenCount">Matched token count.</param>
+        private async Task<IEnumerable<BestBetsMatch>> GetSetOfMatchesAsync(string collection, string cleanedTerm, int searchTokenCount, string lang, int matchedTokenCount)
         {
-            string templateFileName = "bestbets_bestbets_cgov_" + language;
+            //This is the query
+            var matchQuery = new NumericRangeQuery { Field = "tokencount", LessThanOrEqualTo = matchedTokenCount } &&
+                             new TermQuery { Field = "is_exact", Value = 0 } &&
+                             new TermQuery { Field = "language", Value = lang } &&
+                             new MatchQuery { Field = "synonym", Query = cleanedTerm, MinimumShouldMatch = matchedTokenCount };
 
-            //We need to perform a separate query for each of the number of matches.
-            for (int i = 1; i <= numTokens; i++)
+            if (searchTokenCount == matchedTokenCount)
             {
-                var response = _elasticClient.SearchTemplate<BestBetsMatch>(sd => {
-                    sd = sd
-                    .Index(_bestbetsConfig.AliasName)
-                    .Type("synonyms")
-                    .File(templateFileName)
-                    .Params(pd =>
-                    {
-                        //Add params that are always set.
-                        pd
-                            .Add("searchstring", cleanedTerm)
-                            .Add("searchtokencount", numTokens)
-                            .Add("matchedtokencount", i);
+                //Add in exact match query too
+                matchQuery = matchQuery ||
+                             new TermQuery { Field = "tokencount", Value = matchedTokenCount } &&
+                             new TermQuery { Field = "is_exact", Value = 1 } &&
+                             new TermQuery { Field = "language", Value = lang } &&
+                             new MatchQuery { Field = "synonym", Query = cleanedTerm, MinimumShouldMatch = matchedTokenCount };
+            }
 
-                        return pd;
-                    });
+            try
+            {
+                string alias = (collection == "preview") ?
+                    this._bestbetsConfig.PreviewAliasName :
+                    this._bestbetsConfig.LiveAliasName;
 
-                    return sd;
-                });
+                var req = new SearchRequest<BestBetsMatch>(alias)
+                {
+                    Query = matchQuery,
+                    Size = 10000 //Make sure this more than the number of synonyms
+                };
+
+                var response = await this._elasticClient.SearchAsync<BestBetsMatch>(req);
 
                 //Test if response is valid
                 if (!response.IsValid)
@@ -160,47 +174,48 @@ namespace NCI.OCPL.Api.BestBets.Services
                     throw new APIErrorException(500, "Errors Occurred.");
                 }
 
-                if (response.Total > 0)
-                {
-                    foreach (BestBetsMatch match in response.Documents)
-                    {
-                        yield return match;
-                    }
-                }
+                return response.Documents;
+
             }
+            catch (APIErrorException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Elasticsearch request failed for Term '{0}'", cleanedTerm);
+                _logger.LogError(ex.Message);
+                throw new APIErrorException(500, "Errors Occurred.");
+            }
+
         }
 
         /// <summary>
-        /// True if CGBestBetsDisplayService is able to retrieve BestBets.
+        /// Helper function that generates a list of best bet matches to iterate through.
         /// </summary>
-        public bool IsHealthy
+        /// <param name="collection">The search index to use</param> 
+        /// <param name="cleanedTerm">The Cleaned Term</param>
+        /// <param name="language">The language of the best bets to fetch</param>
+        /// <param name="numTokens">The number of tokens an analyzer would break this up into</param>
+        /// <returns>IEnumerable<BestBetsMatch> suitable for iterating through</returns>
+        private async Task<IEnumerable<BestBetsMatch>> GetBestBetMatchesAsync(string collection, string cleanedTerm, string language, int numTokens)
         {
-            get
+            //Pool up all the fetches to be called in one shot
+            var tasks = from tokenCount in Enumerable.Range(1, numTokens)
+                        select this.GetSetOfMatchesAsync(collection, cleanedTerm, numTokens, language, tokenCount);
+
+            try
             {
-                // Use the cluster health API to verify that the Best Bets index is functioning.
-                // Maps to https://ncias-d1592-v.nci.nih.gov:9299/_cluster/health/bestbets?pretty (or other server)
-                //
-                // References:
-                // https://www.elastic.co/guide/en/elasticsearch/reference/master/cluster-health.html
-                // https://github.com/elastic/elasticsearch/blob/master/rest-api-spec/src/main/resources/rest-api-spec/api/cluster.health.json#L20
-                IClusterHealthResponse response = _elasticClient.ClusterHealth(hd =>
-                {
-                    hd = hd
-                        .Index(_bestbetsConfig.AliasName);
+                //Call them and wait for their results
+                var results = await Task.WhenAll(tasks);
 
-                    return hd;
-                });
-
-                if(!response.IsValid)
-                {
-                    _logger.LogError("Error checking ElasticSearch health.");
-                    _logger.LogError("Returned debug info: {0}.", response.DebugInformation);
-                    throw new APIErrorException(500, "Errors Occurred.");
-                }
-
-                return (response.Status == "green"
-                    || response.Status == "yellow");
+                return results.SelectMany(i => i);
+            }
+            catch (Exception ex)
+            {
+                throw;
             }
         }
+
     }
 }

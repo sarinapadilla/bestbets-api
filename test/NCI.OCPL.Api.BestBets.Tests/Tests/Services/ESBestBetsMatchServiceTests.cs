@@ -1,20 +1,16 @@
+using System;
 using System.Collections.Generic;
-using System.Net.Http;
-using Microsoft.Extensions.Options;
 
-using Xunit;
-using Moq;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging.Testing;
 
 using Nest;
 using Elasticsearch.Net;
-
-using NCI.OCPL.Utils.Testing;
+using Xunit;
 
 using NCI.OCPL.Api.BestBets.Services;
 using NCI.OCPL.Api.BestBets.Tests.ESHealthTestData;
 using NCI.OCPL.Api.BestBets.Tests.ESMatchTestData;
-using System;
-using Microsoft.Extensions.Logging.Testing;
 
 namespace NCI.OCPL.Api.BestBets.Tests
 {
@@ -69,8 +65,8 @@ namespace NCI.OCPL.Api.BestBets.Tests
         };
 
 
-        [Theory, MemberData("GetMatchesData")]
-        public void GetMatches_Normal(
+        [Theory, MemberData(nameof(GetMatchesData))]
+        public async void GetMatches_Normal(
             string searchTerm, 
             string lang, 
             ESMatchConnection connection, 
@@ -84,70 +80,9 @@ namespace NCI.OCPL.Api.BestBets.Tests
             ESTokenAnalyzerService tokenService = GetTokenizerService(tokenizerConn);
             ESBestBetsMatchService service = GetMatchService(tokenService, connection);
 
-            string[] actualMatches = service.GetMatches(lang, searchTerm);
+            string[] actualMatches = await service.GetMatches("live", lang, searchTerm);
 
             Assert.Equal(expectedCategories, actualMatches);
-        }
-
-        [Theory]
-        [InlineData("green")]
-        [InlineData("yellow")]
-        public void HealthStatus_Healthy(string datafile)
-        {
-            ESHealthConnection connection = new ESHealthConnection(datafile);
-            // The tokenizer doesn't get called during a healthcheck for the match service,
-            // so we don't need to supply a valid data file for the mock tokenizer.
-            ESHealthTokenizerConnection tokenizerConn = new ESHealthTokenizerConnection(null);
-
-            ESTokenAnalyzerService tokenService = GetTokenizerService(tokenizerConn);
-            ESBestBetsMatchService service = GetMatchService(tokenService, connection);
-
-            bool isHealthy = service.IsHealthy;
-
-            Assert.True(isHealthy);
-        }
-
-        [Theory]
-        [InlineData("red")]
-        [InlineData("unexpected")]   // i.e. "Unexpected color"
-        public void HealthStatus_Unhealthy(string datafile)
-        {
-            ESHealthConnection connection = new ESHealthConnection(datafile);
-            // The tokenizer doesn't get called during a healthcheck for the match service,
-            // so we don't need to supply a valid data file for the mock tokenizer.
-            ESHealthTokenizerConnection tokenizerConn = new ESHealthTokenizerConnection(null);
-
-            ESTokenAnalyzerService tokenService = GetTokenizerService(tokenizerConn);
-            ESBestBetsMatchService service = GetMatchService(tokenService, connection);
-
-            bool isHealthy = service.IsHealthy;
-
-            Assert.False(isHealthy);
-        }
-
-        /// <summary>
-        /// Test for when the ES healthcheck returns a non-200 response code
-        /// (response.IsValid comes back as false).
-        /// </summary>
-        /// <param name="httpStatus"></param>
-        [Theory]
-        [InlineData(404)]
-        [InlineData(500)]
-        public void HealthStatus_InvalidResponse(int httpStatus)
-        {
-            ESErrorConnection connection = new ESErrorConnection(httpStatus);
-            // The tokenizer doesn't get called during a healthcheck for the match service,
-            // so we don't need to supply a valid data file for the mock tokenizer.
-            ESHealthTokenizerConnection tokenizerConn = new ESHealthTokenizerConnection(null);
-
-            ESTokenAnalyzerService tokenService = GetTokenizerService(tokenizerConn);
-            ESBestBetsMatchService service = GetMatchService(tokenService, connection);
-
-            Assert.Throws<APIErrorException>(
-                ()=> {
-                    bool isHealthy = service.IsHealthy;
-                });
-
         }
 
         private ESTokenAnalyzerService GetTokenizerService(IConnection connection)
@@ -177,6 +112,8 @@ namespace NCI.OCPL.Api.BestBets.Tests
 
             return new ESBestBetsMatchService(client, tokenService, config, new NullLogger<ESBestBetsMatchService>());
         }
+
+
 
     }
 }

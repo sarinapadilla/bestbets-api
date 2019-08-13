@@ -1,14 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-
-using Elasticsearch.Net;
-
-using NCI.OCPL.Utils.Testing;
-using System.Text;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using NCI.OCPL.Api.BestBets.Tests.Util;
+﻿using NCI.OCPL.Api.Common.Testing;
 
 namespace NCI.OCPL.Api.BestBets.Tests.ESHealthTestData
 {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging.Testing;
 
@@ -14,12 +15,12 @@ using Newtonsoft.Json.Linq;
 using Moq;
 using Xunit;
 
-using NCI.OCPL.Utils.Testing;
-
+using NCI.OCPL.Api.Common;
+using NCI.OCPL.Api.Common.Testing;
 using NCI.OCPL.Api.BestBets;
 using NCI.OCPL.Api.BestBets.Controllers;
-using NCI.OCPL.Api.BestBets.Tests.CategoryTestData;
 using NCI.OCPL.Api.BestBets.Tests.ESHealthTestData;
+using NCI.OCPL.Api.BestBets.Tests.ESDisplayTestData;
 
 namespace NCI.OCPL.Api.BestBets.Tests
 {
@@ -29,145 +30,202 @@ namespace NCI.OCPL.Api.BestBets.Tests
     {
         public static IEnumerable<object[]> XmlDeserializingData => new[] {
             new object[] {
-                "pancoast", 
-                new PancoastTumorCategoryTestData() 
-            }//,
-            //new object[] {
-            //    "breast cancer", 
-            //    new BreastCancerCategoryTestData() 
-            //}
+                "pancoast",
+                new PancoastTumorDisplayTestData()
+            }
         };
 
         [Fact]
-        public void Get_Error_LanguageEmpty() 
+        public async void Get_Error_CollectionEmpty()
         {
             Mock<IBestBetsDisplayService> displayService = new Mock<IBestBetsDisplayService>();
             Mock<IBestBetsMatchService> matchService = new Mock<IBestBetsMatchService>();
+            Mock<IHealthCheckService> healthService = new Mock<IHealthCheckService>();
 
             // Create instance of controller
-            BestBetsController controller = new BestBetsController(                
+            BestBetsController controller = new BestBetsController(
                 matchService.Object,
                 displayService.Object,
+                healthService.Object,
                 NullLogger<BestBetsController>.Instance
             );
 
-            APIErrorException ex = Assert.Throws<APIErrorException>( () => controller.Get(null, null) );
-
+            APIErrorException ex = await Assert.ThrowsAsync<APIErrorException>(() => controller.Get(null, null, null));
         }
 
         [Fact]
-        public void Get_Error_LanguageBad() 
+        public async void Get_Error_CollectionBad()
         {
             Mock<IBestBetsDisplayService> displayService = new Mock<IBestBetsDisplayService>();
             Mock<IBestBetsMatchService> matchService = new Mock<IBestBetsMatchService>();
+            Mock<IHealthCheckService> healthService = new Mock<IHealthCheckService>();
 
             // Create instance of controller
-            BestBetsController controller = new BestBetsController(                
+            BestBetsController controller = new BestBetsController(
                 matchService.Object,
                 displayService.Object,
+                healthService.Object,
                 NullLogger<BestBetsController>.Instance
             );
 
-            APIErrorException ex = Assert.Throws<APIErrorException>(() => controller.Get("Chicken", null));
+            APIErrorException ex = await Assert.ThrowsAsync<APIErrorException>(() => controller.Get("chicken", null, null));
         }
 
         [Fact]
-        public void Get_Error_SearchTermBad() 
+        public async void Get_Error_LanguageEmpty() 
         {
             Mock<IBestBetsDisplayService> displayService = new Mock<IBestBetsDisplayService>();
             Mock<IBestBetsMatchService> matchService = new Mock<IBestBetsMatchService>();
+            Mock<IHealthCheckService> healthService = new Mock<IHealthCheckService>();
 
             // Create instance of controller
             BestBetsController controller = new BestBetsController(                
                 matchService.Object,
                 displayService.Object,
+                healthService.Object,
                 NullLogger<BestBetsController>.Instance
             );
 
-            APIErrorException ex = Assert.Throws<APIErrorException>( () => controller.Get("en", null) );
+            APIErrorException ex = await Assert.ThrowsAsync<APIErrorException>( () => controller.Get("live", null, null) );
+        }
+
+        [Fact]
+        public async void Get_Error_LanguageBad() 
+        {
+            Mock<IBestBetsDisplayService> displayService = new Mock<IBestBetsDisplayService>();
+            Mock<IBestBetsMatchService> matchService = new Mock<IBestBetsMatchService>();
+            Mock<IHealthCheckService> healthService = new Mock<IHealthCheckService>();
+
+            // Create instance of controller
+            BestBetsController controller = new BestBetsController(                
+                matchService.Object,
+                displayService.Object,
+                healthService.Object,
+                NullLogger<BestBetsController>.Instance
+            );
+
+            await Assert.ThrowsAsync<APIErrorException>(() => controller.Get("live", "Chicken", null));
+        }
+
+        [Fact]
+        public async void Get_Error_SearchTermBad() 
+        {
+            Mock<IBestBetsDisplayService> displayService = new Mock<IBestBetsDisplayService>();
+            Mock<IBestBetsMatchService> matchService = new Mock<IBestBetsMatchService>();
+            Mock<IHealthCheckService> healthService = new Mock<IHealthCheckService>();
+
+            // Create instance of controller
+            BestBetsController controller = new BestBetsController(                
+                matchService.Object,
+                displayService.Object,
+                healthService.Object,
+                NullLogger<BestBetsController>.Instance
+            );
+
+            await Assert.ThrowsAsync<APIErrorException>( () => controller.Get("live", "en", null) );
         }
 
 
-        [Theory, MemberData("XmlDeserializingData")]
-        public void Get_EnglishTerm(string searchTerm, BaseCategoryTestData data) 
+        [Theory, MemberData(nameof(XmlDeserializingData))]
+        public async void Get_EnglishTerm(string searchTerm, BaseDisplayTestData displayData) 
         {
+
+
             Mock<IBestBetsDisplayService> displayService = new Mock<IBestBetsDisplayService>(); 
             displayService
                 .Setup(
                     dispSvc => dispSvc.GetBestBetForDisplay(
-                        It.Is<string>(catID => catID == data.ExpectedData.ID)
+                        It.Is<string>(coll => coll == "live"),
+                        It.Is<string>(catID => catID == displayData.ExpectedData.ID)
                     )
                 )
-                .Returns(TestingTools.DeserializeXML<CancerGovBestBet>(data.TestFilePath));
+                .Returns(Task.FromResult<IBestBetDisplay>(displayData.ExpectedData));
 
             Mock<IBestBetsMatchService> matchService = new Mock<IBestBetsMatchService>();
             matchService
                 .Setup(
-                    matchSvc => matchSvc.GetMatches(                        
+                    matchSvc => matchSvc.GetMatches(
+                        It.Is<string>(coll => coll == "live"),
                         It.Is<string>(lang => lang == "en"),
                         It.Is<string>(term => term == searchTerm)
                     )
                 )
-                .Returns(new string[] { data.ExpectedData.ID });
-            
+                .Returns(Task.FromResult(new string[] { displayData.ExpectedData.ID }));
+
+            Mock<IHealthCheckService> healthService = new Mock<IHealthCheckService>();
+            healthService
+                .Setup(
+                    healthSvc => healthSvc.IsHealthy(
+                    )
+                )
+                .Returns(Task.FromResult(true));
+
             // Create instance of controller
             BestBetsController controller = new BestBetsController(                
                 matchService.Object,
                 displayService.Object,
+                healthService.Object,
                 NullLogger<BestBetsController>.Instance
             );
 
-            IBestBetDisplay[] actualItems = controller.Get("en", searchTerm);
+            IBestBetDisplay[] actualItems = await controller.Get("live", "en", searchTerm);
 
-            Assert.Equal(actualItems, new IBestBetDisplay[] { data.ExpectedData }, new IBestBetDisplayComparer());
+            Assert.Equal(actualItems, new IBestBetDisplay[] { displayData.ExpectedData }, new IBestBetDisplayComparer());
         }
 
         /// <summary>
-        /// Verify that Status always returns successfully when the services it depends
-        /// on are healthy.
+        /// Verify that Status returns successfully when the health check service is healthy.
         /// </summary>
         [Fact]
-        public void IsHealthy_Healthy()
+        public async void IsHealthy_Healthy()
         {
-            IBestBetsDisplayService displayService = new HealthyBestBetsDisplayService();
-            IBestBetsMatchService matchService = new HealthyBestBetsMatchService();
+            IBestBetsDisplayService displayService = null;
+            IBestBetsMatchService matchService = null;
+            IHealthCheckService healthService = GetMockedHealthSvc<IHealthCheckService>(true);
 
             // Create instance of controller
             BestBetsController controller = new BestBetsController(
                 matchService,
                 displayService,
+                healthService,
                 NullLogger<BestBetsController>.Instance
                 );
 
-            Assert.Equal(BestBetsController.HEALTHY_STATUS, controller.GetStatus(), ignoreCase: true);
+            var actual = await controller.GetStatus(); 
+
+            Assert.Equal(BestBetsController.HEALTHY_STATUS, actual, ignoreCase: true);
+        }
+
+
+        private static T GetMockedHealthSvc<T>( bool status) where T : class, IHealthCheckService {
+            var mock = new Mock<T>();
+            mock.Setup(svc => svc.IsHealthy())
+                .Returns(Task.FromResult(status));
+
+            return mock.Object;
         }
 
         /// <summary>
-        /// Combinations of one or more unhealthy services which are supposed to result in
-        /// BestBetsController.GetStatus() reporting an error condition.
+        /// Verify that Status fails for the unhealthy health check service.
         /// </summary>
-        public static IEnumerable<object[]> UnhealthyServiceCombinations => new[]
+        [Fact]
+        public async void IsHealthy_Unhealthy()
         {
-            new object[] { new UnhealthyBestBetsDisplayService(), new UnhealthyBestBetsMatchService() },
-            new object[] { new HealthyBestBetsDisplayService(), new UnhealthyBestBetsMatchService() },
-            new object[] { new UnhealthyBestBetsDisplayService(), new HealthyBestBetsMatchService() }
-        };
+            IBestBetsDisplayService displayService = null;
+            IBestBetsMatchService matchService = null;
+            IHealthCheckService healthService = GetMockedHealthSvc<IHealthCheckService>(false);
 
-        /// <summary>
-        /// Verify that Status fails for the various combinations of unhealthy services.
-        /// </summary>
-        [Theory, MemberData("UnhealthyServiceCombinations")]
-        public void IsHealthy_Unhealthy(IBestBetsDisplayService displayService, IBestBetsMatchService matchService)
-        {
+            // Create instance of controller
             BestBetsController controller = new BestBetsController(
                 matchService,
                 displayService,
+                healthService,
                 NullLogger<BestBetsController>.Instance
                 );
 
-            // If any of the services are unhealthy, verify that GetStatus() throws APIErrorException
+            // If the health check service is unhealthy, verify that GetStatus() throws APIErrorException
             // with a status of 500.
-            APIErrorException ex = Assert.Throws<APIErrorException>(() => controller.GetStatus());
+            APIErrorException ex = await Assert.ThrowsAsync<APIErrorException>(() => controller.GetStatus());
 
             Assert.Equal(500, ex.HttpStatusCode);
         }
